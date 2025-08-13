@@ -6,7 +6,7 @@ import "./App.css";
 
 export default function App() {
   return (
-    <div className="app-container">
+    <div className="app-container bg-light">
       {/* Main Content */}
       <div className="page-content">
         <Routes>
@@ -19,13 +19,16 @@ export default function App() {
       {/* Bottom Tab Bar */}
       <nav className="bottom-tab">
         <NavLink to="/items" className="tab-item">
-          🛒 Items
+          <span className="icon">🛒</span>
+          <span className="label">Items</span>
         </NavLink>
         <NavLink to="/" className="tab-item">
-          📦 Order
+          <span className="icon">📦</span>
+          <span className="label">Order</span>
         </NavLink>
         <NavLink to="/search" className="tab-item">
-          🔍 Search
+          <span className="icon">🔍</span>
+          <span className="label">Search</span>
         </NavLink>
       </nav>
     </div>

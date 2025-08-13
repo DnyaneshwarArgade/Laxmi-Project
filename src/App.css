@@ -1,0 +1,33 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 60px; /* prevent content hiding under bottom bar */
+}
+
+.bottom-tab {
+  display: flex;
+  background: #222;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.tab-item {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  flex: 1;           
+  text-align: center; 
+  padding: 10px 0;
+}
+
+.tab-item.active {
+  color: yellow;
+}

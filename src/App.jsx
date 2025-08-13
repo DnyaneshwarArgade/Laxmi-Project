@@ -1,7 +1,7 @@
 import { Routes, Route, NavLink } from "react-router-dom";
-import Items from "./Components/Items";
-import Order from "./Components/Order";
-import Search from "./Components/Search";
+import Items from "./Componenet/Items";
+import Order from "./Componenet/Order";
+import Search from "./Componenet/Search";
 import "./App.css";
 
 export default function App() {

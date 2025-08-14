@@ -6,13 +6,10 @@ import Swal from 'sweetalert2';
 function Items() {
   const [showModal, setShowModal] = useState(false);
   const [items, setItems] = useState([]);
-  const [itemName, setItemName] = useState('');
-  const [itemPrice, setItemPrice] = useState('');
-  const [quantity, setQuantity] = useState('');
+  const [newItems, setNewItems] = useState([{ name: '', price: '', quantity: '' }]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentItemIndex, setCurrentItemIndex] = useState(null);
 
-  // Load from localStorage on first render
   useEffect(() => {
     const storedItems = localStorage.getItem('itemsList');
     if (storedItems) {
@@ -20,60 +17,53 @@ function Items() {
     }
   }, []);
 
-  // Save to localStorage whenever items change
   useEffect(() => {
     localStorage.setItem('itemsList', JSON.stringify(items));
   }, [items]);
 
   const handleSave = () => {
-    if (!itemName.trim()) {
-      Swal.fire('Error', 'Please enter an item name', 'error');
-      return;
-    }
-    if (!itemPrice || itemPrice <= 0) {
-      Swal.fire('Error', 'Please enter a valid price', 'error');
-      return;
-    }
-    if (!quantity || quantity <= 0) {
-      Swal.fire('Error', 'Please enter a valid quantity', 'error');
-      return;
+    for (let item of newItems) {
+      if (!item.name.trim()) {
+        Swal.fire('Error', 'Please enter an item name', 'error');
+        return;
+      }
+      if (!item.price || item.price <= 0) {
+        Swal.fire('Error', 'Please enter a valid price', 'error');
+        return;
+      }
+      if (!item.quantity || item.quantity <= 0) {
+        Swal.fire('Error', 'Please enter a valid quantity', 'error');
+        return;
+      }
     }
 
     if (isEditMode) {
       const updatedItems = [...items];
-      updatedItems[currentItemIndex] = {
-        name: itemName,
-        price: Number(itemPrice),
-        quantity: Number(quantity)
-      };
+      updatedItems[currentItemIndex] = newItems[0]; 
       setItems(updatedItems);
-
       Swal.fire({
         icon: 'success',
         title: 'Item Updated',
-        text: `${itemName} has been updated successfully!`,
+        text: `${newItems[0].name} has been updated successfully!`,
         timer: 2000,
         showConfirmButton: false
       });
     } else {
-      setItems([...items, {
-        name: itemName,
-        price: Number(itemPrice),
-        quantity: Number(quantity)
-      }]);
-
+      setItems([...items, ...newItems.map(i => ({
+        name: i.name,
+        price: Number(i.price),
+        quantity: Number(i.quantity)
+      }))]);
       Swal.fire({
         icon: 'success',
-        title: 'Item Added',
-        text: `${itemName} has been added successfully!`,
+        title: 'Items Added',
+        text: `${newItems.length} item(s) have been added successfully!`,
         timer: 2000,
         showConfirmButton: false
       });
     }
 
-    setItemName('');
-    setItemPrice('');
-    setQuantity('');
+    setNewItems([{ name: '', price: '', quantity: '' }]);
     setIsEditMode(false);
     setCurrentItemIndex(null);
     setShowModal(false);
@@ -81,9 +71,7 @@ function Items() {
 
   const handleEdit = (index) => {
     const item = items[index];
-    setItemName(item.name);
-    setItemPrice(item.price);
-    setQuantity(item.quantity);
+    setNewItems([{ name: item.name, price: item.price, quantity: item.quantity }]);
     setIsEditMode(true);
     setCurrentItemIndex(index);
     setShowModal(true);
@@ -106,47 +94,56 @@ function Items() {
     });
   };
 
+  const addMoreItemRow = () => {
+    setNewItems([...newItems, { name: '', price: '', quantity: '' }]);
+  };
+
+  const updateItemField = (index, field, value) => {
+    const updated = [...newItems];
+    updated[index][field] = value;
+    setNewItems(updated);
+  };
+  // Function to remove item row
+const removeItemRow = (index) => {
+  setNewItems((prevItems) => prevItems.filter((_, i) => i !== index));
+};
+
+
   return (
     <div className="container mt-4">
-      {/* Header + Add Button */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="mb-0">Items List</h4>
-        <button
-          className="btn btn-primary btn-sm"
-          onClick={() => {
-            setIsEditMode(false);
-            setItemName('');
-            setItemPrice('');
-            setQuantity('');
-            setShowModal(true);
-          }}
-        >
-          <i className="bi bi-plus-lg"></i> Add Item
-        </button>
-      </div>
+<div className="position-relative mb-3">
+  {/* Center Heading */}
+  <h4 className="mb-0 text-center">Items List</h4>
 
-      {/* Items List */}
+  {/* Right Side Button */}
+  <button
+    className="btn btn-primary btn-sm position-absolute end-0 top-50 translate-middle-y"
+    onClick={() => {
+      setIsEditMode(false);
+      setNewItems([{ name: '', price: '', quantity: '' }]);
+      setShowModal(true);
+    }}
+  >
+    <i className="bi bi-plus-lg"></i> Add Item
+  </button>
+</div>
+
+
+
       {items.map((item, index) => (
         <div key={index} className="item-card shadow-sm mb-3 p-3 d-flex justify-content-between align-items-center">
-          <span className="fw-semibold">{item.name}  -  <small className="text-muted">(₹ {item.price})</small></span>
+          <span className="fw-semibold">{item.name} - <small className="text-muted">(₹ {item.price})</small></span>
           <div>
-            <button
-              className="btn btn-outline-primary btn-sm me-2"
-              onClick={() => handleEdit(index)}
-            >
+            <button className="btn btn-outline-primary btn-sm me-2" onClick={() => handleEdit(index)}>
               <i className="bi bi-pencil-fill"></i>
             </button>
-            <button
-              className="btn btn-outline-danger btn-sm"
-              onClick={() => handleDelete(index)}
-            >
+            <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(index)}>
               <i className="bi bi-trash"></i>
             </button>
           </div>
         </div>
       ))}
 
-      {/* Modal */}
       {showModal && (
         <div
           className="modal fade show d-block"
@@ -157,100 +154,118 @@ function Items() {
             backdropFilter: "blur(3px)"
           }}
         >
-         <div className="modal-dialog modal-dialog-centered" role="document">
-  <div className="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
+          <div className="modal-dialog modal-dialog-centered" role="document">
+            <div className="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
+              <div
+                className="modal-header text-white"
+                style={{
+                  background: "linear-gradient(135deg, #6297b9ff, #070d13ff)",
+                  borderBottom: "none",
+                  padding: "1rem 1.5rem",
+                }}
+              >
+                <h5 className="modal-title fw-bold d-flex align-items-center">
+                  {isEditMode ? 'Edit Item' : 'Add New Item(s)'}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setShowModal(false)}
+                ></button>
+              </div>
 
-    {/* Modal Header */}
-    <div
-      className="modal-header text-white"
-      style={{
-        background: "linear-gradient(135deg, #6297b9ff, #070d13ff)",
-        borderBottom: "none",
-        padding: "1rem 1.5rem",
-      }}
-    >
-      <h5 className="modal-title fw-bold d-flex align-items-center">
-        <i className="bi bi-plus-circle me-2 text-warning"></i>
-        {isEditMode ? 'Edit Item' : 'Add New Item'}
-      </h5>
+              <div className="modal-body p-4 bg-light">
+                {newItems.map((item, idx) => (
+  <div key={idx} className="border rounded-3 p-3 mb-3 bg-white shadow-sm position-relative">
+
+    {/* Remove Button - Right Top Corner */}
+    {!isEditMode && newItems.length > 1 && (
       <button
         type="button"
-        className="btn-close btn-close-white"
-        onClick={() => setShowModal(false)}
-      ></button>
-    </div>
-
-    {/* Modal Body */}
-    <div className="modal-body p-4 bg-light">
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Item Name</label>
-        <input
-          type="text"
-          className="form-control form-control-lg shadow-sm border-0 rounded-3"
-          placeholder="Enter item name"
-          value={itemName}
-          onChange={(e) => setItemName(e.target.value)}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Item Price</label>
-        <input
-          type="number"
-          className="form-control form-control-lg shadow-sm border-0 rounded-3"
-          placeholder="Enter item price"
-          value={itemPrice}
-          onChange={(e) => setItemPrice(e.target.value)}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Quantity</label>
-        <input
-          type="number"
-          className="form-control form-control-lg shadow-sm border-0 rounded-3"
-          placeholder="Enter item quantity"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-        />
-      </div>
-    </div>
-
-    {/* Modal Footer */}
-    <div
-      className="modal-footer"
-      style={{
-        background: "linear-gradient(135deg, #f1f1f1, #e4e4e4)",
-        borderTop: "none",
-        padding: "1rem 1.5rem",
-      }}
-    >
-      <button
-        type="button"
-        className="btn btn-outline-secondary px-4 rounded-pill"
-        onClick={() => setShowModal(false)}
+        className="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 rounded-circle"
+        onClick={() => removeItemRow(idx)}
+        title="Remove this item"
       >
-        <i className="bi bi-x-circle me-1"></i> Close
+        <i className="bi bi-x-lg"></i>
       </button>
-      <button
-        type="button"
-        className="btn btn-success px-4 rounded-pill shadow-sm"
-        style={{
-          background: "linear-gradient(135deg, #28a745, #218838)",
-          border: "none",
-        }}
-        onClick={handleSave}
-      >
-        <i className="bi bi-check-circle me-1"></i> Save
-      </button>
-    </div>
+    )}
 
+    <div className="mb-2">
+      <label className="form-label fw-semibold">Item Name</label>
+      <input
+        type="text"
+        className="form-control form-control-lg shadow-lg border-0 rounded-3"
+        placeholder="Enter item name"
+        value={item.name}
+        onChange={(e) => updateItemField(idx, 'name', e.target.value)}
+      />
+    </div>
+    <div className="mb-2">
+      <label className="form-label fw-semibold">Item Price</label>
+      <input
+        type="number"
+        className="form-control form-control-lg shadow-lg border-0 rounded-3"
+        placeholder="Enter item price"
+        value={item.price}
+        onChange={(e) => updateItemField(idx, 'price', e.target.value)}
+      />
+    </div>
+    <div className="mb-2">
+      <label className="form-label fw-semibold">Quantity</label>
+      <input
+        type="number"
+        className="form-control form-control-lg shadow-lg border-0 rounded-3"
+        placeholder="Enter item quantity"
+        value={item.quantity}
+        onChange={(e) => updateItemField(idx, 'quantity', e.target.value)}
+      />
+    </div>
   </div>
-</div>
+))}
 
+
+                {!isEditMode && (
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary w-100 rounded-pill"
+                    onClick={addMoreItemRow}
+                  >
+                    <i className="bi bi-plus-circle me-2"></i> Add More Item
+                  </button>
+                )}
+              </div>
+
+              <div
+                className="modal-footer"
+                style={{
+                  background: "linear-gradient(135deg, #f1f1f1, #e4e4e4)",
+                  borderTop: "none",
+                  padding: "1rem 1.5rem",
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary px-4 rounded-pill"
+                  onClick={() => setShowModal(false)}
+                >
+                  <i className="bi bi-x-circle me-1"></i> Close
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-success px-4 rounded-pill shadow-sm"
+                  style={{
+                    background: "linear-gradient(135deg, #28a745, #218838)",
+                    border: "none",
+                  }}
+                  onClick={handleSave}
+                >
+                  <i className="bi bi-check-circle me-1"></i> Save
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
-
     </div>
   );
 }

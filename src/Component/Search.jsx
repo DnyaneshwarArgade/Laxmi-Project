@@ -64,8 +64,8 @@ export default function InvoiceSearch() {
       padding: "5px",
     },
     title: { fontSize: "18px", fontWeight: "bold" },
-    subTitle: { fontSize: "12px", margin: "5px 0" },
-    contact: { fontSize: "12px" },
+    subTitle: { fontSize: "12px", margin: "5px 0", fontWeight: "bold"},
+    contact: { fontSize: "12px", fontWeight: "bold"},
     table: {
       width: "100%",
       borderCollapse: "collapse",
@@ -161,13 +161,12 @@ export default function InvoiceSearch() {
           <div style={styles.container}>
             {/* HEADER */}
             <div style={styles.header}>
-              <div style={styles.title}>SBH</div>
+              <div style={styles.title}>लक्ष्मी जनरल स्टोअर्स</div>
               <div style={styles.subTitle}>
-                "Hiranandani Towers", Shimpi Lane,
-                <br />
-                Near Meera Medical, Telikhunt Chowk,
-                <br />
-                Ahmednagar - 414 111
+                शालेय साहित्य, ऑफीस स्टेशनरी, प्रेझेंट आर्टिकल्स, टॉइज, गॉगल्स
+
+                रेसिडेन्शिअल हायस्कूल समोर, <br />
+                मिरी रोड शेवगाव ता . शेवगाव, जि . अहिल्यानगर
               </div>
               <div style={styles.contact}>
                 Mob: 9225326077, 8552907871

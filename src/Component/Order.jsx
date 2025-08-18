@@ -236,7 +236,7 @@ export default function Orders() {
     printWindow.document.write(`
     <html>
       <head>
-        <title>Invoice</title>
+        <title></title>
         ${styles}
       </head>
       <body>
@@ -443,10 +443,12 @@ export default function Orders() {
         </div>
       ) : (
         <div style={themedStyles.cardContainer}>
-          {orders.map((order, i) => {
+          {[...orders].reverse().map((order, i) => {
+            // Calculate the correct index in the original orders array
+            const originalIndex = orders.length - 1 - i;
             const total = sumOrder(order);
             return (
-              <div key={i} style={themedStyles.card}
+              <div key={originalIndex} style={themedStyles.card}
                 onMouseOver={e => e.currentTarget.style.boxShadow = "0 12px 32px rgba(59,130,246,0.18)"}
                 onMouseOut={e => e.currentTarget.style.boxShadow = themedStyles.card.boxShadow}
               >
@@ -496,10 +498,10 @@ export default function Orders() {
                 </div>
 
                 <div style={themedStyles.cardActions}>
-                  <button style={themedButtonStyles.subtle} onClick={() => handleEdit(i)} title="Edit">
+                  <button style={themedButtonStyles.subtle} onClick={() => handleEdit(originalIndex)} title="Edit">
                     <span role="img" aria-label="edit"></span>Edit
                   </button>
-                  <button style={themedButtonStyles.danger} onClick={() => handleDelete(i)} title="Delete">
+                  <button style={themedButtonStyles.danger} onClick={() => handleDelete(originalIndex)} title="Delete">
                     <span role="img" aria-label="delete"></span>Delete
                   </button>
                   <button style={themedButtonStyles.success} onClick={() => handleView(order)} title="View Invoice">
@@ -524,6 +526,9 @@ export default function Orders() {
               background: theme === "dark" ? "#18181b" : "#fff",
               color: theme === "dark" ? "#fff" : "#18181b",
               border: theme === "dark" ? "1px solid #334155" : "#e6e8f0",
+              display: "flex",
+              flexDirection: "column",
+              maxHeight: "90vh",
             }}
           >
             <div style={{
@@ -531,6 +536,7 @@ export default function Orders() {
               background: theme === "dark" ? "#23272f" : themedStyles.invoiceBar.background,
               color: theme === "dark" ? "#fff" : themedStyles.invoiceBar.color,
               borderBottom: theme === "dark" ? "1px solid #334155" : themedStyles.invoiceBar.borderBottom,
+              flex: "0 0 auto",
             }}>
               <div style={{ ...themedStyles.invoiceTitle, color: theme === "dark" ? "#facc15" : "#0b5ed7" }}>
                 {editIndex !== null ? "Edit Order" : "Create New Order"}
@@ -539,11 +545,22 @@ export default function Orders() {
                 <button style={themedButtonStyles.ghost} onClick={() => { setShowForm(false); setEditIndex(null); }}>Close</button>
               </div>
             </div>
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={handleSubmit}
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 0,
+              }}
+            >
               <div style={{
                 padding: 18,
                 background: theme === "dark" ? "#23272f" : "#fff",
                 color: theme === "dark" ? "#fff" : "#18181b",
+                flex: 1,
+                overflowY: "auto", 
+                minHeight: 0,
               }}>
                 <div style={{
                   ...invoiceStyles.outer,
@@ -568,19 +585,22 @@ export default function Orders() {
                       <div style={{
                         ...invoiceStyles.title,
                         color: theme === "dark" ? "#facc15" : "#18181b",
-                      }}>SBH</div>
+                      }}>लक्ष्मी जनरल स्टोअर्स </div>
                       <div style={{
                         ...invoiceStyles.subTitle,
                         color: theme === "dark" ? "#e5e7eb" : "#18181b",
                       }}>
-                        "Hiranandani Towers", Shimpi Lane,<br />
-                        Near Meera Medical, Telikhunt Chowk,<br />
-                        Ahmednagar - 414 111
+
+                        शालेय साहित्य, ऑफीस स्टेशनरी, प्रेझेंट आर्टिकल्स, टॉइज, गॉगल्स
+
+                        रेसिडेन्शिअल हायस्कूल समोर, <br />
+                        मिरी रोड शेवगाव ता . शेवगाव, जि . अहिल्यानगर
                       </div>
                       <div style={{
                         ...invoiceStyles.contact,
                         color: theme === "dark" ? "#e5e7eb" : "#18181b",
-                      }}>Mob: 9225326077, 8552907871</div>
+                      }}>मो. नं . 9850837400
+                        9850332356</div>
                     </div>
 
                     <table style={{
@@ -894,13 +914,15 @@ export default function Orders() {
                         )}
                       </span>
                     </div>
+                    {/* Save/Cancel buttons always visible at bottom */}
                     <div style={{
                       display: "flex",
                       justifyContent: "flex-end",
                       gap: 10,
                       padding: 14,
                       borderTop: theme === "dark" ? "1px solid #334155" : "1px solid #e5e7eb",
-                      background: theme === "dark" ? "#23272f" : "#f8fafc"
+                      background: theme === "dark" ? "#23272f" : "#f8fafc",
+                      flex: "0 0 auto",
                     }}>
                       <button
                         type="button"
@@ -922,26 +944,47 @@ export default function Orders() {
 
       {showInvoice && selectedOrder && (
         <div style={themedStyles.modal} role="dialog" aria-modal="true">
-          <div style={{ ...themedStyles.modalContent, width: "95%", maxWidth: 820, padding: 0, overflow: "hidden" }}>
+          <div
+            style={{
+              ...themedStyles.modalContent,
+              width: "95%",
+              maxWidth: 820,
+              padding: 0,
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              maxHeight: "90vh", // ADD
+            }}
+          >
             <div style={themedStyles.invoiceBar}>
-              <div style={themedStyles.invoiceTitle}>Invoice</div>
+              <div style={themedStyles.invoiceTitle}></div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={printInvoice} style={themedButtonStyles.success} title="Print">Print</button>
                 <button style={themedButtonStyles.ghost} onClick={() => setShowInvoice(false)}>Close</button>
               </div>
             </div>
 
-            <div ref={invoiceRef} style={{ padding: 10 }}>
+            <div
+              ref={invoiceRef}
+              style={{
+                padding: 10,
+                flex: 1,
+                overflowY: "auto", 
+                minHeight: 0,
+              }}
+            >
               <div style={invoiceStyles.outer}>
                 <div style={invoiceStyles.container}>
                   <div style={invoiceStyles.header}>
-                    <div style={invoiceStyles.title}>SBH</div>
+                    <div style={invoiceStyles.title}>लक्ष्मी जनरल स्टोअर्स</div>
                     <div style={invoiceStyles.subTitle}>
-                      "Hiranandani Towers", Shimpi Lane,<br />
-                      Near Meera Medical, Telikhunt Chowk,<br />
-                      Ahmednagar - 414 111
+                      शालेय साहित्य, ऑफीस स्टेशनरी, प्रेझेंट आर्टिकल्स, टॉइज, गॉगल्स
+
+                      रेसिडेन्शिअल हायस्कूल समोर, <br />
+                      मिरी रोड शेवगाव ता . शेवगाव, जि . अहिल्यानगर
                     </div>
-                    <div style={invoiceStyles.contact}>Mob: 9225326077, 8552907871</div>
+                    <div style={invoiceStyles.contact}>मो. नं . 9850837400 
+                      9850332356</div>
                   </div>
 
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -1211,8 +1254,8 @@ const invoiceStyles = {
   container: { width: "595px", fontFamily: "Arial, sans-serif", border: "1px solid #000", fontSize: "14px", background: "#fff" },
   header: { textAlign: "center", borderBottom: "1px solid #000", padding: 5 },
   title: { fontSize: "18px", fontWeight: "bold" },
-  subTitle: { fontSize: "12px", margin: "5px 0" },
-  contact: { fontSize: "12px" },
+  subTitle: { fontSize: "12px", margin: "5px 0", fontWeight: "bold" },
+  contact: { fontSize: "12px", fontWeight: "bold"},
   table: { width: "100%", borderCollapse: "collapse", marginTop: 5 },
   th: { border: "1px solid #000", background: "#d9d9ff", padding: 5, textAlign: "left" },
   td: { border: "1px solid #000", padding: 5 },

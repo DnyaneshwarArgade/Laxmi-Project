@@ -39,7 +39,7 @@ function Items() {
 
     if (isEditMode) {
       const updatedItems = [...items];
-      updatedItems[currentItemIndex] = newItems[0]; 
+      updatedItems[currentItemIndex] = newItems[0];
       setItems(updatedItems);
       Swal.fire({
         icon: 'success',
@@ -77,6 +77,7 @@ function Items() {
     setShowModal(true);
   };
 
+
   const handleDelete = (index) => {
     Swal.fire({
       title: 'Are you sure?',
@@ -89,10 +90,19 @@ function Items() {
     }).then((result) => {
       if (result.isConfirmed) {
         setItems(items.filter((_, i) => i !== index));
-        Swal.fire('Deleted!', 'Item has been deleted.', 'success');
+
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Item has been deleted.',
+          icon: 'success',
+          showConfirmButton: false, // OK बटन काढले
+          timer: 1500                // Auto close
+        });
       }
     });
   };
+
+
 
   const addMoreItemRow = () => {
     setNewItems([...newItems, { name: '', price: '', quantity: '' }]);
@@ -104,37 +114,60 @@ function Items() {
     setNewItems(updated);
   };
   // Function to remove item row
-const removeItemRow = (index) => {
-  setNewItems((prevItems) => prevItems.filter((_, i) => i !== index));
-};
+  const removeItemRow = (index) => {
+    setNewItems((prevItems) => prevItems.filter((_, i) => i !== index));
+  };
 
 
   return (
     <div className="container mt-4">
-<div className="position-relative mb-3">
-  {/* Center Heading */}
-  <h4 className="mb-0 text-center">Items List</h4>
+      <div className="position-relative mb-3">
+        {/* Center Heading */}
+        <h4 className="mb-0 text-center">Items List</h4>
 
-  {/* Right Side Button */}
-  <button
-    className="btn btn-primary btn-sm position-absolute end-0 top-50 translate-middle-y"
-    onClick={() => {
-      setIsEditMode(false);
-      setNewItems([{ name: '', price: '', quantity: '' }]);
-      setShowModal(true);
-    }}
-  >
-    <i className="bi bi-plus-lg"></i> Add Item
-  </button>
-</div>
+        {/* Right Side Button */}
+        <button
+          className="btn btn-primary btn-md position-absolute end-0 top-50 translate-middle-y"
+          onClick={() => {
+            setIsEditMode(false);
+            setNewItems([{ name: '', price: '', quantity: '' }]);
+            setShowModal(true);
+          }}
+        >
+          <i className="bi bi-plus-lg"></i> Add Item
+        </button>
+      </div>
 
 
 
       {items.map((item, index) => (
-        <div key={index} className="item-card shadow-sm mb-3 p-3 d-flex justify-content-between align-items-center">
-          <span className="fw-semibold">{item.name} - <small className="text-muted">(₹ {item.price})</small></span>
-          <div>
-            <button className="btn btn-outline-primary btn-sm me-2" onClick={() => handleEdit(index)}>
+        <div
+          key={index}
+          className="item-card shadow-sm mb-3 p-3 d-flex align-items-start flex-wrap"
+          style={{ gap: '0.5rem' }}
+        >
+          {/* Item Name */}
+          <div
+            className="fw-semibold flex-grow-1"
+            style={{ minWidth: '0', wordBreak: 'break-word', whiteSpace: 'normal' }}
+          >
+            {item.name}
+          </div>
+
+          {/* Price */}
+          <div
+            className="text-end flex-shrink-0"
+            style={{ minWidth: '80px' }}
+          >
+            ₹ {item.price}
+          </div>
+
+          {/* Actions */}
+          <div
+            className="d-flex flex-shrink-0 justify-content-end"
+            style={{ minWidth: '120px', gap: '0.5rem' }}
+          >
+            <button className="btn btn-outline-primary btn-sm" onClick={() => handleEdit(index)}>
               <i className="bi bi-pencil-fill"></i>
             </button>
             <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(index)}>
@@ -143,6 +176,7 @@ const removeItemRow = (index) => {
           </div>
         </div>
       ))}
+
 
       {showModal && (
         <div
@@ -176,52 +210,52 @@ const removeItemRow = (index) => {
 
               <div className="modal-body p-4 bg-light">
                 {newItems.map((item, idx) => (
-  <div key={idx} className="border rounded-3 p-3 mb-3 bg-white shadow-sm position-relative">
+                  <div key={idx} className="border rounded-3 p-3 mb-3 bg-white shadow-sm position-relative">
 
-    {/* Remove Button - Right Top Corner */}
-    {!isEditMode && newItems.length > 1 && (
-      <button
-        type="button"
-        className="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 rounded-circle"
-        onClick={() => removeItemRow(idx)}
-        title="Remove this item"
-      >
-        <i className="bi bi-x-lg"></i>
-      </button>
-    )}
+                    {/* Remove Button - Right Top Corner */}
+                    {!isEditMode && newItems.length > 1 && (
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 rounded-circle"
+                        onClick={() => removeItemRow(idx)}
+                        title="Remove this item"
+                      >
+                        <i className="bi bi-x-lg"></i>
+                      </button>
+                    )}
 
-    <div className="mb-2">
-      <label className="form-label fw-semibold">Item Name</label>
-      <input
-        type="text"
-        className="form-control form-control-lg shadow-lg border-0 rounded-3"
-        placeholder="Enter item name"
-        value={item.name}
-        onChange={(e) => updateItemField(idx, 'name', e.target.value)}
-      />
-    </div>
-    <div className="mb-2">
-      <label className="form-label fw-semibold">Item Price</label>
-      <input
-        type="number"
-        className="form-control form-control-lg shadow-lg border-0 rounded-3"
-        placeholder="Enter item price"
-        value={item.price}
-        onChange={(e) => updateItemField(idx, 'price', e.target.value)}
-      />
-    </div>
-    <div className="mb-2">
-      <label className="form-label fw-semibold">Quantity</label>
-      <input
-        type="number"
-        className="form-control form-control-lg shadow-lg border-0 rounded-3"
-        placeholder="Enter item quantity"
-        value={item.quantity}
-        onChange={(e) => updateItemField(idx, 'quantity', e.target.value)}
-      />
-    </div>
-  </div>
-))}
+                    <div className="mb-2">
+                      <label className="form-label fw-semibold">Item Name</label>
+                      <input
+                        type="text"
+                        className="form-control form-control-lg shadow-lg border-0 rounded-3"
+                        placeholder="Enter item name"
+                        value={item.name}
+                        onChange={(e) => updateItemField(idx, 'name', e.target.value)}
+                      />
+                    </div>
+                    <div className="mb-2">
+                      <label className="form-label fw-semibold">Item Price</label>
+                      <input
+                        type="number"
+                        className="form-control form-control-lg shadow-lg border-0 rounded-3"
+                        placeholder="Enter item price"
+                        value={item.price}
+                        onChange={(e) => updateItemField(idx, 'price', e.target.value)}
+                      />
+                    </div>
+                    <div className="mb-2">
+                      <label className="form-label fw-semibold">Quantity</label>
+                      <input
+                        type="number"
+                        className="form-control form-control-lg shadow-lg border-0 rounded-3"
+                        placeholder="Enter item quantity"
+                        value={item.quantity}
+                        onChange={(e) => updateItemField(idx, 'quantity', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                ))}
 
 
                 {!isEditMode && (
@@ -243,13 +277,13 @@ const removeItemRow = (index) => {
                   padding: "1rem 1.5rem",
                 }}
               >
-                <button
+                {/* <button
                   type="button"
                   className="btn btn-outline-secondary px-4 rounded-pill"
                   onClick={() => setShowModal(false)}
                 >
                   <i className="bi bi-x-circle me-1"></i> Close
-                </button>
+                </button> */}
                 <button
                   type="button"
                   className="btn btn-success px-4 rounded-pill shadow-sm"

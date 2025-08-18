@@ -443,10 +443,12 @@ export default function Orders() {
         </div>
       ) : (
         <div style={themedStyles.cardContainer}>
-          {[...orders].reverse().map((order, i) => { // CHANGE: reverse() for newest on top
+          {[...orders].reverse().map((order, i) => {
+            // Calculate the correct index in the original orders array
+            const originalIndex = orders.length - 1 - i;
             const total = sumOrder(order);
             return (
-              <div key={orders.length - 1 - i} style={themedStyles.card}
+              <div key={originalIndex} style={themedStyles.card}
                 onMouseOver={e => e.currentTarget.style.boxShadow = "0 12px 32px rgba(59,130,246,0.18)"}
                 onMouseOut={e => e.currentTarget.style.boxShadow = themedStyles.card.boxShadow}
               >
@@ -496,10 +498,10 @@ export default function Orders() {
                 </div>
 
                 <div style={themedStyles.cardActions}>
-                  <button style={themedButtonStyles.subtle} onClick={() => handleEdit(i)} title="Edit">
+                  <button style={themedButtonStyles.subtle} onClick={() => handleEdit(originalIndex)} title="Edit">
                     <span role="img" aria-label="edit"></span>Edit
                   </button>
-                  <button style={themedButtonStyles.danger} onClick={() => handleDelete(i)} title="Delete">
+                  <button style={themedButtonStyles.danger} onClick={() => handleDelete(originalIndex)} title="Delete">
                     <span role="img" aria-label="delete"></span>Delete
                   </button>
                   <button style={themedButtonStyles.success} onClick={() => handleView(order)} title="View Invoice">

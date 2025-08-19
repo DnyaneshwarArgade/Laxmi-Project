@@ -1,9 +1,7 @@
-import { Routes, Route, NavLink, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { Routes, Route, NavLink } from "react-router-dom";
 import Items from "./Component/Items";
 import Order from "./Component/Order";
 import Search from "./Component/Search";
-import Login from "./Component/Login";
 import "./App.css";
 
 export default function App() {
@@ -13,42 +11,28 @@ export default function App() {
     <div className="app-container bg-light">
       <div className="page-content">
         <Routes>
-          {/* जर login झाले नसेल तर /login दाखवायचं */}
-          <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
-
-          {/* Protected Routes */}
-          <Route
-            path="/"
-            element={isAuth ? <Order /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/items"
-            element={isAuth ? <Items /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/search"
-            element={isAuth ? <Search /> : <Navigate to="/login" />}
-          />
+          <Route path="/" element={<Order />} />
+          <Route path="/items" element={<Items />} />
+          <Route path="/search" element={<Search />} />
         </Routes>
       </div>
 
       {/* Bottom Tab Bar */}
-      {isAuth && (
-        <nav className="bottom-tab">
-          <NavLink to="/items" className="tab-item">
-            <span className="icon">🛒</span>
-            <span className="label">Items</span>
-          </NavLink>
-          <NavLink to="/" className="tab-item">
-            <span className="icon">📦</span>
-            <span className="label">Order</span>
-          </NavLink>
-          <NavLink to="/search" className="tab-item">
-            <span className="icon">🔍</span>
-            <span className="label">Search</span>
-          </NavLink>
-        </nav>
-      )}
+      <nav className="bottom-tab">
+        <NavLink to="/items" className="tab-item">
+          <span className="icon">🛒</span>
+          <span className="label">Items</span>
+        </NavLink>
+        <NavLink to="/" className="tab-item">
+          <span className="icon">📦</span>
+          <span className="label">Order</span>
+        </NavLink>
+        <NavLink to="/search" className="tab-item">
+          <span className="icon">🔍</span>
+          <span className="label">Search</span>
+        </NavLink>
+      </nav>
     </div>
   );
 }
+

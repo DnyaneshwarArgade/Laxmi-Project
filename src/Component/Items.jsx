@@ -27,14 +27,14 @@ function Items() {
         Swal.fire('Error', 'Please enter an item name', 'error');
         return;
       }
-      if (!item.price || item.price <= 0) {
-        Swal.fire('Error', 'Please enter a valid price', 'error');
-        return;
-      }
-      if (!item.quantity || item.quantity <= 0) {
-        Swal.fire('Error', 'Please enter a valid quantity', 'error');
-        return;
-      }
+      // if (!item.price || item.price <= 0) {
+      //   Swal.fire('Error', 'Please enter a valid price', 'error');
+      //   return;
+      // }
+      // if (!item.quantity || item.quantity <= 0) {
+      //   Swal.fire('Error', 'Please enter a valid quantity', 'error');
+      //   return;
+      // }
     }
 
     if (isEditMode) {
@@ -277,13 +277,6 @@ function Items() {
                   padding: "1rem 1.5rem",
                 }}
               >
-                {/* <button
-                  type="button"
-                  className="btn btn-outline-secondary px-4 rounded-pill"
-                  onClick={() => setShowModal(false)}
-                >
-                  <i className="bi bi-x-circle me-1"></i> Close
-                </button> */}
                 <button
                   type="button"
                   className="btn btn-success px-4 rounded-pill shadow-sm"
@@ -305,3 +298,323 @@ function Items() {
 }
 
 export default Items;
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap-icons/font/bootstrap-icons.css';
+// import Swal from 'sweetalert2';
+
+// // ✅ Replace with your API base URL
+// const API_URL = "http://localhost:5000/api/items";
+
+// function Items() {
+//   const [showModal, setShowModal] = useState(false);
+//   const [items, setItems] = useState([]);
+//   const [newItems, setNewItems] = useState([{ name: '', price: '', quantity: '' }]);
+//   const [isEditMode, setIsEditMode] = useState(false);
+//   const [currentItemIndex, setCurrentItemIndex] = useState(null);
+//   const [currentItemId, setCurrentItemId] = useState(null);
+
+//   // ✅ Fetch all items from API
+//   const fetchItems = async () => {
+//     try {
+//       const res = await fetch(API_URL);
+//       const data = await res.json();
+//       setItems(data);
+//     } catch (err) {
+//       console.error("Error fetching items:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchItems();
+//   }, []);
+
+//   // ✅ Create new items
+//   const createItems = async (itemsData) => {
+//     try {
+//       const res = await fetch(API_URL, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(itemsData),
+//       });
+//       const data = await res.json();
+//       setItems((prev) => [...prev, ...data]); // assuming API returns created items
+//       Swal.fire({
+//         icon: 'success',
+//         title: 'Items Added',
+//         text: `${itemsData.length} item(s) have been added successfully!`,
+//         timer: 2000,
+//         showConfirmButton: false
+//       });
+//     } catch (err) {
+//       console.error("Error creating item:", err);
+//     }
+//   };
+
+//   // ✅ Update item
+//   const updateItem = async (id, updatedData) => {
+//     try {
+//       const res = await fetch(`${API_URL}/${id}`, {
+//         method: "PUT",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(updatedData),
+//       });
+//       const data = await res.json();
+//       setItems((prev) =>
+//         prev.map((item) => (item.id === id ? data : item))
+//       );
+//       Swal.fire({
+//         icon: 'success',
+//         title: 'Item Updated',
+//         text: `${updatedData.name} has been updated successfully!`,
+//         timer: 2000,
+//         showConfirmButton: false
+//       });
+//     } catch (err) {
+//       console.error("Error updating item:", err);
+//     }
+//   };
+
+//   // ✅ Delete item
+//   const deleteItem = async (id) => {
+//     try {
+//       await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+//       setItems((prev) => prev.filter((item) => item.id !== id));
+//       Swal.fire({
+//         title: 'Deleted!',
+//         text: 'Item has been deleted.',
+//         icon: 'success',
+//         showConfirmButton: false,
+//         timer: 1500
+//       });
+//     } catch (err) {
+//       console.error("Error deleting item:", err);
+//     }
+//   };
+
+//   // ✅ Handle Save
+//   const handleSave = () => {
+//     for (let item of newItems) {
+//       if (!item.name.trim()) {
+//         Swal.fire('Error', 'Please enter an item name', 'error');
+//         return;
+//       }
+//     }
+
+//     if (isEditMode && currentItemId) {
+//       updateItem(currentItemId, newItems[0]);
+//     } else {
+//       createItems(newItems);
+//     }
+
+//     setNewItems([{ name: '', price: '', quantity: '' }]);
+//     setIsEditMode(false);
+//     setCurrentItemIndex(null);
+//     setCurrentItemId(null);
+//     setShowModal(false);
+//   };
+
+//   // ✅ Handle Edit
+//   const handleEdit = (index) => {
+//     const item = items[index];
+//     setNewItems([{ name: item.name, price: item.price, quantity: item.quantity }]);
+//     setIsEditMode(true);
+//     setCurrentItemIndex(index);
+//     setCurrentItemId(item.id); // important for API update
+//     setShowModal(true);
+//   };
+
+//   // ✅ Handle Delete
+//   const handleDelete = (id) => {
+//     Swal.fire({
+//       title: 'Are you sure?',
+//       text: "This will delete the item",
+//       icon: 'warning',
+//       showCancelButton: true,
+//       confirmButtonColor: '#d33',
+//       cancelButtonColor: '#3085d6',
+//       confirmButtonText: 'Yes, delete it!'
+//     }).then((result) => {
+//       if (result.isConfirmed) {
+//         deleteItem(id);
+//       }
+//     });
+//   };
+
+//   // ✅ Add More Row
+//   const addMoreItemRow = () => {
+//     setNewItems([...newItems, { name: '', price: '', quantity: '' }]);
+//   };
+
+//   // ✅ Update input field
+//   const updateItemField = (index, field, value) => {
+//     const updated = [...newItems];
+//     updated[index][field] = value;
+//     setNewItems(updated);
+//   };
+
+//   // ✅ Remove Row
+//   const removeItemRow = (index) => {
+//     setNewItems((prevItems) => prevItems.filter((_, i) => i !== index));
+//   };
+
+//   return (
+//     <div className="container mt-4">
+//       <div className="position-relative mb-3">
+//         <h4 className="mb-0 text-center">Items List</h4>
+//         <button
+//           className="btn btn-primary btn-md position-absolute end-0 top-50 translate-middle-y"
+//           onClick={() => {
+//             setIsEditMode(false);
+//             setNewItems([{ name: '', price: '', quantity: '' }]);
+//             setShowModal(true);
+//           }}
+//         >
+//           <i className="bi bi-plus-lg"></i> Add Item
+//         </button>
+//       </div>
+
+//       {items.map((item, index) => (
+//         <div
+//           key={item.id || index}
+//           className="item-card shadow-sm mb-3 p-3 d-flex align-items-start flex-wrap"
+//           style={{ gap: '0.5rem' }}
+//         >
+//           <div
+//             className="fw-semibold flex-grow-1"
+//             style={{ minWidth: '0', wordBreak: 'break-word', whiteSpace: 'normal' }}
+//           >
+//             {item.name}
+//           </div>
+
+//           <div className="text-end flex-shrink-0" style={{ minWidth: '80px' }}>
+//             ₹ {item.price}
+//           </div>
+
+//           <div
+//             className="d-flex flex-shrink-0 justify-content-end"
+//             style={{ minWidth: '120px', gap: '0.5rem' }}
+//           >
+//             <button className="btn btn-outline-primary btn-sm" onClick={() => handleEdit(index)}>
+//               <i className="bi bi-pencil-fill"></i>
+//             </button>
+//             <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(item.id)}>
+//               <i className="bi bi-trash"></i>
+//             </button>
+//           </div>
+//         </div>
+//       ))}
+
+//       {showModal && (
+//         <div
+//           className="modal fade show d-block"
+//           tabIndex="-1"
+//           role="dialog"
+//           style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(3px)" }}
+//         >
+//           <div className="modal-dialog modal-dialog-centered" role="document">
+//             <div className="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
+//               <div
+//                 className="modal-header text-white"
+//                 style={{
+//                   background: "linear-gradient(135deg, #6297b9ff, #070d13ff)",
+//                   borderBottom: "none",
+//                   padding: "1rem 1.5rem",
+//                 }}
+//               >
+//                 <h5 className="modal-title fw-bold d-flex align-items-center">
+//                   {isEditMode ? 'Edit Item' : 'Add New Item(s)'}
+//                 </h5>
+//                 <button type="button" className="btn-close btn-close-white" onClick={() => setShowModal(false)}></button>
+//               </div>
+
+//               <div className="modal-body p-4 bg-light">
+//                 {newItems.map((item, idx) => (
+//                   <div key={idx} className="border rounded-3 p-3 mb-3 bg-white shadow-sm position-relative">
+//                     {!isEditMode && newItems.length > 1 && (
+//                       <button
+//                         type="button"
+//                         className="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 rounded-circle"
+//                         onClick={() => removeItemRow(idx)}
+//                         title="Remove this item"
+//                       >
+//                         <i className="bi bi-x-lg"></i>
+//                       </button>
+//                     )}
+
+//                     <div className="mb-2">
+//                       <label className="form-label fw-semibold">Item Name</label>
+//                       <input
+//                         type="text"
+//                         className="form-control form-control-lg shadow-lg border-0 rounded-3"
+//                         placeholder="Enter item name"
+//                         value={item.name}
+//                         onChange={(e) => updateItemField(idx, 'name', e.target.value)}
+//                       />
+//                     </div>
+//                     <div className="mb-2">
+//                       <label className="form-label fw-semibold">Item Price</label>
+//                       <input
+//                         type="number"
+//                         className="form-control form-control-lg shadow-lg border-0 rounded-3"
+//                         placeholder="Enter item price"
+//                         value={item.price}
+//                         onChange={(e) => updateItemField(idx, 'price', e.target.value)}
+//                       />
+//                     </div>
+//                     <div className="mb-2">
+//                       <label className="form-label fw-semibold">Quantity</label>
+//                       <input
+//                         type="number"
+//                         className="form-control form-control-lg shadow-lg border-0 rounded-3"
+//                         placeholder="Enter item quantity"
+//                         value={item.quantity}
+//                         onChange={(e) => updateItemField(idx, 'quantity', e.target.value)}
+//                       />
+//                     </div>
+//                   </div>
+//                 ))}
+
+//                 {!isEditMode && (
+//                   <button
+//                     type="button"
+//                     className="btn btn-outline-primary w-100 rounded-pill"
+//                     onClick={addMoreItemRow}
+//                   >
+//                     <i className="bi bi-plus-circle me-2"></i> Add More Item
+//                   </button>
+//                 )}
+//               </div>
+
+//               <div
+//                 className="modal-footer"
+//                 style={{
+//                   background: "linear-gradient(135deg, #f1f1f1, #e4e4e4)",
+//                   borderTop: "none",
+//                   padding: "1rem 1.5rem",
+//                 }}
+//               >
+//                 <button
+//                   type="button"
+//                   className="btn btn-success px-4 rounded-pill shadow-sm"
+//                   style={{
+//                     background: "linear-gradient(135deg, #28a745, #218838)",
+//                     border: "none",
+//                   }}
+//                   onClick={handleSave}
+//                 >
+//                   <i className="bi bi-check-circle me-1"></i> Save
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// export default Items;

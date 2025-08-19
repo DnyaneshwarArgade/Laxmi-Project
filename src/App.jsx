@@ -1,7 +1,8 @@
+
 import { Routes, Route, NavLink } from "react-router-dom";
 import Items from "./Component/Items";
 import Order from "./Component/Order";
-import Search from "./Component/Search";
+import Customer from "./Component/Customer";
 import "./App.css";
 
 export default function App() {
@@ -12,7 +13,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Order />} />
           <Route path="/items" element={<Items />} />
-          <Route path="/search" element={<Search />} />
+          <Route path="/customer" element={<Customer />} />
         </Routes>
       </div>
 
@@ -26,11 +27,12 @@ export default function App() {
           <span className="icon">📦</span>
           <span className="label">Order</span>
         </NavLink>
-        <NavLink to="/search" className="tab-item">
-          <span className="icon">🔍</span>
-          <span className="label">Search</span>
+        <NavLink to="/customer" className="tab-item">
+          <span className="icon">👥</span>   {/* Customer साठी icon */}
+          <span className="label">Customer</span>
         </NavLink>
       </nav>
     </div>
   );
 }
+

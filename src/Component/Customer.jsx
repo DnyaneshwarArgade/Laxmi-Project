@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaPlus, FaUserEdit, FaTrashAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 
-const CustomerDashboard = () => {
+const Customer = () => {
   const [customers, setCustomers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -242,4 +242,4 @@ const CustomerDashboard = () => {
   );
 };
 
-export default CustomerDashboard;
+export default Customer;

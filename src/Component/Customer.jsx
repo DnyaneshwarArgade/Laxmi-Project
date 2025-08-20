@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { FaPlus, FaUserEdit, FaTrashAlt } from "react-icons/fa";
+import { FaUserEdit, FaTrashAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 const Customer = () => {
   const [customers, setCustomers] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
-    id: "",
     name: "",
     phone: "",
     address: "",
   });
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const storedData = localStorage.getItem("customers");
@@ -29,42 +28,28 @@ const Customer = () => {
   };
 
   const handleSave = () => {
-    if (
-      !formData.id ||
-      !formData.name ||
-      !formData.phone ||
-      !formData.address
-    ) {
+    if (!formData.name || !formData.phone || !formData.address) {
       Swal.fire("Error", "Please fill all fields", "error");
       return;
     }
 
-    if (editMode) {
-      setCustomers(
-        customers.map((cust) => (cust.id === formData.id ? formData : cust))
-      );
-      Swal.fire("Updated!", "Customer details updated successfully", "success");
-    } else {
-      if (customers.find((cust) => cust.id === formData.id)) {
-        Swal.fire("Error", "Customer ID already exists!", "error");
-        return;
-      }
-      setCustomers([...customers, formData]);
-      Swal.fire("Added!", "New customer added successfully", "success");
-    }
+    setCustomers(
+      customers.map((cust) =>
+        cust.phone === formData.phone ? formData : cust
+      )
+    );
+    Swal.fire("Updated!", "Customer details updated successfully", "success");
 
     setShowModal(false);
-    setFormData({ id: "", name: "", phone: "", address: "" });
-    setEditMode(false);
+    setFormData({ name: "", phone: "", address: "" });
   };
 
   const handleEdit = (cust) => {
     setFormData(cust);
-    setEditMode(true);
     setShowModal(true);
   };
 
-  const handleDelete = (id, name) => {
+  const handleDelete = (phone, name) => {
     Swal.fire({
       title: `Are you sure to delete ${name}?`,
       text: "This action cannot be undone!",
@@ -75,35 +60,38 @@ const Customer = () => {
       confirmButtonText: "Yes, Delete",
     }).then((result) => {
       if (result.isConfirmed) {
-        setCustomers(customers.filter((cust) => cust.id !== id));
+        setCustomers(customers.filter((cust) => cust.phone !== phone));
         Swal.fire("Deleted!", "Customer deleted successfully", "success");
       }
     });
   };
 
+  
+  const filteredCustomers = customers.filter((cust) =>
+    cust.name.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
   return (
     <div className="container mt-4">
       <h2 className="fw-bold text-dark mt-5 text-center mb-4">
-        Customer Table 
+        Customer Table
       </h2>
 
-      <div className="d-flex justify-content-end mb-3">
-        <button
-          className="btn btn-success px-4 py-2 rounded-pill shadow-sm d-flex align-items-center gap-2"
-          onClick={() => {
-            setFormData({ id: "", name: "", phone: "", address: "" });
-            setEditMode(false);
-            setShowModal(true);
-          }}
-        >
-          <FaPlus /> Add New Customer
-        </button>
+      
+      <div className="d-flex justify-content-center mb-3">
+        <input
+          type="text"
+          placeholder="Search by customer name"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="form-control w-50 shadow-sm rounded-pill px-3"
+        />
       </div>
 
+    
       <table className="table table-striped table-bordered table-hover shadow text-center align-middle">
         <thead className="table-dark">
           <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Mobile Number</th>
             <th>Address</th>
@@ -111,26 +99,25 @@ const Customer = () => {
           </tr>
         </thead>
         <tbody>
-          {customers.length > 0 ? (
-            customers.map((cust) => (
-              <tr key={cust.id}>
-                <td>{cust.id}</td>
+          {filteredCustomers.length > 0 ? (
+            filteredCustomers.map((cust, index) => (
+              <tr key={index}>
                 <td>{cust.name}</td>
                 <td>{cust.phone}</td>
                 <td>{cust.address}</td>
                 <td>
                   <div className="d-flex justify-content-center gap-2">
                     <button
-                      className="btn btn-primary btn-sm d-flex align-items-center gap-1"
+                      className="btn btn-outline-primary btn-sm"
                       onClick={() => handleEdit(cust)}
                     >
-                      <FaUserEdit /> Edit
+                      <FaUserEdit />
                     </button>
                     <button
-                      className="btn btn-danger btn-sm d-flex align-items-center gap-1"
-                      onClick={() => handleDelete(cust.id, cust.name)}
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() => handleDelete(cust.phone, cust.name)}
                     >
-                      <FaTrashAlt /> Delete
+                      <FaTrashAlt />
                     </button>
                   </div>
                 </td>
@@ -138,87 +125,69 @@ const Customer = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5">No Customers Found</td>
+              <td colSpan="4">No Customers Found</td>
             </tr>
           )}
         </tbody>
       </table>
 
+    
       {showModal && (
         <div className="modal show d-block" tabIndex="-1">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content shadow-lg rounded-4 border-0">
               <div
-                className="modal-header bg-gradient text-white rounded-top-4"
+                className="modal-header text-white rounded-top-4"
                 style={{
-                  background: "linear-gradient(90deg, #0d6efd, #0dcaf0)",
+                  background: "linear-gradient(135deg, #6297b9ff, #070d13ff)",
                 }}
               >
-                <h5 className="modal-title fw-bold">
-                  {editMode ? "Add Edit Form" : "Add Customer Form"}
-                </h5>
+                <h5 className="modal-title fw-bold">Edit Customer</h5>
                 <button
                   type="button"
                   className="btn-close btn-close-white"
                   onClick={() => setShowModal(false)}
                 ></button>
               </div>
-              <div className="modal-body p-4">
-                <form>
-                  <h5 className="modal-title fw-bold">
-                    {editMode ? "Edit Customer Form" : "Add Customer Form"}
-                  </h5>
-
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold mt-4">
-                      Customer ID
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control shadow-sm rounded"
-                      name="id"
-                      value={formData.id}
-                      onChange={handleChange}
-                      placeholder="Enter Customer ID"
-                      disabled={editMode}
-                    />
+              <div className="modal-body">
+                <div className="card border-0 shadow-sm rounded-3 p-3">
+                  <div className="card-body">
+                    <div className="mb-3">
+                      <label className="fw-semibold">Name</label>
+                      <input
+                        type="text"
+                        className="form-control shadow-sm rounded-pill"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="Enter Customer Name"
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="fw-semibold">Mobile Number</label>
+                      <input
+                        type="text"
+                        className="form-control shadow-sm rounded-pill"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="Enter Mobile Number"
+                        disabled
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="fw-semibold">Address</label>
+                      <textarea
+                        className="form-control shadow-sm rounded-3"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        placeholder="Enter Address"
+                        rows="2"
+                      ></textarea>
+                    </div>
                   </div>
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold">Name</label>
-                    <input
-                      type="text"
-                      className="form-control shadow-sm rounded"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Enter Name"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold">
-                      Mobile Number
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control shadow-sm rounded"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="Enter Mobile Number"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold">Address</label>
-                    <textarea
-                      className="form-control shadow-sm rounded"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      placeholder="Enter Address"
-                      rows="2"
-                    ></textarea>
-                  </div>
-                </form>
+                </div>
               </div>
               <div className="modal-footer d-flex justify-content-between">
                 <button
@@ -231,7 +200,7 @@ const Customer = () => {
                   className="btn btn-success rounded-pill px-4 shadow-sm"
                   onClick={handleSave}
                 >
-                  {editMode ? "Update Customer" : "Save Customer"}
+                  Update Customer
                 </button>
               </div>
             </div>
@@ -243,3 +212,5 @@ const Customer = () => {
 };
 
 export default Customer;
+
+

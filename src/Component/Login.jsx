@@ -1,39 +1,62 @@
 import React, { useState } from "react";
 import { CgOverflow } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { BsBorderWidth } from "react-icons/bs";
 
 export default function Login({ setIsAuth }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+const handleLogin = (e) => {
+  e.preventDefault();
 
-    if (!email || !password) {
-      alert("⚠️ Please enter Email and Password!");
-      return;
-    }
+  if (!email || !password) {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Fields",
+      text: "⚠️ Please enter Email and Password!",
+      showConfirmButton: false,   
+      timer: 2000,  
+    });
+    return;
+  }
 
-    if (email === "Laxmi@gmail.com" && password === "Laxmi51") {
-      alert("✅ Login Successful!");
+  if (email === "Laxmi@gmail.com" && password === "Laxmi51") {
+    Swal.fire({
+      icon: "success",
+      title: "Login Successful",
+      text: "Welcome to the Laxmi Genral Store....!!! 🎉",
+      timer: 2000,
+      showConfirmButton: false,   
+    }).then(() => {
       setIsAuth(true);
       navigate("/");
-    } else {
-      alert("❌ Invalid Email or Password!");
-    }
-  };
+    });
+  } else {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Credentials",
+      text: "❌ Invalid Email or Password!",
+      showConfirmButton: false,   
+      timer: 2000,                
+    });
+  }
+};
+
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
+    <div style={styles.container} className="bg-light">
+      <div style={styles.card} className="bg-white">
         <img
-          src="https://cdn-icons-png.flaticon.com/512/5087/5087579.png"
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXVBASNO7C59zz-GfBusZjc47ZNrbLpTT1mA&s"
           alt="login"
           style={styles.image}
         />
 
-        <h2 style={styles.heading}>Welcome Back</h2>
+        <h2 style={styles.heading}>Laxmi Genral Store...!!!</h2>
         <p style={styles.subHeading}>Login to your account</p>
 
         <form onSubmit={handleLogin}>
@@ -45,6 +68,7 @@ export default function Login({ setIsAuth }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={styles.input}
+              className="shadow-sm rounded-pill form-control "
             />
           </div>
 
@@ -56,6 +80,7 @@ export default function Login({ setIsAuth }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
+              className="shadow-sm rounded-pill form-control "
             />
           </div>
 
@@ -75,9 +100,9 @@ export default function Login({ setIsAuth }) {
           </button>
         </form>
 
-        <p style={styles.footerText}>
+        {/* <p style={styles.footerText}>
           Demo: <b>Laxmi@gmail.com / Laxmi51</b>
-        </p>
+        </p> */}
       </div>
     </div>
   );
@@ -89,7 +114,7 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    background: "linear-gradient(135deg, #1f1c2c, #928dab)",
+    // background: "linear-gradient(135deg, #1f1c2c, #c4c3caff)",
     fontFamily: "Segoe UI, sans-serif",
   },
   card: {
@@ -117,12 +142,12 @@ const styles = {
   heading: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#fff",
+    color: "#111111ff",
     marginBottom: 8,
   },
   subHeading: {
     fontSize: 15,
-    color: "#ddd",
+    color: "#111111ff",
     marginBottom: 30,
   },
   inputContainer: {
@@ -131,22 +156,23 @@ const styles = {
     textAlign: "left",
   },
   label: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "500",
-    color: "#fff",
+    color: "#131212ff",
     marginBottom: 6,
     display: "block",
   },
-  input: {
-    width: "100%",
-    height: 45,
-    borderRadius: 10,
-    border: "none",
-    padding: "0 15px",
-    fontSize: 15,
-    outline: "none",
-    background: "rgba(255,255,255,0.9)",
-  },
+ input: {
+  width: "100%",
+  height: 45,
+  borderRadius: 10,
+  border: "none",
+  padding: "0 15px",
+  fontSize: 15,
+  outline: "none",
+  background: "rgba(240, 240, 240, 0.9)",  // हलका gray
+
+},
   btn: {
     background: "linear-gradient(90deg, #36d1dc, #5b86e5)",
     padding: "14px",
@@ -160,11 +186,11 @@ const styles = {
   btnText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#fff",
+    color: "#fffcfcff",
   },
   footerText: {
     marginTop: 25,
     fontSize: 14,
-    color: "#eee",
+    color: "#242323ff",
   },
 };

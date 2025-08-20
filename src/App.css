@@ -1,4 +1,9 @@
-Layout
+*{
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
 .app-container {
   display: flex;
   flex-direction: column;
@@ -8,10 +13,9 @@ Layout
 .page-content {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 70px; /* space for bottom nav */
+  padding-bottom: 70px; 
 }
 
-/* Bottom Tab Bar */
 .bottom-tab {
   position: fixed;
   bottom: 0;
@@ -63,12 +67,10 @@ Layout
   transform: scale(1.2);
 }
 
-/* Active link styling */
 .tab-item.active .label {
   font-weight: bold;
 }
 
-/* card css */
 .item-card {
   width: 100%;
   border-radius: 12px;

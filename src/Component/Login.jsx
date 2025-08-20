@@ -13,10 +13,10 @@ const handleLogin = (e) => {
   if (!email || !password) {
     Swal.fire({
       icon: "warning",
-      title: "Missing Details",
+      title: "Missing Fields",
       text: "⚠️ Please enter Email and Password!",
-      showConfirmButton: false,   // ✅ OK बटन hide
-      timer: 2000,                // ✅ 2 सेकंदाने बंद होईल
+      showConfirmButton: false,   // ❌ OK button काढला
+      timer: 2000,                // 2 सेकंदात auto close
     });
     return;
   }
@@ -25,9 +25,9 @@ const handleLogin = (e) => {
     Swal.fire({
       icon: "success",
       title: "Login Successful",
-      text: "Welcome Laxmi Store....!!!",
-      showConfirmButton: false,   // ✅ OK बटन hide
-      timer: 2000,                // ✅ 2 सेकंदाने बंद होईल
+      text: "Welcome to the Laxmi Genral Store....!!! 🎉",
+      timer: 2000,
+      showConfirmButton: false,   // ❌ OK button काढला
     }).then(() => {
       setIsAuth(true);
       navigate("/");
@@ -35,14 +35,13 @@ const handleLogin = (e) => {
   } else {
     Swal.fire({
       icon: "error",
-      title: "Invalid Login",
+      title: "Invalid Credentials",
       text: "❌ Invalid Email or Password!",
-      showConfirmButton: false,   // ✅ OK बटन hide
-      timer: 2000,                // ✅ 2 सेकंदाने बंद होईल
+      showConfirmButton: false,   // ❌ OK button काढला
+      timer: 2000,                // 2 सेकंदात auto close
     });
   }
 };
-
 
 
   return (
@@ -57,7 +56,7 @@ const handleLogin = (e) => {
         <h2 style={styles.heading}>Welcome Back</h2>
         <p style={styles.subHeading}>Login to your account</p>
 
-        <form onSubmit={handleLogin} style={styles.form}>
+        <form onSubmit={handleLogin}>
           <div style={styles.inputContainer}>
             <label style={styles.label}>Email</label>
             <input
@@ -110,8 +109,8 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    width: "100vw",
     background: "linear-gradient(135deg, #1f1c2c, #928dab)",
+    fontFamily: "Segoe UI, sans-serif",
   },
   card: {
     background: "rgba(255,255,255,0.1)",
@@ -143,10 +142,11 @@ const styles = {
   subHeading: {
     fontSize: 15,
     color: "#ddd",
-    marginBottom: 25,
+    marginBottom: 30,
   },
   inputContainer: {
     width: "100%",
+    marginBottom: 18,
     textAlign: "left",
   },
   label: {
@@ -172,7 +172,7 @@ const styles = {
     borderRadius: 10,
     border: "none",
     cursor: "pointer",
-    marginTop: 10,
+    marginTop: 15,
     width: "100%",
     transition: "all 0.3s ease",
   },
@@ -182,7 +182,7 @@ const styles = {
     color: "#fff",
   },
   footerText: {
-    marginTop: 20,
+    marginTop: 25,
     fontSize: 14,
     color: "#eee",
   },

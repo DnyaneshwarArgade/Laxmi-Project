@@ -57,7 +57,7 @@ const handleLogin = (e) => {
         <h2 style={styles.heading}>Welcome Back</h2>
         <p style={styles.subHeading}>Login to your account</p>
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} style={styles.form}>
           <div style={styles.inputContainer}>
             <label style={styles.label}>Email</label>
             <input
@@ -110,8 +110,8 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
+    width: "100vw",
     background: "linear-gradient(135deg, #1f1c2c, #928dab)",
-    fontFamily: "Segoe UI, sans-serif",
   },
   card: {
     background: "rgba(255,255,255,0.1)",
@@ -123,8 +123,8 @@ const styles = {
     width: "100%",
     maxWidth: "400px",
     border: "1px solid rgba(255,255,255,0.2)",
-    // marginTop: 50,
-    // marginBottom: 50,
+    marginTop: 50,
+    marginBottom: 50,
   },
   image: {
     width: 90,
@@ -143,11 +143,10 @@ const styles = {
   subHeading: {
     fontSize: 15,
     color: "#ddd",
-    marginBottom: 30,
+    marginBottom: 25,
   },
   inputContainer: {
     width: "100%",
-    marginBottom: 18,
     textAlign: "left",
   },
   label: {
@@ -173,7 +172,7 @@ const styles = {
     borderRadius: 10,
     border: "none",
     cursor: "pointer",
-    marginTop: 15,
+    marginTop: 10,
     width: "100%",
     transition: "all 0.3s ease",
   },
@@ -183,7 +182,7 @@ const styles = {
     color: "#fff",
   },
   footerText: {
-    marginTop: 25,
+    marginTop: 20,
     fontSize: 14,
     color: "#eee",
   },

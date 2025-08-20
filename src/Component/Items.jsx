@@ -95,8 +95,8 @@ function Items() {
           title: 'Deleted!',
           text: 'Item has been deleted.',
           icon: 'success',
-          showConfirmButton: false, // OK बटन काढले
-          timer: 1500                // Auto close
+          showConfirmButton: false, 
+          timer: 1500                
         });
       }
     });
@@ -113,7 +113,7 @@ function Items() {
     updated[index][field] = value;
     setNewItems(updated);
   };
-  // Function to remove item row
+
   const removeItemRow = (index) => {
     setNewItems((prevItems) => prevItems.filter((_, i) => i !== index));
   };
@@ -304,4 +304,6 @@ function Items() {
   );
 }
 
-export default Items;
+export default Items; 
+
+

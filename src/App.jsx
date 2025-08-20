@@ -8,7 +8,7 @@ import "./App.css";
 export default function App() {
   return (
     <div className="app-container bg-light">
-      {/* Main Content */}
+    
       <div className="page-content">
         <Routes>
           <Route path="/" element={<Order />} />
@@ -17,7 +17,7 @@ export default function App() {
         </Routes>
       </div>
 
-      {/* Bottom Tab Bar */}
+      
       <nav className="bottom-tab">
         <NavLink to="/items" className="tab-item">
           <span className="icon">🛒</span>
@@ -28,7 +28,7 @@ export default function App() {
           <span className="label">Order</span>
         </NavLink>
         <NavLink to="/customer" className="tab-item">
-          <span className="icon">👥</span>   {/* Customer साठी icon */}
+          <span className="icon">👥</span>  
           <span className="label">Customer</span>
         </NavLink>
       </nav>

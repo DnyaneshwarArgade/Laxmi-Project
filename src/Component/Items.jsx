@@ -27,14 +27,14 @@ function Items() {
         Swal.fire('Error', 'Please enter an item name', 'error');
         return;
       }
-      if (!item.price || item.price <= 0) {
-        Swal.fire('Error', 'Please enter a valid price', 'error');
-        return;
-      }
-      if (!item.quantity || item.quantity <= 0) {
-        Swal.fire('Error', 'Please enter a valid quantity', 'error');
-        return;
-      }
+      // if (!item.price || item.price <= 0) {
+      //   Swal.fire('Error', 'Please enter a valid price', 'error');
+      //   return;
+      // }
+      // if (!item.quantity || item.quantity <= 0) {
+      //   Swal.fire('Error', 'Please enter a valid quantity', 'error');
+      //   return;
+      // }
     }
 
     if (isEditMode) {
@@ -277,13 +277,6 @@ function Items() {
                   padding: "1rem 1.5rem",
                 }}
               >
-                {/* <button
-                  type="button"
-                  className="btn btn-outline-secondary px-4 rounded-pill"
-                  onClick={() => setShowModal(false)}
-                >
-                  <i className="bi bi-x-circle me-1"></i> Close
-                </button> */}
                 <button
                   type="button"
                   className="btn btn-success px-4 rounded-pill shadow-sm"
@@ -304,6 +297,4 @@ function Items() {
   );
 }
 
-export default Items; 
-
-
+export default Items;

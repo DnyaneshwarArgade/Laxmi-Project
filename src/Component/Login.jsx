@@ -1,27 +1,49 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function Login({ setIsAuth }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+const handleLogin = (e) => {
+  e.preventDefault();
 
-    if (!email || !password) {
-      alert("⚠️ Please enter Email and Password!");
-      return;
-    }
+  if (!email || !password) {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Details",
+      text: "⚠️ Please enter Email and Password!",
+      showConfirmButton: false,   // ✅ OK बटन hide
+      timer: 2000,                // ✅ 2 सेकंदाने बंद होईल
+    });
+    return;
+  }
 
-    if (email === "Laxmi@gmail.com" && password === "Laxmi51") {
-      alert("✅ Login Successful!");
+  if (email === "Laxmi@gmail.com" && password === "Laxmi51") {
+    Swal.fire({
+      icon: "success",
+      title: "Login Successful",
+      text: "Welcome Laxmi Store....!!!",
+      showConfirmButton: false,   // ✅ OK बटन hide
+      timer: 2000,                // ✅ 2 सेकंदाने बंद होईल
+    }).then(() => {
       setIsAuth(true);
       navigate("/");
-    } else {
-      alert("❌ Invalid Email or Password!");
-    }
-  };
+    });
+  } else {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Login",
+      text: "❌ Invalid Email or Password!",
+      showConfirmButton: false,   // ✅ OK बटन hide
+      timer: 2000,                // ✅ 2 सेकंदाने बंद होईल
+    });
+  }
+};
+
+
 
   return (
     <div style={styles.container}>
@@ -101,8 +123,8 @@ const styles = {
     width: "100%",
     maxWidth: "400px",
     border: "1px solid rgba(255,255,255,0.2)",
-    marginTop: 50,
-    marginBottom: 50,
+    // marginTop: 50,
+    // marginBottom: 50,
   },
   image: {
     width: 90,

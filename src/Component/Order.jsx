@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
+import { FaTrashAlt, FaEye, FaSearch } from "react-icons/fa";
 
 const buttonStyles = {
   primary: {
@@ -497,25 +498,39 @@ export default function Orders() {
           <h2 style={themedStyles.title}>Orders</h2>
           <p style={themedStyles.subtitle}>Create, view and manage your orders easily</p>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <input
-            type="text"
-            placeholder="Search by customer name"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{
-              height: 40,
-              borderRadius: 10,
-              border: "1px solid #cbd5e1",
-              padding: "0 14px",
-              fontSize: 15,
-              background: "#fff",
-              color: "#18181b",
-              outline: "none",
-              minWidth: 220,
-              marginRight: 8,
-            }}
-          />
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ position: "relative", width: 459 }}>
+            <FaSearch
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#64748b",
+                fontSize: 18,
+                pointerEvents: "none",
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Search by customer name"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{
+                height: 40,
+                borderRadius: 10,
+                border: "1px solid #cbd5e1",
+                padding: "0 14px 0 38px", // left padding for icon
+                fontSize: 15,
+                background: "#fff",
+                color: "#18181b",
+                outline: "none",
+                minWidth: 180,
+                marginRight: 8,
+                width: "100%",
+              }}
+            />
+          </div>
           <button style={themedButtonStyles.primary} onClick={openForm} aria-label="Create order">
             <span style={{ fontSize: 20, lineHeight: 1 }}></span>
             <span>Add Order</span>
@@ -587,14 +602,14 @@ export default function Orders() {
                     justifyContent: "center",
                     minWidth: 140,
                   }}>
-                    <button style={{ ...themedButtonStyles.subtle, fontSize: 17, padding: "12px 18px" }} onClick={() => handleEdit(originalIndex)} title="Edit">
-                      Edit
+                    <button className="btn btn-outline-primary" onClick={() => handleEdit(originalIndex)} title="Edit">
+                      <i className="bi bi-pencil-fill"></i>
                     </button>
-                    <button style={{ ...themedButtonStyles.danger, fontSize: 17, padding: "12px 18px" }} onClick={() => handleDelete(originalIndex)} title="Delete">
-                      Delete
+                    <button className="btn btn-outline-danger" onClick={() => handleDelete(originalIndex)} title="Delete">
+                      <FaTrashAlt />
                     </button>
-                    <button style={{ ...themedButtonStyles.success, fontSize: 17, padding: "12px 18px" }} onClick={() => handleView(order)} title="View Invoice">
-                      View
+                    <button className="btn btn-outline-success" onClick={() => handleView(order)} title="View Invoice">
+                      <FaEye />
                     </button>
                   </div>
                 </div>
@@ -805,13 +820,14 @@ export default function Orders() {
                                 onChange={e => handleItemChange(idx, "name", e.target.value)}
                                 required
                                 style={{
-                                  width: "98%",
+                                  width: "89%",
                                   background: "#fff",
                                   color: "#18181b",
                                   border: "1px solid #cbd5e1",
                                   borderRadius: 6,
                                   padding: "6px 8px",
                                   fontSize: 15,
+                                  margin:10
                                 }}
                               />
                             </td>
@@ -890,6 +906,7 @@ export default function Orders() {
                                   padding: "4px 8px",
                                   cursor: "pointer",
                                   fontWeight: 700,
+                                  margin:10
                                 }}
                                 title="Remove item"
                               >❌</button>

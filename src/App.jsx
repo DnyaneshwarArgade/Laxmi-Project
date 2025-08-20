@@ -44,7 +44,7 @@ export default function App() {
             <span className="label">Order</span>
           </NavLink>
           <NavLink to="/customer" className="tab-item">
-            <span className="icon">🔍</span>
+            <span className="icon">👤</span>
             <span className="label">Customer</span>
           </NavLink>
         </nav>

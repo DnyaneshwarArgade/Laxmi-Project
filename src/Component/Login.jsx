@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { CgOverflow } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
 
 export default function Login({ setIsAuth }) {
@@ -103,6 +104,7 @@ const styles = {
     border: "1px solid rgba(255,255,255,0.2)",
     marginTop: 50,
     marginBottom: 50,
+
   },
   image: {
     width: 90,

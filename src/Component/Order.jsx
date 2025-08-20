@@ -445,7 +445,6 @@ export default function Orders() {
     },
   };
 
-  // Button styles (only light mode)
   const themedButtonStyles = {
     ...buttonStyles,
     secondary: {
@@ -498,25 +497,44 @@ export default function Orders() {
           <h2 style={themedStyles.title}>Orders</h2>
           <h6 style={themedStyles.subtitle}>Create, view and manage your orders easily</h6>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <input
-            type="text"
-            placeholder="Search by customer name"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{
-              height: 40,
-              borderRadius: 10,
-              border: "1px solid #cbd5e1",
-              padding: "0 14px",
-              fontSize: 15,
-              background: "#fff",
-              color: "#18181b",
-              outline: "none",
-              minWidth: 220,
-              marginRight: 8,
-            }}
-          />
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+            {/* Search Icon */}
+            <span
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#64748b",
+                fontSize: 18,
+                pointerEvents: "none",
+              }}
+            >
+              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7" />
+                <line x1="16.5" y1="16.5" x2="21" y2="21" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              placeholder="Search by customer name"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{
+                height: 40,
+                borderRadius: 10,
+                border: "1px solid #cbd5e1",
+                padding: "0 14px 0 38px", // left padding for icon
+                fontSize: 15,
+                background: "#fff",
+                color: "#18181b",
+                outline: "none",
+                minWidth: 220,
+                marginRight: 8,
+              }}
+            />
+          </div>
           <button style={themedButtonStyles.primary} onClick={openForm} aria-label="Create order">
             <span style={{ fontSize: 20, lineHeight: 1 }}></span>
             <span>Add Order</span>
@@ -557,7 +575,7 @@ export default function Orders() {
                   onMouseOver={e => e.currentTarget.style.boxShadow = "0 12px 32px rgba(59,130,246,0.18)"}
                   onMouseOut={e => e.currentTarget.style.boxShadow = themedStyles.card.boxShadow}
                 >
-                  {/* Left side: Data */}
+                 
                   <div style={{
                     flex: "1 1 220px",
                     minWidth: 0,
@@ -792,7 +810,7 @@ export default function Orders() {
                               textAlign: "center",
                               fontWeight: 600,
                               fontSize: 15,
-                              background: "#fff",
+                              background: "#fff",                              
                             }}>{idx + 1}</td>
                             <td style={{
                               border: "1px solid #e5e7eb",

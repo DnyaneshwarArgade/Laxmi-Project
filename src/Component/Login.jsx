@@ -1,51 +1,51 @@
 import React, { useState } from "react";
-import { CgOverflow } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { BsBorderWidth } from "react-icons/bs";
-
-export default function Login({ setIsAuth }) {
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "../store/creators";
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {
+    isLoading,
+    errMess,
+    login: loginData,
+  } = useSelector((state) => state.login);
 
-const handleLogin = (e) => {
-  e.preventDefault();
-
-  if (!email || !password) {
-    Swal.fire({
-      icon: "warning",
-      title: "Missing Fields",
-      text: "⚠️ Please enter Email and Password!",
-      showConfirmButton: false,   
-      timer: 2000,  
-    });
-    return;
-  }
-
-  if (email === "Laxmi@gmail.com" && password === "Laxmi51") {
-    Swal.fire({
-      icon: "success",
-      title: "Login Successful",
-      text: "Welcome to the Laxmi Genral Store....!!! 🎉",
-      timer: 2000,
-      showConfirmButton: false,   
-    }).then(() => {
-      setIsAuth(true);
-      navigate("/");
-    });
-  } else {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Credentials",
-      text: "❌ Invalid Email or Password!",
-      showConfirmButton: false,   
-      timer: 2000,                
-    });
-  }
-};
-
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "⚠️ Please enter Email and Password!",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      return;
+    }
+    // Dispatch Redux login
+    const resultAction = await dispatch(
+      actions.postLogin({ data: { email, password } })
+    );
+    if (actions.postLogin.fulfilled.match(resultAction)) {
+      const { success, token } = resultAction.payload;
+      if (success && token) {
+        navigate("/");
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: resultAction.payload || "Login Failed",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+  };
 
   return (
     <div style={styles.container} className="bg-light">
@@ -99,10 +99,6 @@ const handleLogin = (e) => {
             <span style={styles.btnText}>Login</span>
           </button>
         </form>
-
-        {/* <p style={styles.footerText}>
-          Demo: <b>Laxmi@gmail.com / Laxmi51</b>
-        </p> */}
       </div>
     </div>
   );
@@ -114,7 +110,6 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    // background: "linear-gradient(135deg, #1f1c2c, #c4c3caff)",
     fontFamily: "Segoe UI, sans-serif",
   },
   card: {
@@ -129,7 +124,6 @@ const styles = {
     border: "1px solid rgba(255,255,255,0.2)",
     marginTop: 50,
     marginBottom: 50,
-
   },
   image: {
     width: 90,
@@ -162,17 +156,16 @@ const styles = {
     marginBottom: 6,
     display: "block",
   },
- input: {
-  width: "100%",
-  height: 45,
-  borderRadius: 10,
-  border: "none",
-  padding: "0 15px",
-  fontSize: 15,
-  outline: "none",
-  background: "rgba(240, 240, 240, 0.9)",  // हलका gray
-
-},
+  input: {
+    width: "100%",
+    height: 45,
+    borderRadius: 10,
+    border: "none",
+    padding: "0 15px",
+    fontSize: 15,
+    outline: "none",
+    background: "rgba(240, 240, 240, 0.9)", // हलका gray
+  },
   btn: {
     background: "linear-gradient(90deg, #36d1dc, #5b86e5)",
     padding: "14px",

@@ -1,5 +1,5 @@
 import { Routes, Route, NavLink, Navigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useSelector } from "react-redux";
 import Items from "./Component/Items";
 import Order from "./Component/Order";
 import Customer from "./Component/Customer";
@@ -7,32 +7,29 @@ import Login from "./Component/Login";
 import "./App.css";
 
 export default function App() {
-  const [isAuth, setIsAuth] = useState(false); 
-  const location = useLocation(); 
-
+  const location = useLocation();
+  // Use Redux state for authentication
+  const { login: loginData } = useSelector((state) => state.login);
+  const isAuth = !!loginData?.token;
   // जर आपण login page वर असलो तर
   const isLoginPage = location.pathname === "/login";
+
+  // ProtectedRoute component
+  const ProtectedRoute = ({ children }) => {
+    return isAuth ? children : <Navigate to="/login" />;
+  };
 
   return (
     <div className={!isLoginPage ? "app-container bg-light" : ""}>
       <div className={!isLoginPage ? "page-content" : ""}>
         <Routes>
           {/* जर login झाले नसेल तर /login दाखवायचं */}
-          <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
+          <Route path="/login" element={<Login />} />
 
           {/* Protected Routes */}
-          <Route
-            path="/"
-            element={isAuth ? <Order /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/items"
-            element={isAuth ? <Items /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/customer"
-            element={isAuth ? <Customer /> : <Navigate to="/login" />}
-          />
+          <Route path="/" element={<ProtectedRoute><Order /></ProtectedRoute>} />
+          <Route path="/items" element={<ProtectedRoute><Items /></ProtectedRoute>} />
+          <Route path="/customer" element={<ProtectedRoute><Customer /></ProtectedRoute>} />
         </Routes>
       </div>
 

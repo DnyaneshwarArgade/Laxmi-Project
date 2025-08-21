@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 function Items() {
   const [showModal, setShowModal] = useState(false);
   const [items, setItems] = useState([]);
-  const [newItems, setNewItems] = useState([{ name: '', price: '', quantity: '' }]);
+  const [newItem, setNewItem] = useState({ name: '', price: '', quantity: '' });
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentItemIndex, setCurrentItemIndex] = useState(null);
 
@@ -22,48 +22,46 @@ function Items() {
   }, [items]);
 
   const handleSave = () => {
-    for (let item of newItems) {
-      if (!item.name.trim()) {
-        Swal.fire('Error', 'Please enter an item name', 'error');
-        return;
-      }
-      // if (!item.price || item.price <= 0) {
-      //   Swal.fire('Error', 'Please enter a valid price', 'error');
-      //   return;
-      // }
-      // if (!item.quantity || item.quantity <= 0) {
-      //   Swal.fire('Error', 'Please enter a valid quantity', 'error');
-      //   return;
-      // }
+    if (!newItem.name.trim()) {
+      Swal.fire('Error', 'Please enter an item name', 'error');
+      return;
     }
+    // if (!newItem.price || newItem.price <= 0) {
+    //   Swal.fire('Error', 'Please enter a valid price', 'error');
+    //   return;
+    // }
+    // if (!newItem.quantity || newItem.quantity <= 0) {
+    //   Swal.fire('Error', 'Please enter a valid quantity', 'error');
+    //   return;
+    // }
 
     if (isEditMode) {
       const updatedItems = [...items];
-      updatedItems[currentItemIndex] = newItems[0];
+      updatedItems[currentItemIndex] = newItem;
       setItems(updatedItems);
       Swal.fire({
         icon: 'success',
         title: 'Item Updated',
-        text: `${newItems[0].name} has been updated successfully!`,
+        text: `${newItem.name} has been updated successfully!`,
         timer: 2000,
         showConfirmButton: false
       });
     } else {
-      setItems([...items, ...newItems.map(i => ({
-        name: i.name,
-        price: Number(i.price),
-        quantity: Number(i.quantity)
-      }))]);
+      setItems([...items, {
+        name: newItem.name,
+        price: Number(newItem.price),
+        quantity: Number(newItem.quantity)
+      }]);
       Swal.fire({
         icon: 'success',
-        title: 'Items Added',
-        text: `${newItems.length} item(s) have been added successfully!`,
+        title: 'Item Added',
+        text: `${newItem.name} has been added successfully!`,
         timer: 2000,
         showConfirmButton: false
       });
     }
 
-    setNewItems([{ name: '', price: '', quantity: '' }]);
+    setNewItem({ name: '', price: '', quantity: '' });
     setIsEditMode(false);
     setCurrentItemIndex(null);
     setShowModal(false);
@@ -71,7 +69,7 @@ function Items() {
 
   const handleEdit = (index) => {
     const item = items[index];
-    setNewItems([{ name: item.name, price: item.price, quantity: item.quantity }]);
+    setNewItem({ name: item.name, price: item.price, quantity: item.quantity });
     setIsEditMode(true);
     setCurrentItemIndex(index);
     setShowModal(true);
@@ -104,18 +102,8 @@ function Items() {
 
 
 
-  const addMoreItemRow = () => {
-    setNewItems([...newItems, { name: '', price: '', quantity: '' }]);
-  };
-
-  const updateItemField = (index, field, value) => {
-    const updated = [...newItems];
-    updated[index][field] = value;
-    setNewItems(updated);
-  };
-
-  const removeItemRow = (index) => {
-    setNewItems((prevItems) => prevItems.filter((_, i) => i !== index));
+  const updateItemField = (field, value) => {
+    setNewItem((prev) => ({ ...prev, [field]: value }));
   };
 
 
@@ -130,7 +118,7 @@ function Items() {
           className="btn btn-primary btn-md position-absolute end-0 top-50 translate-middle-y"
           onClick={() => {
             setIsEditMode(false);
-            setNewItems([{ name: '', price: '', quantity: '' }]);
+            setNewItem({ name: '', price: '', quantity: '' });
             setShowModal(true);
           }}
         >
@@ -199,7 +187,7 @@ function Items() {
                 }}
               >
                 <h5 className="modal-title fw-bold d-flex align-items-center">
-                  {isEditMode ? 'Edit Item' : 'Add New Item(s)'}
+                  {isEditMode ? 'Edit Item' : 'Add New Item'}
                 </h5>
                 <button
                   type="button"
@@ -209,64 +197,38 @@ function Items() {
               </div>
 
               <div className="modal-body p-4 bg-light">
-                {newItems.map((item, idx) => (
-                  <div key={idx} className="border rounded-3 p-3 mb-3 bg-white shadow-sm position-relative">
-
-                    {/* Remove Button - Right Top Corner */}
-                    {!isEditMode && newItems.length > 1 && (
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 rounded-circle"
-                        onClick={() => removeItemRow(idx)}
-                        title="Remove this item"
-                      >
-                        <i className="bi bi-x-lg"></i>
-                      </button>
-                    )}
-
-                    <div className="mb-2">
-                      <label className="form-label fw-semibold">Item Name</label>
-                      <input
-                        type="text"
-                        className="form-control form-control-lg shadow-lg border-0 rounded-3"
-                        placeholder="Enter item name"
-                        value={item.name}
-                        onChange={(e) => updateItemField(idx, 'name', e.target.value)}
-                      />
-                    </div>
-                    <div className="mb-2">
-                      <label className="form-label fw-semibold">Item Price</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-lg shadow-lg border-0 rounded-3"
-                        placeholder="Enter item price"
-                        value={item.price}
-                        onChange={(e) => updateItemField(idx, 'price', e.target.value)}
-                      />
-                    </div>
-                    <div className="mb-2">
-                      <label className="form-label fw-semibold">Quantity</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-lg shadow-lg border-0 rounded-3"
-                        placeholder="Enter item quantity"
-                        value={item.quantity}
-                        onChange={(e) => updateItemField(idx, 'quantity', e.target.value)}
-                      />
-                    </div>
+                <div className="border rounded-3 p-3 mb-3 bg-white shadow-sm position-relative">
+                  <div className="mb-2">
+                    <label className="form-label fw-semibold">Item Name</label>
+                    <input
+                      type="text"
+                      className="form-control form-control-lg shadow-lg border-0 rounded-3"
+                      placeholder="Enter item name"
+                      value={newItem.name}
+                      onChange={(e) => updateItemField('name', e.target.value)}
+                    />
                   </div>
-                ))}
-
-
-                {!isEditMode && (
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary w-100 rounded-pill"
-                    onClick={addMoreItemRow}
-                  >
-                    <i className="bi bi-plus-circle me-2"></i> Add More Item
-                  </button>
-                )}
+                  <div className="mb-2">
+                    <label className="form-label fw-semibold">Item Price</label>
+                    <input
+                      type="number"
+                      className="form-control form-control-lg shadow-lg border-0 rounded-3"
+                      placeholder="Enter item price"
+                      value={newItem.price}
+                      onChange={(e) => updateItemField('price', e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label fw-semibold">Quantity</label>
+                    <input
+                      type="number"
+                      className="form-control form-control-lg shadow-lg border-0 rounded-3"
+                      placeholder="Enter item quantity"
+                      value={newItem.quantity}
+                      onChange={(e) => updateItemField('quantity', e.target.value)}
+                    />
+                  </div>
+                </div>
               </div>
 
               <div

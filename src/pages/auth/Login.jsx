@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useDispatch, useSelector } from "react-redux";
-import * as actions from "../store/creators";
+import * as actions from "../../store/creators";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

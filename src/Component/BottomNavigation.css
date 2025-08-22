@@ -1,0 +1,32 @@
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+  z-index: 100;
+  padding: 0.5rem 0;
+}
+
+.nav-item {
+  color: #888;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+}
+
+.nav-item.active {
+  color: #1976d2;
+}
+
+.nav-label {
+  font-size: 0.8rem;
+  margin-top: 2px;
+}

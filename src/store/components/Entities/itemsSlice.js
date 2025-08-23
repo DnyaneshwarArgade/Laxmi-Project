@@ -100,11 +100,15 @@ export const deleteItemsData = createAsyncThunk(
       const myheader = axiosWithToken(data);
       await axios.delete(`${url}/${id}`, { headers: myheader?.headers });
 
-      Swal.fire("Deleted!", "Item Record has been deleted.", "success").then(
-        () => {
-          dispatch(itemsGetData(data));
-        }
-      );
+      Swal.fire({
+        title: "Deleted!",
+        text: "Item Record has been deleted.",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500
+      }).then(() => {
+        dispatch(itemsGetData(data));
+      });
     } catch (error) {
       return rejectWithValue(
         error.message || "An error occurred while deleting item data."

@@ -28,6 +28,10 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Items = () => {
+  // Validation state
+  const [errors, setErrors] = useState({});
+  // Search filter state
+  const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const { items } = useSelector((state) => state.entities.items);
@@ -63,6 +67,15 @@ const Items = () => {
   // handle form submit (Create + Update)
   const handleSubmit = (e) => {
     e.preventDefault();
+    let newErrors = {};
+    if (!formData.name || formData.name.trim().length < 2) {
+      newErrors.name = "Name is required (min 2 chars)";
+    }
+    if (!formData.price || isNaN(formData.price) || Number(formData.price) <= 0) {
+      newErrors.price = "Price must be a positive number";
+    }
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
 
     if (editMode && editId) {
       dispatch(actions.updateItemsData({ data: { token: login?.token, id: editId }, items: formData }));
@@ -76,6 +89,7 @@ const Items = () => {
     setFormData({ name: "", price: "", type: "Batla" });
     setEditMode(false);
     setEditId(null);
+    setErrors({});
   };
 
   // handle edit click
@@ -144,6 +158,8 @@ const Items = () => {
             <Search fontSize="small" sx={{ color: "#42a5f5", mr: 1 }} />
             <InputBase
               placeholder="Search by item name"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               sx={{
                 flex: 1,
                 fontSize: 14,
@@ -183,8 +199,8 @@ const Items = () => {
       </Box>
 
       {/* Table */}
-      <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 2 }}>
-        <Table>
+      <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 2, maxHeight: 350, overflowY: "auto" }}>
+        <Table stickyHeader>
           <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
@@ -198,23 +214,27 @@ const Items = () => {
 
           <TableBody>
             {Array.isArray(items?.data) &&
-              items.data.map((item) => {
-                return (
-                  <TableRow key={item.id} hover>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>₹ {item.price}</TableCell>
-                    {/* <TableCell>{item.type}</TableCell> */}
-                    <TableCell align="right">
-                      <IconButton color="primary" onClick={() => handleEdit(item)}>
-                        <Edit />
-                      </IconButton>
-                      <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
+              items.data
+                .filter(item =>
+                  item.name.toLowerCase().includes(search.toLowerCase())
                 )
-              })}
+                .map((item) => {
+                  return (
+                    <TableRow key={item.id} hover>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>₹ {item.price}</TableCell>
+                      {/* <TableCell>{item.type}</TableCell> */}
+                      <TableCell align="right">
+                        <IconButton color="primary" onClick={() => handleEdit(item)}>
+                          <Edit />
+                        </IconButton>
+                        <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -288,6 +308,8 @@ const Items = () => {
               required
               fullWidth
               variant="outlined"
+              error={!!errors.name}
+              helperText={errors.name}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
@@ -313,6 +335,8 @@ const Items = () => {
               required
               fullWidth
               variant="outlined"
+              error={!!errors.price}
+              helperText={errors.price}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 2,

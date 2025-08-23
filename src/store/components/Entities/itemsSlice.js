@@ -35,12 +35,15 @@ export const itemsGetData = createAsyncThunk(
 export const postItemsData = createAsyncThunk(
   "items/postData",
   async (
-    { data, items, toggle, setSubmitting },
+    { data, formData, toggle, setSubmitting },
     { rejectWithValue, dispatch }
   ) => {
+    console.log('data', data)
+    console.log('formData', formData)
+
     try {
       const myheader = axiosWithToken(data, true);
-      const response = await axios.post(url, items, {
+      const response = await axios.post(url, formData, {
         headers: myheader?.headers,
       });
 

@@ -14,6 +14,8 @@ const Customers = () => {
   useEffect(() => {
     dispatch(actions.customersGetData(data));
   }, []);
+
+
   return (
     <div>
       {customers.data && customers.data.map((item) => {

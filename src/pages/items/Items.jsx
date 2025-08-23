@@ -199,8 +199,8 @@ const Items = () => {
       </Box>
 
       {/* Table */}
-      <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 2, maxHeight: 350, overflowY: "auto" }}>
-        <Table stickyHeader>
+      <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 2 }}>
+        <Table>
           <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>

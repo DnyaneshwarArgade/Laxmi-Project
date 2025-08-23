@@ -35,12 +35,15 @@ export const itemsGetData = createAsyncThunk(
 export const postItemsData = createAsyncThunk(
   "items/postData",
   async (
-    { data, items, toggle, setSubmitting },
+    { data, formData, toggle, setSubmitting },
     { rejectWithValue, dispatch }
   ) => {
+    console.log('data', data)
+    console.log('formData', formData)
+
     try {
       const myheader = axiosWithToken(data, true);
-      const response = await axios.post(url, items, {
+      const response = await axios.post(url, formData, {
         headers: myheader?.headers,
       });
 
@@ -97,11 +100,15 @@ export const deleteItemsData = createAsyncThunk(
       const myheader = axiosWithToken(data);
       await axios.delete(`${url}/${id}`, { headers: myheader?.headers });
 
-      Swal.fire("Deleted!", "Item Record has been deleted.", "success").then(
-        () => {
-          dispatch(itemsGetData(data));
-        }
-      );
+      Swal.fire({
+        title: "Deleted!",
+        text: "Item Record has been deleted.",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500
+      }).then(() => {
+        dispatch(itemsGetData(data));
+      });
     } catch (error) {
       return rejectWithValue(
         error.message || "An error occurred while deleting item data."

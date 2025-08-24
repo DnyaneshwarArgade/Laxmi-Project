@@ -23,18 +23,24 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Search, Delete, Edit } from "@mui/icons-material";
-import { WarningAmber, Close } from "@mui/icons-material";
+import { Search, Delete, Edit, PersonAdd } from "@mui/icons-material";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import TextField from "@mui/material/TextField";
+import Swal from "sweetalert2";
 
-// ✅ Toastify
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// ✅ Validation Schema
+const schema = yup.object({
+  name: yup.string().required("Name is required"),
+  address: yup.string().required("Address is required"),
+  phone: yup
+    .string()
+    .matches(/^\d{10}$/, "Phone must be 10 digits")
+    .required("Phone is required"),
+});
 
-const Items = () => {
-  // Validation state
-  const [errors, setErrors] = useState({});
-  // Search filter state
-  const [search, setSearch] = useState("");
+const Customers = () => {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const token = login?.token;
@@ -131,32 +137,27 @@ const Items = () => {
     }
   };
 
-  // handle edit click
-  const handleEdit = (item) => {
-    setFormData({
-      name: item.name,
-      price: item.price,
-      type: "Batla",
+  const onDelete = (row) => {
+    Swal.fire({
+      title: `Delete ${row?.name}?`,
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(actions.deleteCustomersData({ id: row.id, data: { token } }));
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: `${row?.name} has been deleted.`,
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
     });
-    setEditId(item.id);
-    setEditMode(true);
-    setOpen(true);
-  };
-
-  // handle delete click -> open confirmation dialog
-  const handleDeleteClick = (id) => {
-    setDeleteId(id);
-    setDeleteDialog(true);
-  };
-
-  // confirm delete
-  const confirmDelete = () => {
-    if (deleteId) {
-      dispatch(actions.deleteItemsData({ data, id: deleteId }));
-      toast.error("Item deleted ❌");
-    }
-    setDeleteDialog(false);
-    setDeleteId(null);
   };
 
   return (
@@ -243,32 +244,43 @@ const Items = () => {
           </Box>
         </Box>
 
-      {/* Table */}
-      <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 2, maxHeight: 350, overflowY: "auto" }}>
-        <Table stickyHeader>
-          <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Price</TableCell>
-              {/* <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell> */}
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
+        {error && (
+          <Typography color="error" sx={{ mb: 2 }}>
+            {String(error)}
+          </Typography>
+        )}
 
-          <TableBody>
-            {Array.isArray(items?.data) &&
-              items.data
-                .filter(item =>
-                  item.name.toLowerCase().includes(search.toLowerCase())
-                )
-                .map((item) => {
-                  return (
-                    <TableRow key={item.id} hover>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>₹ {item.price}</TableCell>
-                      {/* <TableCell>{item.type}</TableCell> */}
+        {isLoading ? (
+          <Box display="flex" justifyContent="center" py={6}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 3 }}>
+            <Table size={isMobile ? "small" : "medium"}>
+              <TableHead sx={{ backgroundColor: "#f1f4f9" }}>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Phone</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filtered.length > 0 ? (
+                  filtered.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      hover
+                      sx={{
+                        "&:hover": { backgroundColor: "#f0faff" },
+                        transition: "0.3s",
+                      }}
+                    >
+                      <TableCell>{row.name}</TableCell>
+                      <TableCell>{row.address}</TableCell>
+                      <TableCell>{row.phone}</TableCell>
                       <TableCell align="right">
                         <IconButton
                           color="primary"

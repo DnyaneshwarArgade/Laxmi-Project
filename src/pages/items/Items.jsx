@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import * as actions from "../../store/creators";
 import {
@@ -15,375 +15,402 @@ import {
   TableRow,
   Typography,
   Dialog,
-  DialogActions,
-  DialogContent,
   DialogTitle,
-  CircularProgress,
-  Card,
-  useMediaQuery,
-  useTheme,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from "@mui/material";
-import { Search, Delete, Edit, PersonAdd } from "@mui/icons-material";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import TextField from "@mui/material/TextField";
+import { Search, Delete, Edit } from "@mui/icons-material";
 import Swal from "sweetalert2";
 
-// ✅ Validation Schema
-const schema = yup.object({
-  name: yup.string().required("Name is required"),
-  address: yup.string().required("Address is required"),
-  phone: yup
-    .string()
-    .matches(/^\d{10}$/, "Phone must be 10 digits")
-    .required("Phone is required"),
-});
+// ✅ Toastify
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const Customers = () => {
+const Items = () => {
+  // Validation state
+  const [errors, setErrors] = useState({});
+  // Search filter state
+  const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
-  const token = login?.token;
-
-  const {
-    customers,
-    isLoading,
-    isPostLoading,
-    isUpdateLoading,
-    error,
-  } = useSelector((state) => state.entities.customers);
-
-  const [search, setSearch] = useState("");
-  const [openForm, setOpenForm] = useState(false);
-  const [editing, setEditing] = useState(null);
-
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: { name: "", address: "", phone: "" },
+  const { items } = useSelector((state) => state.entities.items);
+  console.log('items', items)
+  const data = {
+    token: login?.token,
+  }
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "Pen",
+    price: "10",
+    type: "Batla",
   });
+  console.log('formData', formData)
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const list = useMemo(() => {
-    if (Array.isArray(customers)) return customers;
-    if (customers?.data && Array.isArray(customers.data)) return customers.data;
-    return [];
-  }, [customers]);
+  // delete confirmation
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    if (token) dispatch(actions.customersGetData({ token }));
-  }, [dispatch, token]);
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return list;
-    return list.filter((c) => (c?.name || "").toLowerCase().includes(q));
-  }, [list, search]);
-
-  const openAdd = () => {
-    setEditing(null);
-    reset({ name: "", address: "", phone: "" });
-    setOpenForm(true);
-  };
-
-  const openEdit = (row) => {
-    setEditing(row);
-    reset({ name: row.name, address: row.address, phone: row.phone });
-    setOpenForm(true);
-  };
-
-  const closeForm = () => {
-    setOpenForm(false);
-    setEditing(null);
-  };
-
-  const onSubmit = (data) => {
-    const toggle = () => {
-      closeForm();
-      Swal.fire({
-        icon: "success",
-        title: editing ? "Customer Updated!" : "Customer Added!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    };
-
-    const setSubmitting = () => {};
-
-    if (editing?.id) {
-      dispatch(
-        actions.updateCustomersData({
-          data: { token, id: editing.id },
-          customers: data,
-          toggle,
-          setSubmitting,
-        })
-      );
-    } else {
-      dispatch(
-        actions.postCustomersData({
-          data: { token },
-          customers: data,
-          toggle,
-          setSubmitting,
-        })
-      );
+    if (login?.token) {
+      dispatch(actions.itemsGetData({ token: login?.token }));
     }
+  }, [dispatch, login]);
+
+  // handle input change
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const onDelete = (row) => {
-    Swal.fire({
-      title: `Delete ${row?.name}?`,
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(actions.deleteCustomersData({ id: row.id, data: { token } }));
-        Swal.fire({
-          icon: "success",
-          title: "Deleted!",
-          text: `${row?.name} has been deleted.`,
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      }
-    });
+  // handle form submit (Create + Update)
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let newErrors = {};
+    if (!formData.name || formData.name.trim().length < 2) {
+      newErrors.name = "Name is required (min 2 chars)";
+    }
+    if (!formData.price || isNaN(formData.price) || Number(formData.price) <= 0) {
+      newErrors.price = "Price must be a positive number";
+    }
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
+    if (editMode && editId) {
+      dispatch(actions.updateItemsData({ data: { token: login?.token, id: editId }, items: formData }));
+      toast.success("Item updated successfully ✏");
+    } else {
+      dispatch(actions.postItemsData({ data, formData }));
+      toast.success("Item created successfully ✅");
+    }
+
+    setOpen(false);
+    setFormData({ name: "", price: "", type: "Batla" });
+    setEditMode(false);
+    setEditId(null);
+    setErrors({});
   };
+
+  // handle edit click
+  const handleEdit = (item) => {
+    setFormData({
+      name: item.name,
+      price: item.price,
+      type: "Batla",
+    });
+    setEditId(item.id);
+    setEditMode(true);
+    setOpen(true);
+  };
+
+  // handle delete click -> open confirmation dialog
+ const handleDeleteClick = (id) => {
+  setDeleteId(id);
+
+  // SweetAlert confirm popup
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this action!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      confirmDelete(id); // call confirm delete
+    }
+  });
+};
+
+
+// confirm delete
+const confirmDelete = (id) => {
+  if (id) {
+    dispatch(actions.deleteItemsData({ data, id }));
+    Swal.fire({
+      icon: "success",
+      title: "Deleted!",
+      text: "Your item has been deleted.",
+      showConfirmButton: false,  
+      timer: 2000,               
+    });
+  }
+};
 
   return (
-    <Box sx={{ p: isMobile ? 2 : 4, backgroundColor: "#f9fafb", minHeight: "100vh" }}>
-      <Card
-        sx={{
-          p: isMobile ? 2 : 3,
-          borderRadius: "16px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-          backgroundColor: "#fff",
-        }}
-      >
-        {/* Header */}
-        <Box
-          display="flex"
-          flexDirection={isMobile ? "column" : "row"}
-          justifyContent="space-between"
-          alignItems={isMobile ? "stretch" : "center"}
-          mb={3}
-          gap={2}
-        >
-          <Box>
-            <Typography variant="h4" fontWeight="bold" color="primary">
-              Customers
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Manage and track all your customers easily
-            </Typography>
-          </Box>
-
-          <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={2}>
-            {/* 🔍 Search Box */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                width: isMobile ? "100%" : 280,
-                background: "#ffffff",
-                borderRadius: "25px",
-                padding: "4px 12px",
-                border: "2px solid #667eea",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  borderColor: "#5a67d8",
-                  boxShadow: "0 0 8px rgba(102,126,234,0.5)",
-                },
-                "&:focus-within": {
-                  borderColor: "#5a67d8",
-                  boxShadow: "0 0 8px rgba(90,103,216,0.6)",
-                },
-              }}
-            >
-              <Search fontSize="small" sx={{ color: "#667eea", mr: 1 }} />
-              <InputBase
-                placeholder="Search by customer name"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                sx={{
-                  flex: 1,
-                  fontSize: 14,
-                  color: "#333",
-                  "&::placeholder": { color: "#999" },
-                }}
-              />
-            </Box>
-
-            {/* Add Customer Button */}
-            <Button
-              variant="contained"
-              startIcon={<PersonAdd />}
-              sx={{
-                borderRadius: "8px",
-                px: 3,
-                py: 1,
-                textTransform: "none",
-                fontWeight: "bold",
-                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              }}
-              onClick={openAdd}
-              fullWidth={isMobile}
-            >
-              Add Customer
-            </Button>
-          </Box>
+    <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh" }}>
+      {/* Header */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box>
+          <Typography variant="h5" fontWeight="bold">
+            Items
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            View and manage your items
+          </Typography>
         </Box>
 
-        {error && (
-          <Typography color="error" sx={{ mb: 2 }}>
-            {String(error)}
-          </Typography>
-        )}
-
-        {isLoading ? (
-          <Box display="flex" justifyContent="center" py={6}>
-            <CircularProgress />
+        {/* Search + Add Button */}
+        <Box display="flex" alignItems="center" gap={2}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              width: 280,
+              background: "white",
+              borderRadius: "25px",
+              padding: "4px 12px",
+              border: "2px solid #42a5f5",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                borderColor: "#1e88e5",
+                boxShadow: "0 0 8px rgba(66,165,245,0.5)",
+              },
+              "&:focus-within": {
+                borderColor: "#1e88e5",
+                boxShadow: "0 0 8px rgba(30,136,229,0.6)",
+              },
+            }}
+          >
+            <Search fontSize="small" sx={{ color: "#42a5f5", mr: 1 }} />
+            <InputBase
+              placeholder="Search by item name"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              sx={{
+                flex: 1,
+                fontSize: 14,
+                color: "#333",
+                "&::placeholder": { color: "#999" },
+              }}
+            />
           </Box>
-        ) : (
-          <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 3 }}>
-            <Table size={isMobile ? "small" : "medium"}>
-              <TableHead sx={{ backgroundColor: "#f1f4f9" }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Phone</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filtered.length > 0 ? (
-                  filtered.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      hover
-                      sx={{
-                        "&:hover": { backgroundColor: "#f0faff" },
-                        transition: "0.3s",
-                      }}
-                    >
-                      <TableCell>{row.name}</TableCell>
-                      <TableCell>{row.address}</TableCell>
-                      <TableCell>{row.phone}</TableCell>
+
+          {/* Add Button */}
+          <Button
+            variant="contained"
+            onClick={() => {
+              setFormData({ name: "", price: "", type: "Batla" });
+              setEditMode(false);
+              setEditId(null);
+              setOpen(true);
+            }}
+            sx={{
+              minWidth: 40,
+              height: 40,
+              borderRadius: "50%",
+              textTransform: "none",
+              fontSize: 22,
+              fontWeight: "bold",
+              background: "linear-gradient(135deg,#43ee90ff, #2527adff)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #1565c0, #1e88e5)",
+                transform: "scale(1.00) rotate(10deg)",
+                boxShadow: "0 6px 16px rgba(25,118,210,0.5)",
+              },
+            }}
+          >
+            +
+          </Button>
+        </Box>
+      </Box>
+
+      {/* Table */}
+      <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 2 }}>
+        <Table>
+          <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
+            <TableRow>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Price</TableCell>
+              {/* <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell> */}
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                Actions
+              </TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {Array.isArray(items?.data) &&
+              items.data
+                .filter(item =>
+                  item.name.toLowerCase().includes(search.toLowerCase())
+                )
+                .map((item) => {
+                  return (
+                    <TableRow key={item.id} hover>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>₹ {item.price}</TableCell>
+                      {/* <TableCell>{item.type}</TableCell> */}
                       <TableCell align="right">
-                        <IconButton
-                          color="primary"
-                          onClick={() => openEdit(row)}
-                          sx={{ "&:hover": { backgroundColor: "#e3f2fd" } }}
-                        >
+                        <IconButton color="primary" onClick={() => handleEdit(item)}>
                           <Edit />
                         </IconButton>
-                        <IconButton
-                          color="error"
-                          onClick={() => onDelete(row)}
-                          sx={{ "&:hover": { backgroundColor: "#ffebee" } }}
-                        >
+                        <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
                           <Delete />
                         </IconButton>
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} align="center">
-                      No customers found
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Card>
+                  )
+                })}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      {/* Add / Edit Dialog */}
-      <Dialog open={openForm} onClose={closeForm} fullWidth maxWidth="sm">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogTitle sx={{ fontWeight: "bold" }}>
-            {editing ? "Edit Customer" : "Add Customer"}
-          </DialogTitle>
-          <DialogContent>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  placeholder="Enter name"
-                  fullWidth
-                  margin="dense"
-                  error={!!errors.name}
-                  helperText={errors.name?.message}
-                />
-              )}
-            />
-            <Controller
-              name="address"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  placeholder="Enter address"
-                  fullWidth
-                  margin="dense"
-                  error={!!errors.address}
-                  helperText={errors.address?.message}
-                />
-              )}
-            />
-            <Controller
-              name="phone"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  placeholder="Enter phone number"
-                  fullWidth
-                  margin="dense"
-                  error={!!errors.phone}
-                  helperText={errors.phone?.message}
-                />
-              )}
-            />
-          </DialogContent>
-          <DialogActions sx={{ p: 2 }}>
-            <Button onClick={closeForm}>Cancel</Button>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={isPostLoading || isUpdateLoading}
+      {/* Add / Edit Item Dialog */}
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: { borderRadius: 3, p: 1.5, boxShadow: 8 },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            bgcolor: "linear-gradient(135deg, #1976d2 30%, #42a5f5 90%)",
+            color: "white",
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            py: 2,
+            px: 3,
+          }}
+        >
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography fontWeight="bold" fontSize={20} color="black">
+              {editMode ? "Edit Item" : "Add Item"}
+            </Typography>
+            <Box
+              onClick={() => setOpen(false)}
               sx={{
-                borderRadius: "8px",
-                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background: "white",
+                color: "#1976d2",
+                fontSize: 22,
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                "&:hover": {
+                  background: "#e3f2fd",
+                },
               }}
             >
-              {isPostLoading || isUpdateLoading ? (
-                <CircularProgress size={20} sx={{ color: "white" }} />
-              ) : (
-                "Save"
-              )}
-            </Button>
-          </DialogActions>
-        </form>
+              ×
+            </Box>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent sx={{ mt: 0 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+            }}
+          >
+            <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
+              Item Name
+            </Typography>
+            <TextField
+              placeholder="Enter item name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              fullWidth
+              variant="outlined"
+              error={!!errors.name}
+              helperText={errors.name}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  height: 50,
+                },
+                "& .MuiOutlinedInput-input": {
+                  padding: "12px 15px",
+                  fontSize: 16,
+                },
+                width: "100%",
+              }}
+            />
+
+            <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
+              Price
+            </Typography>
+            <TextField
+              placeholder="Enter price"
+              name="price"
+              type="number"
+              value={formData.price}
+              onChange={handleChange}
+              required
+              fullWidth
+              variant="outlined"
+              error={!!errors.price}
+              helperText={errors.price}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  height: 50,
+                },
+                "& .MuiOutlinedInput-input": {
+                  padding: "12px 15px",
+                  fontSize: 16,
+                },
+                width: "100%",
+              }}
+            />
+
+
+          </Box>
+        </DialogContent>
+
+        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            sx={{
+              px: 4,
+              borderRadius: 2,
+              textTransform: "none",
+              background: "linear-gradient(135deg, #1976d2, #42a5f5)",
+              boxShadow: "0 4px 12px rgba(17, 17, 17, 0.4)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #1565c0, #1e88e5)",
+              },
+            }}
+          >
+            {editMode ? "Update" : "Submit"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialog} onClose={() => setDeleteDialog(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this item?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </Box>
   );
 };
 
-export default Customers;
+export default Items;

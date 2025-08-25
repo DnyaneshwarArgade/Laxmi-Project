@@ -11,9 +11,9 @@ export default function DashboardCards() {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state?.login);
   const { count, isLoading } = useSelector((state) => state?.dashboard?.count);
-
   console.log("count", count);
 
+  // Token payload
   const data = {
     token: login?.token,
   };
@@ -22,32 +22,34 @@ export default function DashboardCards() {
     dispatch(countGetData(data));
   }, [dispatch, login?.token]);
 
-  // UI Card Configuration
+  // UI Card Configuration (show only total_customers, total_items, complete, and add Total Orders)
   const cardData = [
     {
       title: "Total Customers",
-      value: count?.total_customers || 0,
+      value: count?.data?.total_customers ?? count?.total_customers ?? 0,
       icon: <PeopleIcon fontSize="large" />,
       color: "#E3F2FD",
       iconColor: "#1976D2",
     },
     {
       title: "Total Items",
-      value: count?.total_items || 0,
+      value: count?.data?.total_items ?? count?.total_items ?? 0,
       icon: <ShoppingCartIcon fontSize="large" />,
       color: "#FFF3E0",
       iconColor: "#F57C00",
     },
     {
       title: "Completed Orders",
-      value: count?.complete || 0,
+      value: count?.data?.complete ?? count?.complete ?? 0,
       icon: <CheckCircleIcon fontSize="large" />,
       color: "#E8F5E9",
       iconColor: "#388E3C",
     },
     {
-      title: "Pending Orders",
-      value: count?.pending || 0,
+      title: "Total Orders",
+      value:
+        (count?.data?.complete ?? count?.complete ?? 0) +
+        (count?.data?.pending ?? count?.pending ?? 0),
       icon: <AccessTimeIcon fontSize="large" />,
       color: "#FCE4EC",
       iconColor: "#C2185B",
@@ -80,7 +82,7 @@ export default function DashboardCards() {
       >
         {cardData.map((item, index) => (
           <Card
-            key={index}
+            key={item}
             sx={{
               borderRadius: "16px",
               background: "#fff",

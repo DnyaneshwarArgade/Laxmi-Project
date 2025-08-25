@@ -21,7 +21,7 @@ import {
   TextField,
 } from "@mui/material";
 import { Search, Delete, Edit } from "@mui/icons-material";
-import { WarningAmber, Close } from "@mui/icons-material";
+import Swal from "sweetalert2";
 
 // ✅ Toastify
 import { toast } from "react-toastify";
@@ -79,7 +79,7 @@ const Items = () => {
 
     if (editMode && editId) {
       dispatch(actions.updateItemsData({ data: { token: login?.token, id: editId }, items: formData }));
-      toast.success("Item updated successfully ✏️");
+      toast.success("Item updated successfully ✏");
     } else {
       dispatch(actions.postItemsData({ data, formData }));
       toast.success("Item created successfully ✅");
@@ -105,27 +105,47 @@ const Items = () => {
   };
 
   // handle delete click -> open confirmation dialog
-  const handleDeleteClick = (id) => {
-    setDeleteId(id);
-    setDeleteDialog(true);
-  };
+ const handleDeleteClick = (id) => {
+  setDeleteId(id);
 
-  // confirm delete
-  const confirmDelete = () => {
-    if (deleteId) {
-      dispatch(actions.deleteItemsData({ data, id: deleteId }));
-      toast.error("Item deleted ❌");
+  // SweetAlert confirm popup
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this action!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      confirmDelete(id); // call confirm delete
     }
-    setDeleteDialog(false);
-    setDeleteId(null);
-  };
+  });
+};
+
+
+// confirm delete
+const confirmDelete = (id) => {
+  if (id) {
+    dispatch(actions.deleteItemsData({ data, id }));
+    Swal.fire({
+      icon: "success",
+      title: "Deleted!",
+      text: "Your item has been deleted.",
+      showConfirmButton: false,  
+      timer: 2000,               
+    });
+  }
+};
 
   return (
     <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh" }}>
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Box>
-          <Typography variant="h5" fontWeight="bold">
+          <Typography variant="h4" fontWeight="bold" color="primary">
             Items
           </Typography>
           <Typography variant="body2" color="text.secondary">

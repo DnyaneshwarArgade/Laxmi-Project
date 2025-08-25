@@ -20,6 +20,8 @@ import {
   DialogTitle,
   CircularProgress,
   Card,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { Search, Delete, Edit, PersonAdd } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
@@ -64,6 +66,9 @@ const Customers = () => {
     resolver: yupResolver(schema),
     defaultValues: { name: "", address: "", phone: "" },
   });
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const list = useMemo(() => {
     if (Array.isArray(customers)) return customers;
@@ -156,10 +161,24 @@ const Customers = () => {
   };
 
   return (
-    <Box sx={{ p: 4, backgroundColor: "#eef3f9", minHeight: "100vh" }}>
-      <Card sx={{ p: 3, borderRadius: "16px", boxShadow: 4 }}>
+    <Box sx={{ p: isMobile ? 2 : 4, backgroundColor: "#f9fafb", minHeight: "100vh" }}>
+      <Card
+        sx={{
+          p: isMobile ? 2 : 3,
+          borderRadius: "16px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          backgroundColor: "#fff",
+        }}
+      >
         {/* Header */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Box
+          display="flex"
+          flexDirection={isMobile ? "column" : "row"}
+          justifyContent="space-between"
+          alignItems={isMobile ? "stretch" : "center"}
+          mb={3}
+          gap={2}
+        >
           <Box>
             <Typography variant="h4" fontWeight="bold" color="primary">
               Customers
@@ -169,39 +188,56 @@ const Customers = () => {
             </Typography>
           </Box>
 
-          <Box display="flex" alignItems="center" gap={2}>
-            <Paper
+          <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={2}>
+            {/* 🔍 Search Box */}
+            <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                px: 2,
-                py: 0.5,
-                borderRadius: "30px",
-                boxShadow: 1,
-                width: 280,
-                backgroundColor: "#fff",
+                width: isMobile ? "100%" : 280,
+                background: "#ffffff",
+                borderRadius: "25px",
+                padding: "4px 12px",
+                border: "2px solid #667eea",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  borderColor: "#5a67d8",
+                  boxShadow: "0 0 8px rgba(102,126,234,0.5)",
+                },
+                "&:focus-within": {
+                  borderColor: "#5a67d8",
+                  boxShadow: "0 0 8px rgba(90,103,216,0.6)",
+                },
               }}
             >
-              <Search fontSize="small" sx={{ color: "gray" }} />
+              <Search fontSize="small" sx={{ color: "#667eea", mr: 1 }} />
               <InputBase
-                placeholder="Search customer"
+                placeholder="Search by customer name"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                sx={{ ml: 1, flex: 1 }}
+                sx={{
+                  flex: 1,
+                  fontSize: 14,
+                  color: "#333",
+                  "&::placeholder": { color: "#999" },
+                }}
               />
-            </Paper>
+            </Box>
+
+            {/* Add Customer Button */}
             <Button
               variant="contained"
               startIcon={<PersonAdd />}
               sx={{
-                borderRadius: "30px",
+                borderRadius: "8px",
                 px: 3,
                 py: 1,
                 textTransform: "none",
                 fontWeight: "bold",
-                background: "linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)",
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
               }}
               onClick={openAdd}
+              fullWidth={isMobile}
             >
               Add Customer
             </Button>
@@ -220,8 +256,8 @@ const Customers = () => {
           </Box>
         ) : (
           <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 3 }}>
-            <Table>
-              <TableHead sx={{ backgroundColor: "#f5f7fa" }}>
+            <Table size={isMobile ? "small" : "medium"}>
+              <TableHead sx={{ backgroundColor: "#f1f4f9" }}>
                 <TableRow>
                   <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
@@ -294,7 +330,6 @@ const Customers = () => {
                   margin="dense"
                   error={!!errors.name}
                   helperText={errors.name?.message}
-                  InputLabelProps={{ shrink: false }}
                 />
               )}
             />
@@ -309,7 +344,6 @@ const Customers = () => {
                   margin="dense"
                   error={!!errors.address}
                   helperText={errors.address?.message}
-                  InputLabelProps={{ shrink: false }}
                 />
               )}
             />
@@ -324,7 +358,6 @@ const Customers = () => {
                   margin="dense"
                   error={!!errors.phone}
                   helperText={errors.phone?.message}
-                  InputLabelProps={{ shrink: false }}
                 />
               )}
             />

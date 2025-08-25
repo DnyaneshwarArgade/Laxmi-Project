@@ -11,8 +11,9 @@ export default function DashboardCards() {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state?.login);
   const { count, isLoading } = useSelector((state) => state?.dashboard?.count);
+  console.log("count", count);
 
-  // Token object
+  // Token payload
   const data = {
     token: login?.token,
   };
@@ -21,35 +22,35 @@ export default function DashboardCards() {
     dispatch(countGetData(data));
   }, [dispatch, login?.token]);
 
-  // Card Config
+  // UI Card Configuration
   const cardData = [
-    {
-      title: "Total Orders",
-      value: count?.total_orders || 0,
-      icon: <ShoppingCartIcon fontSize="large" />,
-      color: "#e3f2fd",
-      iconColor: "#1976d2",
-    },
-    {
-      title: "Completed Orders",
-      value: count?.completed_orders || 0,
-      icon: <CheckCircleIcon fontSize="large" />,
-      color: "#e8f5e9",
-      iconColor: "#2e7d32",
-    },
     {
       title: "Total Customers",
       value: count?.total_customers || 0,
       icon: <PeopleIcon fontSize="large" />,
-      color: "#fff3e0",
-      iconColor: "#ef6c00",
+      color: "#E3F2FD",
+      iconColor: "#1976D2",
     },
     {
       title: "Total Items",
       value: count?.total_items || 0,
+      icon: <ShoppingCartIcon fontSize="large" />,
+      color: "#FFF3E0",
+      iconColor: "#F57C00",
+    },
+    {
+      title: "Completed Orders",
+      value: count?.complete || 0,
+      icon: <CheckCircleIcon fontSize="large" />,
+      color: "#E8F5E9",
+      iconColor: "#388E3C",
+    },
+    {
+      title: "Pending Orders",
+      value: count?.pending || 0,
       icon: <AccessTimeIcon fontSize="large" />,
-      color: "#f3e5f5",
-      iconColor: "#6a1b9a",
+      color: "#FCE4EC",
+      iconColor: "#C2185B",
     },
   ];
 
@@ -75,7 +76,7 @@ export default function DashboardCards() {
       >
         {cardData.map((item, index) => (
           <Card
-            key={index}
+            key={item}
             sx={{
               borderRadius: "16px",
               background: "#fff",

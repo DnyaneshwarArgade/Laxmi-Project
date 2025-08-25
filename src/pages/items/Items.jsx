@@ -145,7 +145,7 @@ const confirmDelete = (id) => {
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Box>
-          <Typography variant="h5" fontWeight="bold">
+          <Typography variant="h4" fontWeight="bold" color="primary">
             Items
           </Typography>
           <Typography variant="body2" color="text.secondary">

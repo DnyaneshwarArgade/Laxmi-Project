@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
-import { FaTrashAlt, FaEye, FaSearch } from "react-icons/fa";
+import { FaTrashAlt, FaEye } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { customersGetData, itemsGetData } from "../../store/creators";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import { CircularProgress } from "@mui/material";
 
 const buttonStyles = {
   primary: {
@@ -94,20 +99,50 @@ const buttonStyles = {
 };
 
 export default function Orders() {
+  const dispatch = useDispatch();
+  const { login } = useSelector((state) => state.login);
+  const token = login?.token;
+  const { customers, isLoading: customersLoading } = useSelector(
+    (state) => state.entities.customers
+  );
+  const { items, isLoading: itemsLoading } = useSelector(
+    (state) => state.entities.items
+  );
+
+  // Customers list for Autocomplete
+  const customerList = useMemo(() => {
+    if (Array.isArray(customers)) return customers;
+    if (customers?.data && Array.isArray(customers.data)) return customers.data;
+    return [];
+  }, [customers]);
+
+  // Items list for Autocomplete
+  const itemList = useMemo(() => {
+    if (Array.isArray(items)) return items;
+    if (items?.data && Array.isArray(items.data)) return items.data;
+    return [];
+  }, [items]);
+
   const [showForm, setShowForm] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
   const [search, setSearch] = useState("");
-
   const [formData, setFormData] = useState({
     billNo: "",
+    customerId: "",
     customerName: "",
     contact: "",
     items: [],
   });
-
   const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(customersGetData({ token }));
+      dispatch(itemsGetData({ token }));
+    }
+  }, [dispatch, token]);
 
   useEffect(() => {
     const cached = localStorage.getItem("orders");
@@ -123,6 +158,40 @@ export default function Orders() {
   useEffect(() => {
     localStorage.setItem("orders", JSON.stringify(orders));
   }, [orders]);
+
+  // Autocomplete change handler
+  const handleCustomerChange = (event, value) => {
+    if (value) {
+      setFormData((p) => ({
+        ...p,
+        customerId: value.id,
+        customerName: value.name,
+        contact: value.phone || "",
+      }));
+    } else {
+      setFormData((p) => ({
+        ...p,
+        customerId: "",
+        customerName: "",
+        contact: "",
+      }));
+    }
+  };
+
+  // Item Autocomplete change handler
+  const handleItemSelect = (idx, value) => {
+    if (value) {
+      setFormData((prev) => {
+        const items = [...prev.items];
+        items[idx] = {
+          ...items[idx],
+          name: value.name,
+          price: value.price,
+        };
+        return { ...prev, items };
+      });
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -145,8 +214,16 @@ export default function Orders() {
   const removeItem = (i) =>
     setFormData((p) => ({ ...p, items: p.items.filter((_, x) => x !== i) }));
 
-  const resetForm = () => setFormData({ billNo: "", customerName: "", contact: "", items: [] });
+  const resetForm = () =>
+    setFormData({
+      billNo: "",
+      customerId: "",
+      customerName: "",
+      contact: "",
+      items: [],
+    });
 
+  // 1. Add createdAt field when saving an order
   const handleSubmit = (e) => {
     e.preventDefault();
     const cleaned = {
@@ -156,6 +233,9 @@ export default function Orders() {
         qty: Number(it.qty || 0),
         price: Number(it.price || 0),
       })),
+      createdAt: editIndex !== null
+        ? orders[editIndex]?.createdAt || new Date().toISOString()
+        : new Date().toISOString(), // Save today's date for new order
     };
     if (editIndex !== null) {
       const copy = [...orders];
@@ -499,7 +579,6 @@ export default function Orders() {
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-            {/* Search Icon */}
             <span
               style={{
                 position: "absolute",
@@ -525,7 +604,7 @@ export default function Orders() {
                 height: 40,
                 borderRadius: 10,
                 border: "1px solid #cbd5e1",
-                padding: "0 14px 0 38px", // left padding for icon
+                padding: "0 14px 0 38px",
                 fontSize: 15,
                 background: "#fff",
                 color: "#18181b",
@@ -561,6 +640,14 @@ export default function Orders() {
             .map((order, i) => {
               const originalIndex = orders.length - 1 - i;
               const total = sumOrder(order);
+              // Format date
+              const orderDate = order.createdAt
+                ? new Date(order.createdAt).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })
+                : "—";
               return (
                 <div key={originalIndex} style={{
                   ...themedStyles.card,
@@ -591,6 +678,10 @@ export default function Orders() {
                     <div style={{ ...themedStyles.row, fontSize: 20 }}>
                       <span style={{ ...themedStyles.label, fontSize: 18 }}>Contact</span>
                       <span style={{ ...themedStyles.value, fontSize: 20 }}>{order.contact || "—"}</span>
+                    </div>
+                    <div style={{ ...themedStyles.row, fontSize: 18 }}>
+                      <span style={{ ...themedStyles.label, fontSize: 16 }}>Date</span>
+                      <span style={{ ...themedStyles.value, fontSize: 16 }}>{orderDate}</span>
                     </div>
                     <div style={{ ...themedStyles.totalRow, fontSize: 22, fontWeight: 700, marginTop: 8 }}>
                       <span>Grand Total</span>
@@ -682,21 +773,28 @@ export default function Orders() {
                     <label style={{ fontWeight: 600, fontSize: 15, marginBottom: 6, display: "block", color: "#0b1b3a" }}>
                       Customer Name
                     </label>
-                    <input
-                      type="text"
-                      name="customerName"
-                      placeholder="Customer Name"
-                      value={formData.customerName}
-                      onChange={handleChange}
-                      required
-                      style={{
-                        ...themedStyles.input,
-                        fontSize: 16,
-                        borderRadius: 8,
-                        border: "1.5px solid #cbd5e1",
-                        background: "#fff",
-                        color: "#18181b",
+                    <Autocomplete
+                      options={customerList}
+                      getOptionLabel={(option) => option.name || ""}
+                      loading={customersLoading}
+                      value={
+                        customerList.find((c) => c.id === formData.customerId) || null
+                      }
+                      onChange={handleCustomerChange}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select Customer"
+                          variant="outlined"
+                          size="small"
+                          required
+                        />
+                      )}
+                      sx={{
+                        width: "100%",
                         marginBottom: 0,
+                        background: "#fff",
+                        borderRadius: 1,
                       }}
                     />
                   </div>
@@ -720,6 +818,7 @@ export default function Orders() {
                         color: "#18181b",
                         marginBottom: 0,
                       }}
+                      disabled
                     />
                   </div>
                 </div>
@@ -810,28 +909,41 @@ export default function Orders() {
                               textAlign: "center",
                               fontWeight: 600,
                               fontSize: 15,
-                              background: "#fff",                              
+                              background: "#fff",
                             }}>{idx + 1}</td>
                             <td style={{
                               border: "1px solid #e5e7eb",
                               textAlign: "center",
                               background: "#fff",
                             }}>
-                              <input
-                                type="text"
-                                placeholder="Item Name"
-                                value={item.name}
-                                onChange={e => handleItemChange(idx, "name", e.target.value)}
-                                required
-                                style={{
+                              <Autocomplete
+                                options={itemList}
+                                getOptionLabel={(option) => option.name || ""}
+                                loading={itemsLoading}
+                                value={itemList.find((i) => i.name === item.name) || null}
+                                onChange={(e, value) => handleItemSelect(idx, value)}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    placeholder="Select Item"
+                                    variant="outlined"
+                                    size="small"
+                                    required
+                                    InputProps={{
+                                      ...params.InputProps,
+                                      endAdornment: (
+                                        <>
+                                          {itemsLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                                          {params.InputProps.endAdornment}
+                                        </>
+                                      ),
+                                    }}
+                                  />
+                                )}
+                                sx={{
                                   width: "89%",
                                   background: "#fff",
-                                  color: "#18181b",
-                                  border: "1px solid #cbd5e1",
-                                  borderRadius: 6,
-                                  padding: "6px 8px",
-                                  fontSize: 15,
-                                  margin:10
+                                  borderRadius: 1,
                                 }}
                               />
                             </td>
@@ -910,7 +1022,7 @@ export default function Orders() {
                                   padding: "4px 8px",
                                   cursor: "pointer",
                                   fontWeight: 700,
-                                  margin:10
+                                  margin: 10
                                 }}
                                 title="Remove item"
                               >❌</button>
@@ -1103,7 +1215,6 @@ export default function Orders() {
                       <span>Bill Amount:</span>
                       <span>{plainINR(selectedOrderTotal)}</span>
                     </div>
-                    {/* <div style={{ textAlign: "right", fontSize: 12 }}>E &amp; O E</div> */}
                   </div>
 
                   {/* Customer & Laxmi General Signatures */}

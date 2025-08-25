@@ -11,9 +11,9 @@ export default function DashboardCards() {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state?.login);
   const { count, isLoading } = useSelector((state) => state?.dashboard?.count);
+
   console.log("count", count);
 
-  // Token payload
   const data = {
     token: login?.token,
   };
@@ -22,32 +22,38 @@ export default function DashboardCards() {
     dispatch(countGetData(data));
   }, [dispatch, login?.token]);
 
-  // UI Card Configuration
+  // Safely extract values from API
+  const totalCustomers = count?.data?.today?.total_customers || 0;
+  const totalItems = count?.data?.today?.total_items || 0;
+  const completedOrders = count?.data?.orders?.complete || 0;
+  const pendingOrders = count?.data?.orders?.pending || 0;
+
+  // UI Cards
   const cardData = [
     {
       title: "Total Customers",
-      value: count?.total_customers || 0,
+      value: totalCustomers,
       icon: <PeopleIcon fontSize="large" />,
       color: "#E3F2FD",
       iconColor: "#1976D2",
     },
     {
       title: "Total Items",
-      value: count?.total_items || 0,
+      value: totalItems,
       icon: <ShoppingCartIcon fontSize="large" />,
       color: "#FFF3E0",
       iconColor: "#F57C00",
     },
     {
       title: "Completed Orders",
-      value: count?.complete || 0,
+      value: completedOrders,
       icon: <CheckCircleIcon fontSize="large" />,
       color: "#E8F5E9",
       iconColor: "#388E3C",
     },
     {
       title: "Pending Orders",
-      value: count?.pending || 0,
+      value: pendingOrders,
       icon: <AccessTimeIcon fontSize="large" />,
       color: "#FCE4EC",
       iconColor: "#C2185B",
@@ -76,7 +82,7 @@ export default function DashboardCards() {
       >
         {cardData.map((item, index) => (
           <Card
-            key={item}
+            key={index}
             sx={{
               borderRadius: "16px",
               background: "#fff",

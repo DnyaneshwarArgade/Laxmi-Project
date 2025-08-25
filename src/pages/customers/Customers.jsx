@@ -284,7 +284,16 @@ const Customers = () => {
                       }}
                     >
                       <TableCell>{row.name}</TableCell>
-                      <TableCell>{row.address}</TableCell>
+                      <TableCell>
+                        {row.address && row.address.length <= 30
+                          ? row.address
+                          : row.address && row.address.match(/.{1,30}/g).map((str, idx) => (
+                              <React.Fragment key={idx}>
+                                {str}
+                                <br />
+                              </React.Fragment>
+                            ))}
+                      </TableCell>
                       <TableCell>{row.phone}</TableCell>
                       <TableCell align="right">
                         <IconButton

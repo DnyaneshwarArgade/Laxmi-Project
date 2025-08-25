@@ -222,7 +222,7 @@ const Items = () => {
             sx={{
               minWidth: { xs: "100%", sm: 40 },
               height: 40,
-               borderRadius: "8px",
+              borderRadius: "8px",
               textTransform: "none",
               fontSize: 17,
               fontWeight: "bold",
@@ -258,7 +258,16 @@ const Items = () => {
                 .map((item) => {
                   return (
                     <TableRow key={item.id} hover>
-                      <TableCell>{item.name}</TableCell>
+                      <TableCell>
+                        {item.name.length <= 30
+                          ? item.name
+                          : item.name.match(/.{1,30}/g).map((str, idx) => (
+                              <React.Fragment key={idx}>
+                                {str}
+                                <br />
+                              </React.Fragment>
+                            ))}
+                      </TableCell>
                       <TableCell>₹ {item.price}</TableCell>
                       {/* <TableCell>{item.type}</TableCell> */}
                       <TableCell align="right">

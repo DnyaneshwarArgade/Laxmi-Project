@@ -22,38 +22,32 @@ export default function DashboardCards() {
     dispatch(countGetData(data));
   }, [dispatch, login?.token]);
 
-  // Safely extract values from API
-  const totalCustomers = count?.data?.today?.total_customers || 0;
-  const totalItems = count?.data?.today?.total_items || 0;
-  const completedOrders = count?.data?.orders?.complete || 0;
-  const pendingOrders = count?.data?.orders?.pending || 0;
-
-  // UI Cards
+  // UI Card Configuration
   const cardData = [
     {
       title: "Total Customers",
-      value: totalCustomers,
+      value: count?.total_customers || 0,
       icon: <PeopleIcon fontSize="large" />,
       color: "#E3F2FD",
       iconColor: "#1976D2",
     },
     {
       title: "Total Items",
-      value: totalItems,
+      value: count?.total_items || 0,
       icon: <ShoppingCartIcon fontSize="large" />,
       color: "#FFF3E0",
       iconColor: "#F57C00",
     },
     {
       title: "Completed Orders",
-      value: completedOrders,
+      value: count?.complete || 0,
       icon: <CheckCircleIcon fontSize="large" />,
       color: "#E8F5E9",
       iconColor: "#388E3C",
     },
     {
       title: "Pending Orders",
-      value: pendingOrders,
+      value: count?.pending || 0,
       icon: <AccessTimeIcon fontSize="large" />,
       color: "#FCE4EC",
       iconColor: "#C2185B",
@@ -74,7 +68,11 @@ export default function DashboardCards() {
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
+          gridTemplateColumns: {
+            xs: "1fr", // 1 card per row on mobile
+            sm: "1fr", // 1 card per row on small screens
+            md: "repeat(2, 1fr)", // 2 cards per row on medium and up
+          },
           gap: 3,
           maxWidth: "900px",
           width: "100%",

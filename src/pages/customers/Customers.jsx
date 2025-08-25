@@ -114,7 +114,7 @@ const Customers = () => {
       });
     };
 
-    const setSubmitting = () => {};
+    const setSubmitting = () => { };
 
     if (editing?.id) {
       dispatch(
@@ -179,7 +179,12 @@ const Customers = () => {
           mb={3}
           gap={2}
         >
-          <Box>
+          <Box sx={{
+            background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            display: "inline-block"
+          }}>
             <Typography variant="h4" fontWeight="bold" color="primary">
               Customers
             </Typography>
@@ -315,9 +320,20 @@ const Customers = () => {
       {/* Add / Edit Dialog */}
       <Dialog open={openForm} onClose={closeForm} fullWidth maxWidth="sm">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogTitle sx={{ fontWeight: "bold" }}>
-            {editing ? "Edit Customer" : "Add Customer"}
-          </DialogTitle>
+
+          <Box
+            sx={{
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              display: "inline-block"
+            }}
+          >
+            <DialogTitle sx={{ fontWeight: "bold" }}>
+              {editing ? "Edit Customer" : "Add Customer"}
+            </DialogTitle>
+
+          </Box>
           <DialogContent>
             <Controller
               name="name"
@@ -358,12 +374,22 @@ const Customers = () => {
                   margin="dense"
                   error={!!errors.phone}
                   helperText={errors.phone?.message}
+                  inputProps={{ maxLength: 10, inputMode: 'numeric', pattern: '[0-9]*' }}
+                  onInput={e => {
+                    // Only allow numbers and max 10 digits
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                    field.onChange(e);
+                  }}
                 />
               )}
             />
           </DialogContent>
           <DialogActions sx={{ p: 2 }}>
-            <Button onClick={closeForm}>Cancel</Button>
+            <Button  sx={{
+                borderRadius: "8px",
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                color:"white"
+              }} onClick={closeForm}>Cancel</Button>
             <Button
               type="submit"
               variant="contained"

@@ -105,61 +105,82 @@ const Items = () => {
   };
 
   // handle delete click -> open confirmation dialog
- const handleDeleteClick = (id) => {
-  setDeleteId(id);
+  const handleDeleteClick = (id) => {
+    setDeleteId(id);
 
-  // SweetAlert confirm popup
-  Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this action!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it!",
-    cancelButtonText: "Cancel",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      confirmDelete(id); // call confirm delete
-    }
-  });
-};
-
-
-// confirm delete
-const confirmDelete = (id) => {
-  if (id) {
-    dispatch(actions.deleteItemsData({ data, id }));
+    // SweetAlert confirm popup
     Swal.fire({
-      icon: "success",
-      title: "Deleted!",
-      text: "Your item has been deleted.",
-      showConfirmButton: false,  
-      timer: 2000,               
+      title: "Are you sure?",
+      text: "You won't be able to revert this action!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        confirmDelete(id); // call confirm delete
+      }
     });
-  }
-};
+  };
+
+
+  // confirm delete
+  const confirmDelete = (id) => {
+    if (id) {
+      dispatch(actions.deleteItemsData({ data, id }));
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Your item has been deleted.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+  };
 
   return (
     <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh" }}>
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Box>
-          <Typography variant="h4" fontWeight="bold" color="primary">
+        <Box sx={{
+          background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          display: "inline-block"
+        }}
+        >
+          <Typography variant="h4" fontWeight="bold" >
             Items
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="black">
             View and manage your items
           </Typography>
         </Box>
 
         {/* Search + Add Button */}
-        <Box display="flex" alignItems="center" gap={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={2}
+          sx={{
+            flexDirection: {
+              xs: "column", // mobile - vertical
+              sm: "row",    // tablet/desktop - horizontal
+            },
+            alignItems: {
+              xs: "stretch", // mobile - full width
+              sm: "center",
+            },
+          }}
+        >
+          {/* Search Box */}
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
-              width: 280,
+              width: { xs: "100%", sm: 280 },
               background: "white",
               borderRadius: "25px",
               padding: "4px 12px",
@@ -179,7 +200,7 @@ const confirmDelete = (id) => {
             <InputBase
               placeholder="Search by item name"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               sx={{
                 flex: 1,
                 fontSize: 14,
@@ -199,23 +220,19 @@ const confirmDelete = (id) => {
               setOpen(true);
             }}
             sx={{
-              minWidth: 40,
+              minWidth: { xs: "100%", sm: 40 },
               height: 40,
-              borderRadius: "50%",
+               borderRadius: "8px",
               textTransform: "none",
-              fontSize: 22,
+              fontSize: 17,
               fontWeight: "bold",
-              background: "linear-gradient(135deg,#43ee90ff, #2527adff)",
-              "&:hover": {
-                background: "linear-gradient(135deg, #1565c0, #1e88e5)",
-                transform: "scale(1.00) rotate(10deg)",
-                boxShadow: "0 6px 16px rgba(25,118,210,0.5)",
-              },
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
             }}
           >
-            +
+            + Add Item
           </Button>
         </Box>
+
       </Box>
 
       {/* Table */}
@@ -280,17 +297,26 @@ const confirmDelete = (id) => {
           }}
         >
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography fontWeight="bold" fontSize={20} color="black">
-              {editMode ? "Edit Item" : "Add Item"}
-            </Typography>
+            <Box
+              sx={{
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                display: "inline-block"
+              }}
+            >
+              <Typography fontWeight="bold" fontSize={20}>
+                {editMode ? "Edit Item" : "Add Item"}
+              </Typography>
+            </Box>
             <Box
               onClick={() => setOpen(false)}
               sx={{
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
-                background: "white",
-                color: "#1976d2",
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                // color: "#1976d2",
                 fontSize: 22,
                 fontWeight: "bold",
                 display: "flex",
@@ -298,7 +324,7 @@ const confirmDelete = (id) => {
                 justifyContent: "center",
                 cursor: "pointer",
                 "&:hover": {
-                  background: "#e3f2fd",
+                  background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
                 },
               }}
             >
@@ -382,10 +408,10 @@ const confirmDelete = (id) => {
               px: 4,
               borderRadius: 2,
               textTransform: "none",
-              background: "linear-gradient(135deg, #1976d2, #42a5f5)",
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
               boxShadow: "0 4px 12px rgba(17, 17, 17, 0.4)",
               "&:hover": {
-                background: "linear-gradient(135deg, #1565c0, #1e88e5)",
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
               },
             }}
           >

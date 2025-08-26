@@ -1,15 +1,22 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
-import { FaTrashAlt, FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  billsGetData,
+  postBillsData,
+  updateBillsData,
+  deleteBillsData,
+} from "../../store/components/Entities/billsSlice"; // ✅ Import API slice
 import { customersGetData, itemsGetData } from "../../store/creators";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, IconButton } from "@mui/material";
+import { Search, Edit, Delete, Visibility } from "@mui/icons-material";
 
+// Update buttonStyles for Add Order and Save button color (same as customer page)
 const buttonStyles = {
   primary: {
-    background: "#0b5ed7",
+    background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", // Customer page color
     color: "#fff",
     border: "none",
     borderRadius: 8,
@@ -102,6 +109,16 @@ export default function Orders() {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const token = login?.token;
+
+  // API data
+  const {
+    bills,
+    isLoading,
+    isPostLoading,
+    isUpdateLoading,
+    error,
+  } = useSelector((state) => state.entities.bills);
+
   const { customers, isLoading: customersLoading } = useSelector(
     (state) => state.entities.customers
   );
@@ -109,20 +126,19 @@ export default function Orders() {
     (state) => state.entities.items
   );
 
-  // Customers list for Autocomplete
+  // Lists for Autocomplete
   const customerList = useMemo(() => {
     if (Array.isArray(customers)) return customers;
     if (customers?.data && Array.isArray(customers.data)) return customers.data;
     return [];
   }, [customers]);
-
-  // Items list for Autocomplete
   const itemList = useMemo(() => {
     if (Array.isArray(items)) return items;
     if (items?.data && Array.isArray(items.data)) return items.data;
     return [];
   }, [items]);
 
+  // UI states
   const [showForm, setShowForm] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -135,29 +151,46 @@ export default function Orders() {
     contact: "",
     items: [],
   });
-  const [orders, setOrders] = useState([]);
 
+  // Fetch API data
   useEffect(() => {
     if (token) {
+      dispatch(billsGetData({ token }));
       dispatch(customersGetData({ token }));
       dispatch(itemsGetData({ token }));
     }
   }, [dispatch, token]);
 
-  useEffect(() => {
-    const cached = localStorage.getItem("orders");
-    if (cached) {
-      try {
-        setOrders(JSON.parse(cached));
-      } catch {
-        localStorage.removeItem("orders");
-      }
-    }
-  }, []);
+  // Orders from backend (enrich with customer and item details)
+  const orders = useMemo(() => {
+    if (!Array.isArray(bills)) return [];
+    return bills.map(order => {
+      // customerName/contact enrich
+      const customer = customerList.find(c => c.id === order.customer_id);
+      return {
+        ...order,
+        customerName: order.customerName || customer?.name || "",
+        contact: order.contact || customer?.phone || "",
+        items: (order.items || []).map(it => {
+          const item = itemList.find(i => i.id === it.item_id);
+          return {
+            ...it,
+            name: it.name || item?.name || "",
+            qty: it.quantity || it.qty || "",
+          };
+        }),
+      };
+    });
+  }, [bills, customerList, itemList]);
 
-  useEffect(() => {
-    localStorage.setItem("orders", JSON.stringify(orders));
-  }, [orders]);
+  // Filter orders by search
+  const filteredOrders = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return orders;
+    return orders.filter((order) =>
+      (order.customerName || "").toLowerCase().includes(q)
+    );
+  }, [orders, search]);
 
   // Autocomplete change handler
   const handleCustomerChange = (event, value) => {
@@ -223,41 +256,72 @@ export default function Orders() {
       items: [],
     });
 
-  // 1. Add createdAt field when saving an order
+  // Add/Edit Order (API)
   const handleSubmit = (e) => {
     e.preventDefault();
-    const cleaned = {
-      ...formData,
-      items: (formData.items || []).map((it) => ({
-        name: (it.name || "").trim(),
-        qty: Number(it.qty || 0),
-        price: Number(it.price || 0),
-      })),
-      createdAt: editIndex !== null
-        ? orders[editIndex]?.createdAt || new Date().toISOString()
-        : new Date().toISOString(), // Save today's date for new order
+
+    // Calculate totals
+    const items = (formData.items || []).map((it) => ({
+      item_id: itemList.find(item => item.name === it.name)?.id || "", // get item_id from itemList
+      price: Number(it.price || 0),
+      quantity: String(it.qty || 0),
+    }));
+    const total_amount = items.reduce((sum, it) => sum + Number(it.price) * Number(it.quantity), 0);
+
+    // Prepare payload as per backend
+    const payload = {
+      customer_id: formData.customerId,
+      discription: "", // Add description if needed
+      date: new Date().toISOString().slice(0, 10), // YYYY-MM-DD
+      total_amount,
+      paid_amount: "0",
+      unpaid_amount: total_amount,
+      discount: "0",
+      status: "Completed",
+      has_returned: false,
+      returned_items: [],
+      items,
     };
-    if (editIndex !== null) {
-      const copy = [...orders];
-      copy[editIndex] = cleaned;
-      setOrders(copy);
+    console.log(formData.customerId);
+
+    const toggle = () => {
+      setShowForm(false);
       setEditIndex(null);
-      Swal.fire({ icon: "success", title: "Order Updated!", timer: 1200, showConfirmButton: false });
+      resetForm();
+    };
+    const setSubmitting = () => {};
+
+    if (editIndex !== null && orders[editIndex]?.id) {
+      dispatch(
+        updateBillsData({
+          data: { token, id: orders[editIndex].id },
+          bills: payload,
+          toggle,
+          setSubmitting,
+        })
+      );
     } else {
-      setOrders((p) => [...p, cleaned]);
-      Swal.fire({ icon: "success", title: "Order Added!", timer: 1200, showConfirmButton: false });
+      dispatch(
+        postBillsData({
+          data: { token },
+          bills: payload,
+          toggle,
+          setSubmitting,
+        })
+      );
     }
-    setShowForm(false);
-    resetForm();
   };
 
+  // Edit Order
   const handleEdit = (i) => {
     setEditIndex(i);
     setFormData(orders[i]);
     setShowForm(true);
   };
 
+  // Delete Order (API)
   const handleDelete = (i) => {
+    const order = orders[i];
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -269,9 +333,8 @@ export default function Orders() {
       background: "#fff",
       color: "#18181b",
     }).then((result) => {
-      if (result.isConfirmed) {
-        setOrders((p) => p.filter((_, x) => x !== i));
-        Swal.fire({ icon: "success", title: "Deleted!", timer: 1000, showConfirmButton: false });
+      if (result.isConfirmed && order?.id) {
+        dispatch(deleteBillsData({ id: order.id, data: { token } }));
       }
     });
   };
@@ -358,32 +421,32 @@ export default function Orders() {
       return str.trim();
     };
 
-    const rw = words(rupees);
-    const pw = paise ? words(paise) + " Paise" : "";
-    if (rupees && paise) return `${rw} Rupees and ${pw} Only`;
-    if (rupees) return `${rw} Rupees Only`;
-    return `${pw} Only`;
-  };
+  const rw = words(rupees);
+const pw = paise ? words(paise) + " Paise" : "";
 
-  const selectedOrderWords = useMemo(() => numberToWordsIndian(selectedOrderTotal), [
-    selectedOrderTotal,
-  ]);
+if (rupees && paise) return `${rw} Rupees and ${pw} Only`;
+if (rupees) return `${rw} Rupees Only`;
+return `${pw} Only`;
+};
 
-  const todayStr = useMemo(() => {
-    const d = new Date();
-    const dd = String(d.getDate()).padStart(2, "0");
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const yyyy = d.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
-  }, []);
+const selectedOrderWords = useMemo(() => numberToWordsIndian(selectedOrderTotal), [
+  selectedOrderTotal,
+]);
+
+const todayStr = useMemo(() => {
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}, []);
+
 
   const invoiceRef = useRef(null);
 
   const printInvoice = () => {
     if (!invoiceRef.current) return;
-
     const invoiceHTML = invoiceRef.current.outerHTML;
-
     const styles = `
     <style>
       *{box-sizing:border-box}
@@ -403,7 +466,6 @@ export default function Orders() {
       .spaceRow td{border:none !important;height:36px}
     </style>
   `;
-
     const printWindow = window.open('', '_blank', 'width=800,height=600');
     printWindow.document.write(`
     <html>
@@ -419,7 +481,6 @@ export default function Orders() {
     </html>
   `);
     printWindow.document.close();
-
     setTimeout(() => {
       printWindow.focus();
       printWindow.print();
@@ -430,6 +491,10 @@ export default function Orders() {
   // Styles (only light mode)
   const themedStyles = {
     ...styles,
+    title: {
+      ...styles.title,
+      color: "#1e40af", // Same as customer page: dark blue (you can use #1e40af or #0b1b3a)
+    },
     page: {
       ...styles.page,
       background: "linear-gradient(180deg, #f5f7ff 0%, #ffffff 40%)",
@@ -574,54 +639,54 @@ export default function Orders() {
     <div style={themedStyles.page}>
       <div style={themedStyles.header}>
         <div style={themedStyles.headerLeft}>
+          {/* Order heading color same as customer page */}
           <h2 style={themedStyles.title}>Orders</h2>
           <h6 style={themedStyles.subtitle}>Create, view and manage your orders easily</h6>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-            <span
-              style={{
-                position: "absolute",
-                left: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "#64748b",
-                fontSize: 18,
-                pointerEvents: "none",
-              }}
-            >
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="7" />
-                <line x1="16.5" y1="16.5" x2="21" y2="21" />
-              </svg>
-            </span>
+          {/* Search Bar */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              width: 280,
+              background: "#ffffff",
+              borderRadius: "25px",
+              padding: "4px 12px",
+              border: "2px solid #667eea",
+              transition: "all 0.3s ease",
+              boxShadow: "0 0 8px rgba(102,126,234,0.08)",
+            }}
+          >
+            <Search fontSize="small" style={{ color: "#667eea", marginRight: 8 }} />
             <input
               type="text"
               placeholder="Search by customer name"
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
-                height: 40,
-                borderRadius: 10,
-                border: "1px solid #cbd5e1",
-                padding: "0 14px 0 38px",
-                fontSize: 15,
-                background: "#fff",
-                color: "#18181b",
+                flex: 1,
+                fontSize: 14,
+                color: "#333",
+                border: "none",
                 outline: "none",
-                minWidth: 220,
-                marginRight: 8,
+                background: "transparent",
+                padding: "8px 0",
               }}
             />
           </div>
-          <button style={themedButtonStyles.primary} onClick={openForm} aria-label="Create order">
+          <button style={buttonStyles.primary} onClick={openForm} aria-label="Create order">
             <span style={{ fontSize: 20, lineHeight: 1 }}></span>
             <span>Add Order</span>
           </button>
         </div>
       </div>
 
-      {orders.length === 0 ? (
+      {isLoading ? (
+        <div style={{ textAlign: "center", marginTop: 40 }}>
+          <CircularProgress />
+        </div>
+      ) : filteredOrders.length === 0 ? (
         <div style={themedStyles.emptyWrap}>
           <div style={themedStyles.emptyIcon}></div>
           <div style={themedStyles.emptyTitle}>No orders yet</div>
@@ -632,15 +697,11 @@ export default function Orders() {
         </div>
       ) : (
         <div style={themedStyles.cardContainer}>
-          {[...orders]
+          {[...filteredOrders]
             .reverse()
-            .filter(order =>
-              order.customerName?.toLowerCase().includes(search.trim().toLowerCase())
-            )
             .map((order, i) => {
-              const originalIndex = orders.length - 1 - i;
+              const originalIndex = orders.findIndex(o => o.id === order.id);
               const total = sumOrder(order);
-              // Format date
               const orderDate = order.createdAt
                 ? new Date(order.createdAt).toLocaleDateString("en-IN", {
                     day: "2-digit",
@@ -649,7 +710,7 @@ export default function Orders() {
                   })
                 : "—";
               return (
-                <div key={originalIndex} style={{
+                <div key={order.id || i} style={{
                   ...themedStyles.card,
                   display: "flex",
                   flexDirection: "row",
@@ -697,15 +758,30 @@ export default function Orders() {
                     justifyContent: "center",
                     minWidth: 140,
                   }}>
-                    <button className="btn btn-outline-primary" onClick={() => handleEdit(originalIndex)} title="Edit">
-                      <i className="bi bi-pencil-fill"></i>
-                    </button>
-                    <button className="btn btn-outline-danger" onClick={() => handleDelete(originalIndex)} title="Delete">
-                      <FaTrashAlt />
-                    </button>
-                    <button className="btn btn-outline-success" onClick={() => handleView(order)} title="View Invoice">
-                      <FaEye />
-                    </button>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEdit(originalIndex)}
+                      title="Edit"
+                      sx={{ "&:hover": { backgroundColor: "#e3f2fd" } }}
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDelete(originalIndex)}
+                      title="Delete"
+                      sx={{ "&:hover": { backgroundColor: "#ffebee" } }}
+                    >
+                      <Delete />
+                    </IconButton>
+                    <IconButton
+                      color="success"
+                      onClick={() => handleView(order)}
+                      title="View Invoice"
+                      sx={{ "&:hover": { backgroundColor: "#e6f4ea" } }}
+                    >
+                      <Visibility />
+                    </IconButton>
                   </div>
                 </div>
               );
@@ -743,7 +819,7 @@ export default function Orders() {
               justifyContent: "space-between",
             }}>
               <span>{editIndex !== null ? "Edit Order" : "Create New Order"}</span>
-              <button style={themedButtonStyles.ghost} onClick={() => { setShowForm(false); setEditIndex(null); }}>✖️</button>
+              <button style={themedButtonStyles.ghost} onClick={() => { setShowForm(false); setEditIndex(null); }}>✖</button>
             </div>
             <form
               onSubmit={handleSubmit}
@@ -1096,12 +1172,12 @@ export default function Orders() {
               }}>
                 <button
                   type="button"
-                  style={themedButtonStyles.ghost}
+                  style={buttonStyles.ghost}
                   onClick={() => { setShowForm(false); setEditIndex(null); }}
                 >Cancel</button>
                 <button
                   type="submit"
-                  style={themedButtonStyles.primary}
+                  style={buttonStyles.primary}
                 >Save</button>
               </div>
             </form>

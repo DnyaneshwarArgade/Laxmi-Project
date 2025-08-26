@@ -262,7 +262,7 @@ const Items = () => {
                         {item.name.length <= 30
                           ? item.name
                           : item.name.match(/.{1,30}/g).map((str, idx) => (
-                              <React.Fragment key={idx}>
+                              <React.Fragment key={`${item.id}-${idx}`}>
                                 {str}
                                 <br />
                               </React.Fragment>

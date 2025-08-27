@@ -119,6 +119,7 @@ export default function Orders() {
     error,
   } = useSelector((state) => state.entities.bills);
 
+  console.log('bills', bills)
   const { customers, isLoading: customersLoading } = useSelector(
     (state) => state.entities.customers
   );
@@ -142,6 +143,7 @@ export default function Orders() {
   const [showForm, setShowForm] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  console.log('selectedOrder', selectedOrder)
   const [editIndex, setEditIndex] = useState(null);
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState({
@@ -163,8 +165,7 @@ export default function Orders() {
 
   // Orders from backend (enrich with customer and item details)
   const orders = useMemo(() => {
-    if (!Array.isArray(bills)) return [];
-    return bills.map(order => {
+    return bills.data?.map(order => {
       // customerName/contact enrich
       const customer = customerList.find(c => c.id === order.customer_id);
       return {
@@ -429,9 +430,6 @@ if (rupees) return `${rw} Rupees Only`;
 return `${pw} Only`;
 };
 
-const selectedOrderWords = useMemo(() => numberToWordsIndian(selectedOrderTotal), [
-  selectedOrderTotal,
-]);
 
 const todayStr = useMemo(() => {
   const d = new Date();
@@ -492,7 +490,7 @@ const todayStr = useMemo(() => {
   const themedStyles = {
     ...styles,
     title: {
-      ...styles.title,
+      // ...styles.title,
       color: "#1e40af", // Same as customer page: dark blue (you can use #1e40af or #0b1b3a)
     },
     page: {
@@ -698,17 +696,8 @@ const todayStr = useMemo(() => {
       ) : (
         <div style={themedStyles.cardContainer}>
           {[...filteredOrders]
-            .reverse()
             .map((order, i) => {
               const originalIndex = orders.findIndex(o => o.id === order.id);
-              const total = sumOrder(order);
-              const orderDate = order.createdAt
-                ? new Date(order.createdAt).toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })
-                : "—";
               return (
                 <div key={order.id || i} style={{
                   ...themedStyles.card,
@@ -742,11 +731,11 @@ const todayStr = useMemo(() => {
                     </div>
                     <div style={{ ...themedStyles.row, fontSize: 18 }}>
                       <span style={{ ...themedStyles.label, fontSize: 16 }}>Date</span>
-                      <span style={{ ...themedStyles.value, fontSize: 16 }}>{orderDate}</span>
+                      <span style={{ ...themedStyles.value, fontSize: 16 }}>{order.date}</span>
                     </div>
                     <div style={{ ...themedStyles.totalRow, fontSize: 22, fontWeight: 700, marginTop: 8 }}>
                       <span>Grand Total</span>
-                      <b>₹ {plainINR(total)}</b>
+                      <b>₹ {order.total_amount}</b>
                     </div>
                   </div>
                   {/* Right side: Buttons */}
@@ -1239,7 +1228,7 @@ const todayStr = useMemo(() => {
                           Mobile: {selectedOrder.contact || "-"}
                         </td>
                         <td style={{ padding: 5, width: "30%" }}>
-                          <b>Bill No.:</b> {selectedOrder.billNo || "-"}<br />
+                          <b>Bill No.:</b> INV_{selectedOrder.id || "-"}<br />
                           <b>Date:</b> {todayStr}
                         </td>
                       </tr>
@@ -1259,15 +1248,15 @@ const todayStr = useMemo(() => {
                     <tbody>
                       {(selectedOrder.items || []).length > 0 ? (
                         selectedOrder.items.map((item, idx) => {
-                          const qty = Number(item.qty || 0);
-                          const price = Number(item.price || 0);
+                          const qty = Number(item.pivot.quantity || 0);
+                          const price = Number(item.pivot.price || 0);
                           const lineTotal = qty * price;
                           return (
                             <tr key={idx}>
                               <td style={invoiceStyles.td}>{idx + 1}</td>
                               <td style={invoiceStyles.td}>{item.name || "-"}</td>
-                              <td style={invoiceStyles.tdRight}>{String(qty)}</td>
-                              <td style={invoiceStyles.tdRight}>{plainINR(price)}</td>
+                              <td style={invoiceStyles.tdRight}>{item.pivot.quantity}</td>
+                              <td style={invoiceStyles.tdRight}>{item.pivot.price}</td>
                               <td style={invoiceStyles.tdRight}>{plainINR(lineTotal)}</td>
                             </tr>
                           );
@@ -1285,11 +1274,11 @@ const todayStr = useMemo(() => {
 
                   <div style={{ padding: 5, borderTop: "1px solid #000" }}>
                     <div style={invoiceStyles.small}>
-                      <b>Bill Amount in Words:</b> {selectedOrderWords || "—"}
+                      <b>Bill Amount in Words:</b> {numberToWordsIndian(selectedOrder.total_amount) || "—"}
                     </div>
                     <div style={invoiceStyles.billFooter}>
                       <span>Bill Amount:</span>
-                      <span>{plainINR(selectedOrderTotal)}</span>
+                      <span>{selectedOrder.total_amount}</span>
                     </div>
                   </div>
 

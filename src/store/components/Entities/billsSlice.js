@@ -62,8 +62,8 @@ export const postBillsData = createAsyncThunk(
       });
 
       dispatch(billsGetData(data));
-      dispatch(billsGetByCustomer({data}));
-      dispatch(customersGetData(data));
+      // dispatch(billsGetByCustomer({data}));
+      // dispatch(customersGetData(data));
       showSuccessAlert("Order Successfully Created!");
       toggle?.();
       setSubmitting?.(false);

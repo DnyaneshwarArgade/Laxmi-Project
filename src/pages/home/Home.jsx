@@ -11,7 +11,6 @@ export default function DashboardCards() {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state?.login);
   const { count, isLoading } = useSelector((state) => state?.dashboard?.count);
-  console.log("count", count);
 
   // Token payload
   const data = {
@@ -22,7 +21,7 @@ export default function DashboardCards() {
     dispatch(countGetData(data));
   }, [dispatch, login?.token]);
 
-  // UI Card Configuration (show only total_customers, total_items, complete, and add Total Orders)
+  // UI Card Configuration
   const cardData = [
     {
       title: "Total Customers",
@@ -39,20 +38,18 @@ export default function DashboardCards() {
       iconColor: "#F57C00",
     },
     {
-      title: "Completed Orders",
-      value: count?.data?.complete ?? count?.complete ?? 0,
-      icon: <CheckCircleIcon fontSize="large" />,
-      color: "#E8F5E9",
-      iconColor: "#388E3C",
-    },
-    {
       title: "Total Orders",
-      value:
-        (count?.data?.complete ?? count?.complete ?? 0) +
-        (count?.data?.pending ?? count?.pending ?? 0),
+      value: count?.data?.orders?.total ?? 0,
       icon: <AccessTimeIcon fontSize="large" />,
       color: "#FCE4EC",
       iconColor: "#C2185B",
+    },
+    {
+      title: "Completed Orders",
+      value: count?.data?.orders?.complete ?? 0,
+      icon: <CheckCircleIcon fontSize="large" />,
+      color: "#E8F5E9",
+      iconColor: "#388E3C",
     },
   ];
 
@@ -71,9 +68,9 @@ export default function DashboardCards() {
         sx={{
           display: "grid",
           gridTemplateColumns: {
-            xs: "1fr", // 1 card per row on mobile
-            sm: "1fr", // 1 card per row on small screens
-            md: "repeat(2, 1fr)", // 2 cards per row on medium and up
+            xs: "1fr",
+            sm: "1fr",
+            md: "repeat(2, 1fr)",
           },
           gap: 3,
           maxWidth: "900px",
@@ -82,7 +79,7 @@ export default function DashboardCards() {
       >
         {cardData.map((item, index) => (
           <Card
-            key={item}
+            key={index}
             sx={{
               borderRadius: "16px",
               background: "#fff",
@@ -100,7 +97,6 @@ export default function DashboardCards() {
                   height: "100%",
                 }}
               >
-                {/* Text */}
                 <Box>
                   <Typography
                     variant="subtitle1"
@@ -116,7 +112,6 @@ export default function DashboardCards() {
                   </Typography>
                 </Box>
 
-                {/* Icon */}
                 <Box
                   sx={{
                     backgroundColor: item.color,

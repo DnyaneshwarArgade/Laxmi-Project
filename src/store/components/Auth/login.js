@@ -20,6 +20,7 @@ export const postLogin = createAsyncThunk(
         const { name, company_id } = response?.data?.data;
         customToast(
           "success",
+          
           `Login Successful! Welcome ${name}`,
           "top-end",
           2000

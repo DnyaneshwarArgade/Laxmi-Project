@@ -637,10 +637,26 @@ const todayStr = useMemo(() => {
     <div style={themedStyles.page}>
       <div style={themedStyles.header}>
         <div style={themedStyles.headerLeft}>
-          {/* Order heading color same as customer page */}
-          <h2 style={themedStyles.title}>Orders</h2>
-          <h6 style={themedStyles.subtitle}>Create, view and manage your orders easily</h6>
-        </div>
+  <h2
+    style={{
+      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+    }}
+  >
+    Orders
+  </h2>
+  <h6
+    style={{
+      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+    }}
+  >
+    Create, view and manage your orders easily
+  </h6>
+</div>
+
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {/* Search Bar */}
           <div
@@ -673,10 +689,19 @@ const todayStr = useMemo(() => {
               }}
             />
           </div>
-          <button style={buttonStyles.primary} onClick={openForm} aria-label="Create order">
-            <span style={{ fontSize: 20, lineHeight: 1 }}></span>
-            <span>Add Order</span>
-          </button>
+        <button style={buttonStyles.primary} onClick={openForm} aria-label="Create order">
+  <span style={{ fontSize: 20, lineHeight: 1 }}></span>
+  <span
+    style={{
+      color: "#f8f2f2ff", // Black text
+      fontWeight: "bold",
+    }}
+  >
+    Add Order
+  </span>
+</button>
+
+
         </div>
       </div>
 
@@ -686,12 +711,57 @@ const todayStr = useMemo(() => {
         </div>
       ) : filteredOrders.length === 0 ? (
         <div style={themedStyles.emptyWrap}>
-          <div style={themedStyles.emptyIcon}></div>
-          <div style={themedStyles.emptyTitle}>No orders yet</div>
-          <div style={themedStyles.emptyText}>Click "Add Order" to create your first order.</div>
-          <button style={{ ...themedButtonStyles.primary, marginTop: 10 }} onClick={openForm}>
-            <span style={{ fontSize: 18 }}></span> Create Order
-          </button>
+  <div
+    style={{
+      ...themedStyles.emptyIcon,
+      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+    }}
+  >
+      🔄
+  </div>
+  
+  <div
+    style={{
+      ...themedStyles.emptyTitle,
+      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      fontWeight: "600",
+    }}
+  >
+    No orders yet
+  </div>
+  
+  <div
+    style={{
+      ...themedStyles.emptyText,
+      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+    }}
+  >
+    Click "Add Order" to create your first order.
+  </div>
+  
+  <button
+    style={{
+      ...themedButtonStyles.primary,
+      marginTop: 10,
+      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+      border: "none",
+      color: "#fff",
+      fontWeight: "600",
+      padding: "10px 20px",
+      borderRadius: 8,
+    }}
+    onClick={openForm}
+  >
+    <span style={{ fontSize: 18 }}></span> Create Order
+  </button>
+
+
         </div>
       ) : (
         <div style={themedStyles.cardContainer}>

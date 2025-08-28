@@ -19,45 +19,29 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Pagination
+  Pagination,
+  InputAdornment
 } from "@mui/material";
 import { Search, Delete, Edit } from "@mui/icons-material";
 import Swal from "sweetalert2";
-import { Clear } from "@mui/icons-material";
-
-
-// ✅ Toastify
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Items = () => {
-  // Validation state
   const [errors, setErrors] = useState({});
-  // Search filter state
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const { items } = useSelector((state) => state.entities.items);
-  const [page, setPage] = useState(1); // current page
-  const rowsPerPage = 10; // प्रति पेज 10 रेकॉर्ड
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10;
 
-  console.log('items', items)
-  const data = {
-    token: login?.token,
-  }
+  const data = { token: login?.token };
+
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "Pen",
-    price: "10",
-    type: "Batla",
-  });
-  console.log('formData', formData)
+  const [formData, setFormData] = useState({ name: "", price: "", type: "Batla" });
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
-
-  // delete confirmation
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
     if (login?.token) {
@@ -65,12 +49,25 @@ const Items = () => {
     }
   }, [dispatch, login]);
 
-  // handle input change
+  useEffect(() => {
+    if (search && items?.data?.length > 0) {
+      // search केलेल्या पहिल्या item चा index शोधा
+      const firstIndex = items.data.findIndex(item =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      );
+      if (firstIndex >= 0) {
+        setPage(Math.floor(firstIndex / rowsPerPage) + 1); // page set करा
+      } else {
+        setPage(1); // काही match नाही तर page 1
+      }
+    }
+  }, [search, items]);
+
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // handle form submit (Create + Update)
   const handleSubmit = (e) => {
     e.preventDefault();
     let newErrors = {};
@@ -84,10 +81,15 @@ const Items = () => {
     if (Object.keys(newErrors).length > 0) return;
 
     if (editMode && editId) {
-      dispatch(actions.updateItemsData({ data: { token: login?.token, id: editId }, items: formData }));
+      dispatch(
+        actions.updateItemsData({ data: { token: login?.token, id: editId }, items: formData })
+      );
       toast.success("Item updated successfully ✏");
     } else {
-      dispatch(actions.postItemsData({ data, formData }));
+      dispatch(actions.postItemsData({ data, formData })).then((res) => {
+        // Assuming your Redux returns the new item
+        dispatch(actions.itemsGetData({ token: login?.token })); // Refresh list after add
+      });
       toast.success("Item created successfully ✅");
     }
 
@@ -98,23 +100,14 @@ const Items = () => {
     setErrors({});
   };
 
-  // handle edit click
   const handleEdit = (item) => {
-    setFormData({
-      name: item.name,
-      price: item.price,
-      type: "Batla",
-    });
+    setFormData({ name: item.name, price: item.price, type: "Batla" });
     setEditId(item.id);
     setEditMode(true);
     setOpen(true);
   };
 
-  // handle delete click -> open confirmation dialog
   const handleDeleteClick = (id) => {
-    setDeleteId(id);
-
-    // SweetAlert confirm popup
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this action!",
@@ -126,16 +119,16 @@ const Items = () => {
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        confirmDelete(id); // call confirm delete
+        confirmDelete(id);
       }
     });
   };
 
-
-  // confirm delete
   const confirmDelete = (id) => {
     if (id) {
-      dispatch(actions.deleteItemsData({ data, id }));
+      dispatch(actions.deleteItemsData({ data, id })).then(() => {
+        dispatch(actions.itemsGetData({ token: login?.token })); // Refresh list after delete
+      });
       Swal.fire({
         icon: "success",
         title: "Deleted!",
@@ -146,42 +139,32 @@ const Items = () => {
     }
   };
 
+  const filteredItems = Array.isArray(items?.data)
+    ? items.data.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
+    : [];
+
   return (
     <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh" }}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Box sx={{
-          background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          display: "inline-block"
-        }}
-        >
-          <Typography variant="h4" fontWeight="bold" >
-            Items
-          </Typography>
-          <Typography variant="body2" color="black">
-            View and manage your items
-          </Typography>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+        sx={{ flexDirection: { xs: "column", sm: "row" }, alignItems: { xs: "stretch", sm: "center" }, gap: { xs: 2, sm: 0 } }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: { xs: "100%", sm: "auto" }, mb: { xs: 1, sm: 0 } }}>
+          <Box sx={{ background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}>
+            <Typography variant="h4" fontWeight="bold">Items</Typography>
+          </Box>
+          <Button
+            variant="contained"
+            onClick={() => { setFormData({ name: "", price: "", type: "Batla" }); setEditMode(false); setEditId(null); setOpen(true); }}
+            sx={{ width: 40, height: 40, minWidth: 40, borderRadius: "50%", textTransform: "none", fontSize: 20, fontWeight: "bold", background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", display: { xs: "flex", sm: "none" } }}
+          >+</Button>
         </Box>
 
-        {/* Search + Add Button */}
-        <Box
-          display="flex"
-          alignItems="center"
-          gap={2}
-          sx={{
-            flexDirection: {
-              xs: "column", // mobile - vertical
-              sm: "row",    // tablet/desktop - horizontal
-            },
-            alignItems: {
-              xs: "stretch", // mobile - full width
-              sm: "center",
-            },
-          }}
-        >
-          {/* Search Box */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, width: { xs: "100%", sm: "auto" } }}>
           <Box
             sx={{
               display: "flex",
@@ -192,82 +175,54 @@ const Items = () => {
               padding: "4px 12px",
               border: "2px solid #42a5f5",
               transition: "all 0.3s ease",
-              "&:hover": {
-                borderColor: "#1e88e5",
-                boxShadow: "0 0 8px rgba(66,165,245,0.5)",
-              },
-              "&:focus-within": {
-                borderColor: "#1e88e5",
-                boxShadow: "0 0 8px rgba(30,136,229,0.6)",
-              },
+              "&:hover": { borderColor: "#1e88e5", boxShadow: "0 0 8px rgba(66,165,245,0.5)" },
+              "&:focus-within": { borderColor: "#1e88e5", boxShadow: "0 0 8px rgba(30,136,229,0.6)" },
             }}
           >
-            <Search fontSize="small" sx={{ color: "#42a5f5", mr: 1 }} />
-
             <InputBase
               placeholder="Search by item name"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              sx={{
-                flex: 1,
-                fontSize: 14,
-                color: "#333",
-                "&::placeholder": { color: "#999" },
-              }}
+              sx={{ flex: 1, fontSize: 14, color: "#333", "&::placeholder": { color: "#999" } }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <Search fontSize="small" sx={{ color: "#42a5f5", mr: 1 }} />
+                </InputAdornment>
+              }
+              endAdornment={
+                search && (
+                  <InputAdornment position="end">
+                    <Box
+                      onClick={() => setSearch("")}
+                      sx={{
+                        cursor: "pointer",
+                        color: "#555",
+                        fontSize: "13px",
+                        borderRadius: "50%",
+                        width: "28px",
+                        height: "28px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      ✖
+                    </Box>
+                  </InputAdornment>
+                )
+              }
             />
-
-            {search && (
-              <Box
-                onClick={() => setSearch("")}
-                sx={{
-                  cursor: "pointer",
-                  color: "#555",          // default text color
-                  fontSize: "13px",
-                  ml: 1,
-                  borderRadius: "50%",
-                  width: "25px",
-                  height: "25px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    backgroundColor: "#e0e0e0",
-                    color: "#000",
-                  },
-                }}
-              >
-                ✖
-              </Box>
-
-            )}
           </Box>
 
+          {/* </Box> */}
 
-
-          {/* Add Button */}
           <Button
             variant="contained"
-            onClick={() => {
-              setFormData({ name: "", price: "", type: "Batla" });
-              setEditMode(false);
-              setEditId(null);
-              setOpen(true);
-            }}
-            sx={{
-              minWidth: { xs: "100%", sm: 40 },
-              height: 40,
-              borderRadius: "8px",
-              textTransform: "none",
-              fontSize: 17,
-              fontWeight: "bold",
-              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-            }}
-          >
-            + Add Item
-          </Button>
+            onClick={() => { setFormData({ name: "", price: "", type: "Batla" }); setEditMode(false); setEditId(null); setOpen(true); }}
+            sx={{ width: 40, height: 40, minWidth: 40, borderRadius: "50%", textTransform: "none", fontSize: 23, fontWeight: "bold", background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", display: { xs: "none", sm: "flex" }, alignItems: "center", justifyContent: "center", p: 0 }}
+          >+</Button>
         </Box>
-
       </Box>
 
       {/* Table */}
@@ -277,48 +232,53 @@ const Items = () => {
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Price</TableCell>
-              {/* <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell> */}
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                Actions
-              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>Actions</TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
-            {Array.isArray(items?.data) &&
-              items.data
-                .filter(item =>
-                  item.name.toLowerCase().includes(search.toLowerCase())
-                )
-                .slice((page - 1) * rowsPerPage, page * rowsPerPage)   // 👈 pagination logic
-                .map((item) => {
-                  return (
-                    <TableRow key={item.id} hover>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>₹ {item.price}</TableCell>
-                      <TableCell align="right">
-                        <IconButton color="primary" onClick={() => handleEdit(item)}>
-                          <Edit />
-                        </IconButton>
-                        <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
-                          <Delete />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+  {filteredItems.length > 0 ? (
+    filteredItems
+      .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+      .map((item) => (
+        <TableRow key={item.id} hover>
+          <TableCell>{item.name}</TableCell>
+          <TableCell>₹ {item.price}</TableCell>
+          <TableCell align="right">
+            <IconButton color="primary" onClick={() => handleEdit(item)}>
+              <Edit />
+            </IconButton>
+            <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
+              <Delete />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+      ))
+  ) : (
+   <TableRow>
+  <TableCell colSpan={3} align="center" sx={{ py: 4, color: "#888" }}>
+    {items?.data?.length === 0 ? (
+      <Box sx={{ display: "flex", flexDirection: "column",  alignItems: "center", gap: 1 }}>
+        <Box sx={{ fontSize: 20, color: "#000" }}>🔄</Box>
+        <span>No items available.</span>
+      </Box>
+    ) : (
+      <Box sx={{ display: "flex", flexDirection: "column",fontStyle: "italic", alignItems: "center", gap: 1 }}>
+        <span>No items found for "{search}"</span>
+      </Box>
+    )}
+  </TableCell>
+</TableRow>
 
-          </TableBody>
+  )}
+</TableBody>
+
         </Table>
       </TableContainer>
 
       <Box display="flex" justifyContent="center" mt={2}>
         <Pagination
-          count={Math.ceil(
-            (items?.data?.filter(item =>
-              item.name.toLowerCase().includes(search.toLowerCase())
-            ).length || 0) / rowsPerPage
-          )}
+          count={Math.ceil(filteredItems.length / rowsPerPage)}
           page={page}
           onChange={(e, value) => setPage(value)}
           color="primary"
@@ -326,74 +286,19 @@ const Items = () => {
         />
       </Box>
 
-
-      {/* Add / Edit Item Dialog */}
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        fullWidth
-        maxWidth="sm"
-        PaperProps={{
-          sx: { borderRadius: 3, p: 1.5, boxShadow: 8 },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            bgcolor: "linear-gradient(135deg, #1976d2 30%, #42a5f5 90%)",
-            color: "white",
-            borderTopLeftRadius: 12,
-            borderTopRightRadius: 12,
-            py: 2,
-            px: 3,
-          }}
-        >
+      {/* Add/Edit Dialog */}
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3, p: 1.5, boxShadow: 8 } }}>
+        <DialogTitle sx={{ bgcolor: "linear-gradient(135deg, #1976d2 30%, #42a5f5 90%)", color: "white", borderTopLeftRadius: 12, borderTopRightRadius: 12, py: 2, px: 3 }}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Box
-              sx={{
-                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                display: "inline-block"
-              }}
-            >
-              <Typography fontWeight="bold" fontSize={20}>
-                {editMode ? "Edit Item" : "Add Item"}
-              </Typography>
+            <Box sx={{ background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}>
+              <Typography fontWeight="bold" fontSize={20}>{editMode ? "Edit Item" : "Add Item"}</Typography>
             </Box>
-            <Box
-              onClick={() => setOpen(false)}
-              sx={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-                // color: "#1976d2",
-                fontSize: 22,
-                fontWeight: "bold",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                "&:hover": {
-                  background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-                },
-              }}
-            >
-              ×
-            </Box>
+            <Box onClick={() => setOpen(false)} sx={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", fontSize: 22, fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", "&:hover": { background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)" } }}>×</Box>
           </Box>
         </DialogTitle>
 
         <DialogContent sx={{ mt: 0 }}>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-            }}
-          >
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {/* Item Name */}
             <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
               Item Name
@@ -410,37 +315,23 @@ const Items = () => {
               helperText={errors.name}
               InputProps={{
                 endAdornment: formData.name && (
-                  <Box
-                    onClick={() => setFormData({ ...formData, name: "" })}
-                    sx={{
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      ml: 1,
-                      color: "#101011ff",
-                      borderRadius: "50%",
-                      padding: "2px 6px",
-                      backgroundColor: "white",
-                      "&:hover": {
-                        backgroundColor: "white",
-                      },
-                    }}
-                  >
-                    ✖
-                  </Box>
+                  <InputAdornment position="end">
+                    <Box
+                      onClick={() => setFormData({ ...formData, name: "" })}
+                      sx={{
+                        cursor: "pointer",
+                        color: "#555",
+                        fontSize: "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        "&:hover": { color: "#000" },
+                      }}
+                    >
+                      ✖
+                    </Box>
+                  </InputAdornment>
                 ),
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  height: 50,
-                  backgroundColor: "white",
-                },
-                "& .MuiOutlinedInput-input": {
-                  padding: "12px 15px",
-                  fontSize: 16,
-                  backgroundColor: "white",
-                },
-                width: "100%",
               }}
             />
 
@@ -461,77 +352,35 @@ const Items = () => {
               helperText={errors.price}
               InputProps={{
                 endAdornment: formData.price && (
-                  <Box
-                    onClick={() => setFormData({ ...formData, price: "" })}
-                    sx={{
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      ml: 1,
-                      color: "#0d0d0eff",
-                      borderRadius: "50%",
-                      padding: "2px 6px",
-                      backgroundColor: "white",
-                      "&:hover": {
-                        backgroundColor: "#f0f0f0",
-                      },
-                    }}
-                  >
-                    ✖
-                  </Box>
+                  <InputAdornment position="end">
+                    <Box
+                      onClick={() => setFormData({ ...formData, price: "" })}
+                      sx={{
+                        cursor: "pointer",
+                        color: "#555",
+                        fontSize: "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        "&:hover": { color: "#000" },
+                      }}
+                    >
+                      ✖
+                    </Box>
+                  </InputAdornment>
                 ),
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  height: 50,
-                },
-                "& .MuiOutlinedInput-input": {
-                  padding: "12px 15px",
-                  fontSize: 16,
-                },
-                width: "100%",
               }}
             />
           </Box>
-
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            sx={{
-              px: 4,
-              borderRadius: 2,
-              textTransform: "none",
-              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              boxShadow: "0 4px 12px rgba(17, 17, 17, 0.4)",
-              "&:hover": {
-                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              },
-            }}
-          >
+          <Button onClick={handleSubmit} variant="contained" sx={{ px: 4, borderRadius: 2, textTransform: "none", background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)" }}>
             {editMode ? "Update" : "Submit"}
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialog} onClose={() => setDeleteDialog(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete this item?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialog(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+    </Box >
   );
 };
 

@@ -22,6 +22,8 @@ import {
 } from "@mui/material";
 import { Search, Delete, Edit } from "@mui/icons-material";
 import Swal from "sweetalert2";
+import {  Clear } from "@mui/icons-material";
+
 
 // ✅ Toastify
 import { toast } from "react-toastify";
@@ -176,39 +178,68 @@ const Items = () => {
           }}
         >
           {/* Search Box */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              width: { xs: "100%", sm: 280 },
-              background: "white",
-              borderRadius: "25px",
-              padding: "4px 12px",
-              border: "2px solid #42a5f5",
-              transition: "all 0.3s ease",
-              "&:hover": {
-                borderColor: "#1e88e5",
-                boxShadow: "0 0 8px rgba(66,165,245,0.5)",
-              },
-              "&:focus-within": {
-                borderColor: "#1e88e5",
-                boxShadow: "0 0 8px rgba(30,136,229,0.6)",
-              },
-            }}
-          >
-            <Search fontSize="small" sx={{ color: "#42a5f5", mr: 1 }} />
-            <InputBase
-              placeholder="Search by item name"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              sx={{
-                flex: 1,
-                fontSize: 14,
-                color: "#333",
-                "&::placeholder": { color: "#999" },
-              }}
-            />
-          </Box>
+<Box
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    width: { xs: "100%", sm: 280 },
+    background: "white",
+    borderRadius: "25px",
+    padding: "4px 12px",
+    border: "2px solid #42a5f5",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      borderColor: "#1e88e5",
+      boxShadow: "0 0 8px rgba(66,165,245,0.5)",
+    },
+    "&:focus-within": {
+      borderColor: "#1e88e5",
+      boxShadow: "0 0 8px rgba(30,136,229,0.6)",
+    },
+  }}
+>
+  <Search fontSize="small" sx={{ color: "#42a5f5", mr: 1 }} />
+
+  <InputBase
+    placeholder="Search by item name"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    sx={{
+      flex: 1,
+      fontSize: 14,
+      color: "#333",
+      "&::placeholder": { color: "#999" },
+    }}
+  />
+
+  {search && (
+   <Box
+  onClick={() => setSearch("")}
+  sx={{
+    cursor: "pointer",
+    color: "#555",          // default text color
+    fontSize: "13px",
+    ml: 1,
+    borderRadius: "50%",
+    width: "25px",
+    height: "25px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: "#e0e0e0", // background on hover
+      color: "#000",              // text color on hover
+    },
+  }}
+>
+  ✖
+</Box>
+
+  )}
+</Box>
+
+
 
           {/* Add Button */}
           <Button

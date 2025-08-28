@@ -12,6 +12,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { CircularProgress, IconButton } from "@mui/material";
 import { Search, Edit, Delete, Visibility } from "@mui/icons-material";
+import { borderRadius } from "@mui/system";
 
 // Update buttonStyles for Add Order and Save button color (same as customer page)
 const buttonStyles = {
@@ -49,8 +50,8 @@ const buttonStyles = {
     transition: "background 0.2s",
   },
   ghost: {
-    background: "#f1f5f9",
-    color: "#334155",
+    background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+    color: "#f7f8faff",
     border: "none",
     borderRadius: 8,
     padding: "10px 18px",
@@ -290,7 +291,7 @@ export default function Orders() {
       setEditIndex(null);
       resetForm();
     };
-    const setSubmitting = () => {};
+    const setSubmitting = () => { };
 
     if (editIndex !== null && orders[editIndex]?.id) {
       dispatch(
@@ -422,22 +423,22 @@ export default function Orders() {
       return str.trim();
     };
 
-  const rw = words(rupees);
-const pw = paise ? words(paise) + " Paise" : "";
+    const rw = words(rupees);
+    const pw = paise ? words(paise) + " Paise" : "";
 
-if (rupees && paise) return `${rw} Rupees and ${pw} Only`;
-if (rupees) return `${rw} Rupees Only`;
-return `${pw} Only`;
-};
+    if (rupees && paise) return `${rw} Rupees and ${pw} Only`;
+    if (rupees) return `${rw} Rupees Only`;
+    return `${pw} Only`;
+  };
 
 
-const todayStr = useMemo(() => {
-  const d = new Date();
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const yyyy = d.getFullYear();
-  return `${dd}/${mm}/${yyyy}`;
-}, []);
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }, []);
 
 
   const invoiceRef = useRef(null);
@@ -609,8 +610,9 @@ const todayStr = useMemo(() => {
     },
     ghost: {
       ...buttonStyles.ghost,
-      background: "#f1f5f9",
-      color: "#334155",
+      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+      color: "#f0f1f3ff",
+      borderRadius: "100%",
     },
     iconDanger: {
       ...buttonStyles.iconDanger,
@@ -637,25 +639,25 @@ const todayStr = useMemo(() => {
     <div style={themedStyles.page}>
       <div style={themedStyles.header}>
         <div style={themedStyles.headerLeft}>
-  <h2
-    style={{
-      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-    }}
-  >
-    Orders
-  </h2>
-  <h6
-    style={{
-      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-    }}
-  >
-    Create, view and manage your orders easily
-  </h6>
-</div>
+          <h2
+            style={{
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Orders
+          </h2>
+          <h6
+            style={{
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Create, view and manage your orders easily
+          </h6>
+        </div>
 
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {/* Search Bar */}
@@ -689,17 +691,17 @@ const todayStr = useMemo(() => {
               }}
             />
           </div>
-        <button style={buttonStyles.primary} onClick={openForm} aria-label="Create order">
-  <span style={{ fontSize: 20, lineHeight: 1 }}></span>
-  <span
-    style={{
-      color: "#f8f2f2ff", // Black text
-      fontWeight: "bold",
-    }}
-  >
-    Add Order
-  </span>
-</button>
+          <button style={buttonStyles.primary} onClick={openForm} aria-label="Create order">
+            <span style={{ fontSize: 20, lineHeight: 1 }}></span>
+            <span
+              style={{
+                color: "#f8f2f2ff", // Black text
+                fontWeight: "bold",
+              }}
+            >
+              Add Order
+            </span>
+          </button>
 
 
         </div>
@@ -711,55 +713,56 @@ const todayStr = useMemo(() => {
         </div>
       ) : filteredOrders.length === 0 ? (
         <div style={themedStyles.emptyWrap}>
-  <div
-    style={{
-      ...themedStyles.emptyIcon,
-      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-    }}
-  >
-      🔄
-  </div>
-  
-  <div
-    style={{
-      ...themedStyles.emptyTitle,
-      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-      fontWeight: "600",
-    }}
-  >
-    No orders yet
-  </div>
-  
-  <div
-    style={{
-      ...themedStyles.emptyText,
-      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-    }}
-  >
-    Click "Add Order" to create your first order.
-  </div>
-  
-  <button
-    style={{
-      ...themedButtonStyles.primary,
-      marginTop: 10,
-      background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-      border: "none",
-      color: "#fff",
-      fontWeight: "600",
-      padding: "10px 20px",
-      borderRadius: 8,
-    }}
-    onClick={openForm}
-  >
-    <span style={{ fontSize: 18 }}></span> Create Order
-  </button>
+          <div
+            style={{
+              ...themedStyles.emptyIcon,
+              fontSize: "30px",
+              color: "#000",
+            }}
+          >
+            🔄
+          </div>
+
+
+
+          <div
+            style={{
+              ...themedStyles.emptyTitle,
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontWeight: "600",
+            }}
+          >
+            No orders yet
+          </div>
+
+          <div
+            style={{
+              ...themedStyles.emptyText,
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Click "Add Order" to create your first order.
+          </div>
+
+          <button
+            style={{
+              ...themedButtonStyles.primary,
+              marginTop: 10,
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              border: "none",
+              color: "#fff",
+              fontWeight: "600",
+              padding: "10px 20px",
+              borderRadius: 8,
+            }}
+            onClick={openForm}
+          >
+            <span style={{ fontSize: 18 }}></span> Create Order
+          </button>
 
 
         </div>
@@ -782,7 +785,7 @@ const todayStr = useMemo(() => {
                   onMouseOver={e => e.currentTarget.style.boxShadow = "0 12px 32px rgba(59,130,246,0.18)"}
                   onMouseOut={e => e.currentTarget.style.boxShadow = themedStyles.card.boxShadow}
                 >
-                 
+
                   <div style={{
                     flex: "1 1 220px",
                     minWidth: 0,
@@ -1271,7 +1274,7 @@ const todayStr = useMemo(() => {
               style={{
                 padding: 10,
                 flex: 1,
-                overflowY: "auto", 
+                overflowY: "auto",
                 minHeight: 0,
               }}
             >
@@ -1285,7 +1288,7 @@ const todayStr = useMemo(() => {
                       रेसिडेन्शिअल हायस्कूल समोर, <br />
                       मिरी रोड शेवगाव ता . शेवगाव, जि . अहिल्यानगर
                     </div>
-                    <div style={invoiceStyles.contact}>मो. नं . 9850837400 
+                    <div style={invoiceStyles.contact}>मो. नं . 9850837400
                       9850332356</div>
                   </div>
 
@@ -1540,7 +1543,7 @@ const invoiceStyles = {
   header: { textAlign: "center", borderBottom: "1px solid #000", padding: 5 },
   title: { fontSize: "18px", fontWeight: "bold" },
   subTitle: { fontSize: "12px", margin: "5px 0", fontWeight: "bold" },
-  contact: { fontSize: "12px", fontWeight: "bold"},
+  contact: { fontSize: "12px", fontWeight: "bold" },
   table: { width: "100%", borderCollapse: "collapse", marginTop: 5 },
   th: { border: "1px solid #000", background: "#d9d9ff", padding: 5, textAlign: "left" },
   td: { border: "1px solid #000", padding: 5 },

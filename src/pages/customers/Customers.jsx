@@ -216,6 +216,7 @@ const Customers = () => {
               }}
             >
               <Search fontSize="small" sx={{ color: "#667eea", mr: 1 }} />
+
               <InputBase
                 placeholder="Search by customer name"
                 value={search}
@@ -227,7 +228,27 @@ const Customers = () => {
                   "&::placeholder": { color: "#999" },
                 }}
               />
+
+              {search && (
+                <Box
+                  onClick={() => setSearch("")}
+                  sx={{
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    ml: 1,
+                    color: "#667eea",
+                    borderRadius: "50%",
+                    padding: "2px 6px",
+                    "&:hover": {
+                      backgroundColor: "#f0f0f0",
+                    },
+                  }}
+                >
+                  ✖
+                </Box>
+              )}
             </Box>
+
 
             {/* Add Customer Button */}
             <Button
@@ -288,11 +309,11 @@ const Customers = () => {
                         {row.address && row.address.length <= 30
                           ? row.address
                           : row.address && row.address.match(/.{1,30}/g).map((str, idx) => (
-                              <React.Fragment key={idx}>
-                                {str}
-                                <br />
-                              </React.Fragment>
-                            ))}
+                            <React.Fragment key={idx}>
+                              {str}
+                              <br />
+                            </React.Fragment>
+                          ))}
                       </TableCell>
                       <TableCell>{row.phone}</TableCell>
                       <TableCell align="right">
@@ -355,9 +376,36 @@ const Customers = () => {
                   margin="dense"
                   error={!!errors.name}
                   helperText={errors.name?.message}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "white",
+                      "&.Mui-focused": { backgroundColor: "white" },
+                    },
+                  }}
+                  InputProps={{
+                    endAdornment: field.value && (
+                      <Box
+                        onClick={() => field.onChange("")}
+                        sx={{
+                          cursor: "pointer",
+                          fontSize: "20px",
+                          ml: 1,
+                          color: "#101011ff",
+                          borderRadius: "50%",
+                          padding: "2px 6px",
+                          "&:hover": {
+                            backgroundColor: "#f0f0f0",
+                          },
+                        }}
+                      >
+                        ✖
+                      </Box>
+                    ),
+                  }}
                 />
               )}
             />
+
             <Controller
               name="address"
               control={control}
@@ -369,9 +417,36 @@ const Customers = () => {
                   margin="dense"
                   error={!!errors.address}
                   helperText={errors.address?.message}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "white",
+                      "&.Mui-focused": { backgroundColor: "white" },
+                    },
+                  }}
+                  InputProps={{
+                    endAdornment: field.value && (
+                      <Box
+                        onClick={() => field.onChange("")}
+                        sx={{
+                          cursor: "pointer",
+                          fontSize: "20px",
+                          ml: 1,
+                          color: "#101011ff",
+                          borderRadius: "50%",
+                          padding: "2px 6px",
+                          "&:hover": {
+                            backgroundColor: "#f0f0f0",
+                          },
+                        }}
+                      >
+                        ✖
+                      </Box>
+                    ),
+                  }}
                 />
               )}
             />
+
             <Controller
               name="phone"
               control={control}
@@ -383,22 +458,50 @@ const Customers = () => {
                   margin="dense"
                   error={!!errors.phone}
                   helperText={errors.phone?.message}
-                  inputProps={{ maxLength: 10, inputMode: 'numeric', pattern: '[0-9]*' }}
-                  onInput={e => {
-                    // Only allow numbers and max 10 digits
-                    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                  inputProps={{ maxLength: 10, inputMode: "numeric", pattern: "[0-9]*" }}
+                  onInput={(e) => {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, "").slice(0, 10);
                     field.onChange(e);
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "white",
+                      "&.Mui-focused": { backgroundColor: "white" },
+                    },
+                  }}
+                  InputProps={{
+                    endAdornment: field.value && (
+                      <Box
+                        onClick={() => field.onChange("")}
+                        sx={{
+                          cursor: "pointer",
+                          fontSize: "20px",
+                          ml: 1,
+                          color: "#101011ff",
+                          borderRadius: "50%",
+                          padding: "2px 6px",
+                          "&:hover": {
+                            backgroundColor: "#f0f0f0",
+                          },
+                        }}
+                      >
+                        ✖
+                      </Box>
+                    ),
                   }}
                 />
               )}
             />
           </DialogContent>
+
+
+
           <DialogActions sx={{ p: 2 }}>
-            <Button  sx={{
-                borderRadius: "8px",
-                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-                color:"white"
-              }} onClick={closeForm}>Cancel</Button>
+            <Button sx={{
+              borderRadius: "8px",
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              color: "white"
+            }} onClick={closeForm}>Cancel</Button>
             <Button
               type="submit"
               variant="contained"

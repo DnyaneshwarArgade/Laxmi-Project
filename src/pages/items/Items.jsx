@@ -228,8 +228,8 @@ const Items = () => {
     justifyContent: "center",
     transition: "all 0.2s ease",
     "&:hover": {
-      backgroundColor: "#e0e0e0", // background on hover
-      color: "#000",              // text color on hover
+      backgroundColor: "#e0e0e0", 
+      color: "#000",              
     },
   }}
 >
@@ -375,69 +375,114 @@ const Items = () => {
 
         <DialogContent sx={{ mt: 0 }}>
           <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-            }}
-          >
-            <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
-              Item Name
-            </Typography>
-            <TextField
-              placeholder="Enter item name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              fullWidth
-              variant="outlined"
-              error={!!errors.name}
-              helperText={errors.name}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  height: 50,
-                },
-                "& .MuiOutlinedInput-input": {
-                  padding: "12px 15px",
-                  fontSize: 16,
-                },
-                width: "100%",
-              }}
-            />
+  component="form"
+  onSubmit={handleSubmit}
+  sx={{
+    display: "flex",
+    flexDirection: "column",
+    gap: 2,
+  }}
+>
+  {/* Item Name */}
+  <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
+    Item Name
+  </Typography>
+  <TextField
+    placeholder="Enter item name"
+    name="name"
+    value={formData.name}
+    onChange={handleChange}
+    required
+    fullWidth
+    variant="outlined"
+    error={!!errors.name}
+    helperText={errors.name}
+    InputProps={{
+      endAdornment: formData.name && (
+        <Box
+          onClick={() => setFormData({ ...formData, name: "" })}
+          sx={{
+            cursor: "pointer",
+            fontSize: "14px",
+            ml: 1,
+            color: "#101011ff",
+            borderRadius: "50%",
+            padding: "2px 6px",
+             backgroundColor: "white",
+            "&:hover": {
+               backgroundColor: "white",
+            },
+          }}
+        >
+          ✖
+        </Box>
+      ),
+    }}
+    sx={{
+      "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+        height: 50,
+         backgroundColor: "white",
+      },
+      "& .MuiOutlinedInput-input": {
+        padding: "12px 15px",
+        fontSize: 16,
+         backgroundColor: "white",
+      },
+      width: "100%",
+    }}
+  />
 
-            <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
-              Price
-            </Typography>
-            <TextField
-              placeholder="Enter price"
-              name="price"
-              type="number"
-              value={formData.price}
-              onChange={handleChange}
-              required
-              fullWidth
-              variant="outlined"
-              error={!!errors.price}
-              helperText={errors.price}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  height: 50,
-                },
-                "& .MuiOutlinedInput-input": {
-                  padding: "12px 15px",
-                  fontSize: 16,
-                },
-                width: "100%",
-              }}
-            />
+  {/* Price */}
+  <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
+    Price
+  </Typography>
+  <TextField
+    placeholder="Enter price"
+    name="price"
+    type="number"
+    value={formData.price}
+    onChange={handleChange}
+    required
+    fullWidth
+    variant="outlined"
+    error={!!errors.price}
+    helperText={errors.price}
+    InputProps={{
+      endAdornment: formData.price && (
+        <Box
+          onClick={() => setFormData({ ...formData, price: "" })}
+          sx={{
+            cursor: "pointer",
+            fontSize: "14px",
+            ml: 1,
+            color: "#0d0d0eff",
+            borderRadius: "50%",
+            padding: "2px 6px",
+             backgroundColor: "white",
+            "&:hover": {
+              backgroundColor: "#f0f0f0",
+            },
+          }}
+        >
+          ✖
+        </Box>
+      ),
+    }}
+    sx={{
+      "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+        height: 50,
+      },
+      "& .MuiOutlinedInput-input": {
+        padding: "12px 15px",
+        fontSize: 16,
+      },
+      width: "100%",
+    }}
+  />
+</Box>
 
-
-          </Box>
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>

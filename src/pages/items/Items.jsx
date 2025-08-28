@@ -19,10 +19,11 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Pagination
 } from "@mui/material";
 import { Search, Delete, Edit } from "@mui/icons-material";
 import Swal from "sweetalert2";
-import {  Clear } from "@mui/icons-material";
+import { Clear } from "@mui/icons-material";
 
 
 // ✅ Toastify
@@ -37,6 +38,9 @@ const Items = () => {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const { items } = useSelector((state) => state.entities.items);
+  const [page, setPage] = useState(1); // current page
+  const rowsPerPage = 10; // प्रति पेज 10 रेकॉर्ड
+
   console.log('items', items)
   const data = {
     token: login?.token,
@@ -178,66 +182,66 @@ const Items = () => {
           }}
         >
           {/* Search Box */}
-<Box
-  sx={{
-    display: "flex",
-    alignItems: "center",
-    width: { xs: "100%", sm: 280 },
-    background: "white",
-    borderRadius: "25px",
-    padding: "4px 12px",
-    border: "2px solid #42a5f5",
-    transition: "all 0.3s ease",
-    "&:hover": {
-      borderColor: "#1e88e5",
-      boxShadow: "0 0 8px rgba(66,165,245,0.5)",
-    },
-    "&:focus-within": {
-      borderColor: "#1e88e5",
-      boxShadow: "0 0 8px rgba(30,136,229,0.6)",
-    },
-  }}
->
-  <Search fontSize="small" sx={{ color: "#42a5f5", mr: 1 }} />
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              width: { xs: "100%", sm: 280 },
+              background: "white",
+              borderRadius: "25px",
+              padding: "4px 12px",
+              border: "2px solid #42a5f5",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                borderColor: "#1e88e5",
+                boxShadow: "0 0 8px rgba(66,165,245,0.5)",
+              },
+              "&:focus-within": {
+                borderColor: "#1e88e5",
+                boxShadow: "0 0 8px rgba(30,136,229,0.6)",
+              },
+            }}
+          >
+            <Search fontSize="small" sx={{ color: "#42a5f5", mr: 1 }} />
 
-  <InputBase
-    placeholder="Search by item name"
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    sx={{
-      flex: 1,
-      fontSize: 14,
-      color: "#333",
-      "&::placeholder": { color: "#999" },
-    }}
-  />
+            <InputBase
+              placeholder="Search by item name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              sx={{
+                flex: 1,
+                fontSize: 14,
+                color: "#333",
+                "&::placeholder": { color: "#999" },
+              }}
+            />
 
-  {search && (
-   <Box
-  onClick={() => setSearch("")}
-  sx={{
-    cursor: "pointer",
-    color: "#555",          // default text color
-    fontSize: "13px",
-    ml: 1,
-    borderRadius: "50%",
-    width: "25px",
-    height: "25px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "all 0.2s ease",
-    "&:hover": {
-      backgroundColor: "#e0e0e0", 
-      color: "#000",              
-    },
-  }}
->
-  ✖
-</Box>
+            {search && (
+              <Box
+                onClick={() => setSearch("")}
+                sx={{
+                  cursor: "pointer",
+                  color: "#555",          // default text color
+                  fontSize: "13px",
+                  ml: 1,
+                  borderRadius: "50%",
+                  width: "25px",
+                  height: "25px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    backgroundColor: "#e0e0e0",
+                    color: "#000",
+                  },
+                }}
+              >
+                ✖
+              </Box>
 
-  )}
-</Box>
+            )}
+          </Box>
 
 
 
@@ -286,21 +290,12 @@ const Items = () => {
                 .filter(item =>
                   item.name.toLowerCase().includes(search.toLowerCase())
                 )
+                .slice((page - 1) * rowsPerPage, page * rowsPerPage)   // 👈 pagination logic
                 .map((item) => {
                   return (
                     <TableRow key={item.id} hover>
-                      <TableCell>
-                        {item.name.length <= 30
-                          ? item.name
-                          : item.name.match(/.{1,30}/g).map((str, idx) => (
-                              <React.Fragment key={`${item.id}-${idx}`}>
-                                {str}
-                                <br />
-                              </React.Fragment>
-                            ))}
-                      </TableCell>
+                      <TableCell>{item.name}</TableCell>
                       <TableCell>₹ {item.price}</TableCell>
-                      {/* <TableCell>{item.type}</TableCell> */}
                       <TableCell align="right">
                         <IconButton color="primary" onClick={() => handleEdit(item)}>
                           <Edit />
@@ -310,11 +305,27 @@ const Items = () => {
                         </IconButton>
                       </TableCell>
                     </TableRow>
-                  )
+                  );
                 })}
+
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Box display="flex" justifyContent="center" mt={2}>
+        <Pagination
+          count={Math.ceil(
+            (items?.data?.filter(item =>
+              item.name.toLowerCase().includes(search.toLowerCase())
+            ).length || 0) / rowsPerPage
+          )}
+          page={page}
+          onChange={(e, value) => setPage(value)}
+          color="primary"
+          shape="rounded"
+        />
+      </Box>
+
 
       {/* Add / Edit Item Dialog */}
       <Dialog
@@ -375,113 +386,113 @@ const Items = () => {
 
         <DialogContent sx={{ mt: 0 }}>
           <Box
-  component="form"
-  onSubmit={handleSubmit}
-  sx={{
-    display: "flex",
-    flexDirection: "column",
-    gap: 2,
-  }}
->
-  {/* Item Name */}
-  <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
-    Item Name
-  </Typography>
-  <TextField
-    placeholder="Enter item name"
-    name="name"
-    value={formData.name}
-    onChange={handleChange}
-    required
-    fullWidth
-    variant="outlined"
-    error={!!errors.name}
-    helperText={errors.name}
-    InputProps={{
-      endAdornment: formData.name && (
-        <Box
-          onClick={() => setFormData({ ...formData, name: "" })}
-          sx={{
-            cursor: "pointer",
-            fontSize: "14px",
-            ml: 1,
-            color: "#101011ff",
-            borderRadius: "50%",
-            padding: "2px 6px",
-             backgroundColor: "white",
-            "&:hover": {
-               backgroundColor: "white",
-            },
-          }}
-        >
-          ✖
-        </Box>
-      ),
-    }}
-    sx={{
-      "& .MuiOutlinedInput-root": {
-        borderRadius: 2,
-        height: 50,
-         backgroundColor: "white",
-      },
-      "& .MuiOutlinedInput-input": {
-        padding: "12px 15px",
-        fontSize: 16,
-         backgroundColor: "white",
-      },
-      width: "100%",
-    }}
-  />
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            {/* Item Name */}
+            <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
+              Item Name
+            </Typography>
+            <TextField
+              placeholder="Enter item name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              fullWidth
+              variant="outlined"
+              error={!!errors.name}
+              helperText={errors.name}
+              InputProps={{
+                endAdornment: formData.name && (
+                  <Box
+                    onClick={() => setFormData({ ...formData, name: "" })}
+                    sx={{
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      ml: 1,
+                      color: "#101011ff",
+                      borderRadius: "50%",
+                      padding: "2px 6px",
+                      backgroundColor: "white",
+                      "&:hover": {
+                        backgroundColor: "white",
+                      },
+                    }}
+                  >
+                    ✖
+                  </Box>
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  height: 50,
+                  backgroundColor: "white",
+                },
+                "& .MuiOutlinedInput-input": {
+                  padding: "12px 15px",
+                  fontSize: 16,
+                  backgroundColor: "white",
+                },
+                width: "100%",
+              }}
+            />
 
-  {/* Price */}
-  <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
-    Price
-  </Typography>
-  <TextField
-    placeholder="Enter price"
-    name="price"
-    type="number"
-    value={formData.price}
-    onChange={handleChange}
-    required
-    fullWidth
-    variant="outlined"
-    error={!!errors.price}
-    helperText={errors.price}
-    InputProps={{
-      endAdornment: formData.price && (
-        <Box
-          onClick={() => setFormData({ ...formData, price: "" })}
-          sx={{
-            cursor: "pointer",
-            fontSize: "14px",
-            ml: 1,
-            color: "#0d0d0eff",
-            borderRadius: "50%",
-            padding: "2px 6px",
-             backgroundColor: "white",
-            "&:hover": {
-              backgroundColor: "#f0f0f0",
-            },
-          }}
-        >
-          ✖
-        </Box>
-      ),
-    }}
-    sx={{
-      "& .MuiOutlinedInput-root": {
-        borderRadius: 2,
-        height: 50,
-      },
-      "& .MuiOutlinedInput-input": {
-        padding: "12px 15px",
-        fontSize: 16,
-      },
-      width: "100%",
-    }}
-  />
-</Box>
+            {/* Price */}
+            <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
+              Price
+            </Typography>
+            <TextField
+              placeholder="Enter price"
+              name="price"
+              type="number"
+              value={formData.price}
+              onChange={handleChange}
+              required
+              fullWidth
+              variant="outlined"
+              error={!!errors.price}
+              helperText={errors.price}
+              InputProps={{
+                endAdornment: formData.price && (
+                  <Box
+                    onClick={() => setFormData({ ...formData, price: "" })}
+                    sx={{
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      ml: 1,
+                      color: "#0d0d0eff",
+                      borderRadius: "50%",
+                      padding: "2px 6px",
+                      backgroundColor: "white",
+                      "&:hover": {
+                        backgroundColor: "#f0f0f0",
+                      },
+                    }}
+                  >
+                    ✖
+                  </Box>
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  height: 50,
+                },
+                "& .MuiOutlinedInput-input": {
+                  padding: "12px 15px",
+                  fontSize: 16,
+                },
+                width: "100%",
+              }}
+            />
+          </Box>
 
         </DialogContent>
 

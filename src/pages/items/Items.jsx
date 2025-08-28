@@ -237,41 +237,41 @@ const Items = () => {
           </TableHead>
 
           <TableBody>
-  {filteredItems.length > 0 ? (
-    filteredItems
-      .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-      .map((item) => (
-        <TableRow key={item.id} hover>
-          <TableCell>{item.name}</TableCell>
-          <TableCell>₹ {item.price}</TableCell>
-          <TableCell align="right">
-            <IconButton color="primary" onClick={() => handleEdit(item)}>
-              <Edit />
-            </IconButton>
-            <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
-              <Delete />
-            </IconButton>
-          </TableCell>
-        </TableRow>
-      ))
-  ) : (
-   <TableRow>
-  <TableCell colSpan={3} align="center" sx={{ py: 4, color: "#888" }}>
-    {items?.data?.length === 0 ? (
-      <Box sx={{ display: "flex", flexDirection: "column",  alignItems: "center", gap: 1 }}>
-        <Box sx={{ fontSize: 20, color: "#000" }}>🔄</Box>
-        <span>No items available.</span>
-      </Box>
-    ) : (
-      <Box sx={{ display: "flex", flexDirection: "column",fontStyle: "italic", alignItems: "center", gap: 1 }}>
-        <span>No items found for "{search}"</span>
-      </Box>
-    )}
-  </TableCell>
-</TableRow>
+            {filteredItems.length > 0 ? (
+              filteredItems
+                .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                .map((item) => (
+                  <TableRow key={item.id} hover>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>₹ {item.price}</TableCell>
+                    <TableCell align="right">
+                      <IconButton color="primary" onClick={() => handleEdit(item)}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={3} align="center" sx={{ py: 4, color: "#888" }}>
+                  {items?.data?.length === 0 ? (
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+                      <Box sx={{ fontSize: 20, color: "#000" }}>🔄</Box>
+                      <span>No items available.</span>
+                    </Box>
+                  ) : (
+                    <Box sx={{ display: "flex", flexDirection: "column", fontStyle: "italic", alignItems: "center", gap: 1 }}>
+                      <span>No items found for "{search}"</span>
+                    </Box>
+                  )}
+                </TableCell>
+              </TableRow>
 
-  )}
-</TableBody>
+            )}
+          </TableBody>
 
         </Table>
       </TableContainer>

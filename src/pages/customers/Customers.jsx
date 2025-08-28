@@ -22,6 +22,8 @@ import {
   Card,
   useMediaQuery,
   useTheme,
+  InputAdornment,
+
 } from "@mui/material";
 import { Search, Delete, Edit, PersonAdd } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
@@ -29,6 +31,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import TextField from "@mui/material/TextField";
 import Swal from "sweetalert2";
+import { Close } from "@mui/icons-material";
 
 // ✅ Validation Schema
 const schema = yup.object({
@@ -171,104 +174,96 @@ const Customers = () => {
         }}
       >
         {/* Header */}
-        <Box
-          display="flex"
-          flexDirection={isMobile ? "column" : "row"}
-          justifyContent="space-between"
-          alignItems={isMobile ? "stretch" : "center"}
-          mb={3}
-          gap={2}
-        >
-          <Box sx={{
-            background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            display: "inline-block"
-          }}>
-            <Typography variant="h4" fontWeight="bold" color="primary">
+        <Box mb={3}>
+          <Box
+            display="flex"
+            flexDirection={isMobile ? "column" : "row"}
+            justifyContent="space-between"
+            alignItems={isMobile ? "flex-start" : "center"}
+            gap={isMobile ? 1 : 2}
+          >
+            {/* Title */}
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              sx={{
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                mb: isMobile ? 1 : 0,
+              }}
+            >
               Customers
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Manage and track all your customers easily
-            </Typography>
-          </Box>
 
-          <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={2}>
-            {/* 🔍 Search Box */}
+            {/* Search + Add Button */}
             <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                width: isMobile ? "100%" : 280,
-                background: "#ffffff",
-                borderRadius: "25px",
-                padding: "4px 12px",
-                border: "2px solid #667eea",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  borderColor: "#5a67d8",
-                  boxShadow: "0 0 8px rgba(102,126,234,0.5)",
-                },
-                "&:focus-within": {
-                  borderColor: "#5a67d8",
-                  boxShadow: "0 0 8px rgba(90,103,216,0.6)",
-                },
-              }}
+              display="flex"
+              flexDirection={isMobile ? "column" : "row"}
+              gap={2}
+              width={isMobile ? "100%" : "auto"}
+              alignItems={isMobile ? "stretch" : "center"}
             >
-              <Search fontSize="small" sx={{ color: "#667eea", mr: 1 }} />
-
-              <InputBase
-                placeholder="Search by customer name"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+              {/* Search Box */}
+              <Box
                 sx={{
-                  flex: 1,
-                  fontSize: 14,
-                  color: "#333",
-                  "&::placeholder": { color: "#999" },
+                  display: "flex",
+                  alignItems: "center",
+                  width: isMobile ? "100%" : 280,
+                  background: "#ffffff",
+                  borderRadius: "25px",
+                  padding: "4px 12px",
+                  border: "2px solid #667eea",
+                  transition: "all 0.3s ease",
+                  "&:hover": { borderColor: "#5a67d8", boxShadow: "0 0 8px rgba(102,126,234,0.5)" },
+                  "&:focus-within": { borderColor: "#5a67d8", boxShadow: "0 0 8px rgba(90,103,216,0.6)" },
                 }}
-              />
+              >
+                <Search fontSize="small" sx={{ color: "#667eea", mr: 1 }} />
+                <InputBase
+                  placeholder="Search by customer name"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  sx={{ flex: 1, fontSize: 14, color: "#333", "&::placeholder": { color: "#999" } }}
+                  endAdornment={
+                    search && (
+                      <InputAdornment position="end">
+                        <IconButton size="small" onClick={() => setSearch("")} sx={{ color: "#667eea" }}>
+                          <Close fontSize="small" />
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }
+                />
+              </Box>
 
-              {search && (
-                <Box
-                  onClick={() => setSearch("")}
-                  sx={{
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    ml: 1,
-                    color: "#667eea",
-                    borderRadius: "50%",
-                    padding: "2px 6px",
-                    "&:hover": {
-                      backgroundColor: "#f0f0f0",
-                    },
-                  }}
-                >
-                  ✖
-                </Box>
-              )}
+              {/* Add Button */}
+              <Button
+                variant="contained"
+                onClick={openAdd}
+                sx={{
+                  width: 50,
+                  height: 48,
+                  minWidth: 0,
+                  borderRadius: "50%",
+                  px: 0,
+                  py: 0,
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <PersonAdd sx={{ color: "#fff" }} />
+              </Button>
             </Box>
-
-
-            {/* Add Customer Button */}
-            <Button
-              variant="contained"
-              startIcon={<PersonAdd />}
-              sx={{
-                borderRadius: "8px",
-                px: 3,
-                py: 1,
-                textTransform: "none",
-                fontWeight: "bold",
-                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              }}
-              onClick={openAdd}
-              fullWidth={isMobile}
-            >
-              Add Customer
-            </Button>
           </Box>
         </Box>
+
+
+
 
         {error && (
           <Typography color="error" sx={{ mb: 2 }}>
@@ -351,20 +346,50 @@ const Customers = () => {
       <Dialog open={openForm} onClose={closeForm} fullWidth maxWidth="sm">
         <form onSubmit={handleSubmit(onSubmit)}>
 
-          <Box
-            sx={{
-              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              display: "inline-block"
-            }}
-          >
-            <DialogTitle sx={{ fontWeight: "bold" }}>
+          <DialogTitle sx={{ fontWeight: "bold", p: 2, position: "relative" }}>
+            {/* Title text */}
+            <Box
+              component="span"
+              sx={{
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: "bold",
+                fontSize: "1.25rem", // h5/h6 size adjust
+              }}
+            >
               {editing ? "Edit Customer" : "Add Customer"}
-            </DialogTitle>
+            </Box>
 
-          </Box>
+            {/* Close button top-right */}
+            <Box
+              onClick={closeForm}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                fontSize: 22,
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "#fff",
+                "&:hover": {
+                  background: "linear-gradient(90deg, #5a67d8 0%, #6b46c1 100%)",
+                },
+              }}
+            >
+              ×
+            </Box>
+          </DialogTitle>
+
           <DialogContent>
+            {/* Name */}
             <Controller
               name="name"
               control={control}
@@ -384,28 +409,22 @@ const Customers = () => {
                   }}
                   InputProps={{
                     endAdornment: field.value && (
-                      <Box
-                        onClick={() => field.onChange("")}
-                        sx={{
-                          cursor: "pointer",
-                          fontSize: "20px",
-                          ml: 1,
-                          color: "#101011ff",
-                          borderRadius: "50%",
-                          padding: "2px 6px",
-                          "&:hover": {
-                            backgroundColor: "#f0f0f0",
-                          },
-                        }}
-                      >
-                        ✖
-                      </Box>
+                      <InputAdornment position="end">
+                        <IconButton
+                          size="small"
+                          onClick={() => field.onChange("")}
+                          sx={{ color: "#101011ff" }}
+                        >
+                          <Close fontSize="small" />
+                        </IconButton>
+                      </InputAdornment>
                     ),
                   }}
                 />
               )}
             />
 
+            {/* Address */}
             <Controller
               name="address"
               control={control}
@@ -425,28 +444,22 @@ const Customers = () => {
                   }}
                   InputProps={{
                     endAdornment: field.value && (
-                      <Box
-                        onClick={() => field.onChange("")}
-                        sx={{
-                          cursor: "pointer",
-                          fontSize: "20px",
-                          ml: 1,
-                          color: "#101011ff",
-                          borderRadius: "50%",
-                          padding: "2px 6px",
-                          "&:hover": {
-                            backgroundColor: "#f0f0f0",
-                          },
-                        }}
-                      >
-                        ✖
-                      </Box>
+                      <InputAdornment position="end">
+                        <IconButton
+                          size="small"
+                          onClick={() => field.onChange("")}
+                          sx={{ color: "#101011ff" }}
+                        >
+                          <Close fontSize="small" />
+                        </IconButton>
+                      </InputAdornment>
                     ),
                   }}
                 />
               )}
             />
 
+            {/* Phone */}
             <Controller
               name="phone"
               control={control}
@@ -471,22 +484,15 @@ const Customers = () => {
                   }}
                   InputProps={{
                     endAdornment: field.value && (
-                      <Box
-                        onClick={() => field.onChange("")}
-                        sx={{
-                          cursor: "pointer",
-                          fontSize: "20px",
-                          ml: 1,
-                          color: "#101011ff",
-                          borderRadius: "50%",
-                          padding: "2px 6px",
-                          "&:hover": {
-                            backgroundColor: "#f0f0f0",
-                          },
-                        }}
-                      >
-                        ✖
-                      </Box>
+                      <InputAdornment position="end">
+                        <IconButton
+                          size="small"
+                          onClick={() => field.onChange("")}
+                          sx={{ color: "#101011ff" }}
+                        >
+                          <Close fontSize="small" />
+                        </IconButton>
+                      </InputAdornment>
                     ),
                   }}
                 />
@@ -496,12 +502,8 @@ const Customers = () => {
 
 
 
-          <DialogActions sx={{ p: 2 }}>
-            <Button sx={{
-              borderRadius: "8px",
-              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              color: "white"
-            }} onClick={closeForm}>Cancel</Button>
+
+          <DialogActions sx={{ p: 2, justifyContent: "center" }}>
             <Button
               type="submit"
               variant="contained"
@@ -518,6 +520,7 @@ const Customers = () => {
               )}
             </Button>
           </DialogActions>
+
         </form>
       </Dialog>
     </Box>

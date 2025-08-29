@@ -1,4 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
+import EventIcon from '@mui/icons-material/Event';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -113,9 +117,14 @@ const buttonStyles = {
 };
 
 export default function Orders() {
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10;
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const token = login?.token;
+
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   // API data
   const { bills, isLoading, isPostLoading, isUpdateLoading, error } =
@@ -196,6 +205,11 @@ export default function Orders() {
         )
       : [];
   }, [orders, search]);
+
+  // Paginated orders
+  const paginatedOrders = useMemo(() => {
+    return filteredOrders.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  }, [filteredOrders, page]);
 
   // Autocomplete change handler
   const handleCustomerChange = (event, value) => {
@@ -895,7 +909,12 @@ export default function Orders() {
         </div>
       ) : (
         <div style={themedStyles.cardContainer}>
-          {[...filteredOrders].map((order, i) => {
+          {isLoading && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 120 }}>
+              <CircularProgress size={40} thickness={4} color="primary" />
+            </div>
+          )}
+          {!isLoading && paginatedOrders.map((order, i) => {
             const originalIndex = orders.findIndex((o) => o.id === order.id);
             return (
               <div
@@ -992,6 +1011,18 @@ export default function Orders() {
               </div>
             );
           })}
+          {/* Pagination (MUI Box) */}
+          {filteredOrders.length > rowsPerPage && (
+            <Box display="flex" justifyContent="center" mt={2}>
+              <Pagination
+                count={Math.ceil(filteredOrders.length / rowsPerPage)}
+                page={page}
+                onChange={(e, value) => setPage(value)}
+                color="primary"
+                shape="rounded"
+              />
+            </Box>
+          )}
         </div>
       )}
 
@@ -1017,7 +1048,7 @@ export default function Orders() {
               style={{
                 ...themedStyles.invoiceBar,
                 background: "#f8fafc",
-                color: "#0b5ed7",
+                //color:"(90deg, #667eea 0%, #764ba2 100%)",
                 borderBottom: "#e6e8f0",
                 flex: "0 0 auto",
                 fontSize: 20,
@@ -1150,18 +1181,20 @@ export default function Orders() {
                 >
                   Items
                 </div>
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    background: "#fff",
-                    color: "#18181b",
-                    marginBottom: 10,
-                    borderRadius: 10,
-                    overflow: "hidden",
-                    boxShadow: "0 2px 12px rgba(16,24,40,0.08)",
-                  }}
-                >
+                <div style={{ width: "100%", overflowX: "auto" }}>
+                  <table
+                    style={{
+                      width: "100%",
+                      minWidth: 340,
+                      borderCollapse: "collapse",
+                      background: "#fff",
+                      color: "#18181b",
+                      marginBottom: 10,
+                      borderRadius: 10,
+                      overflow: "hidden",
+                      boxShadow: "0 2px 12px rgba(16,24,40,0.08)",
+                    }}
+                  >
                   <thead>
                     <tr>
                       <th
@@ -1298,10 +1331,12 @@ export default function Orders() {
                                         </>
                                       ),
                                     }}
+                                    sx={{ fontSize: { xs: 13, sm: 15 } }}
                                   />
                                 )}
                                 sx={{
-                                  width: "89%",
+                                  width: "100%",
+                                  minWidth: 90,
                                   background: "#fff",
                                   borderRadius: 1,
                                 }}
@@ -1325,13 +1360,13 @@ export default function Orders() {
                                 }
                                 required
                                 style={{
-                                  width: "60px",
+                                  width: "48px",
                                   background: "#fff",
                                   color: "#18181b",
                                   border: "1px solid #cbd5e1",
                                   borderRadius: 6,
-                                  padding: "6px 8px",
-                                  fontSize: 15,
+                                  padding: "4px 6px",
+                                  fontSize: 14,
                                   textAlign: "center",
                                 }}
                               />
@@ -1354,13 +1389,13 @@ export default function Orders() {
                                 }
                                 required
                                 style={{
-                                  width: "80px",
+                                  width: "60px",
                                   background: "#fff",
                                   color: "#18181b",
                                   border: "1px solid #cbd5e1",
                                   borderRadius: 6,
-                                  padding: "6px 8px",
-                                  fontSize: 15,
+                                  padding: "4px 6px",
+                                  fontSize: 14,
                                   textAlign: "center",
                                 }}
                               />
@@ -1449,7 +1484,8 @@ export default function Orders() {
                       </td>
                     </tr>
                   </tbody>
-                </table>
+                  </table>
+                </div>
 
                 <div
                   style={{
@@ -1487,17 +1523,7 @@ export default function Orders() {
                   flex: "0 0 auto",
                   borderRadius: "0 0 18px 18px",
                 }}
-              >
-                <button
-                  type="button"
-                  style={buttonStyles.ghost}
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditIndex(null);
-                  }}
-                >
-                  Cancel
-                </button>
+              >                
                 <button type="submit" style={buttonStyles.primary}>
                   Save
                 </button>

@@ -112,15 +112,10 @@ export default function Orders() {
   const token = login?.token;
 
   // API data
-  const {
-    bills,
-    isLoading,
-    isPostLoading,
-    isUpdateLoading,
-    error,
-  } = useSelector((state) => state.entities.bills);
+  const { bills, isLoading, isPostLoading, isUpdateLoading, error } =
+    useSelector((state) => state.entities.bills);
 
-  console.log('bills', bills)
+  console.log("bills", bills);
   const { customers, isLoading: customersLoading } = useSelector(
     (state) => state.entities.customers
   );
@@ -144,7 +139,7 @@ export default function Orders() {
   const [showForm, setShowForm] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  console.log('selectedOrder', selectedOrder)
+  console.log("selectedOrder", selectedOrder);
   const [editIndex, setEditIndex] = useState(null);
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState({
@@ -166,15 +161,16 @@ export default function Orders() {
 
   // Orders from backend (enrich with customer and item details)
   const orders = useMemo(() => {
-    return bills.data?.map(order => {
+    if (!Array.isArray(bills.data)) return [];
+    return bills.data?.map((order) => {
       // customerName/contact enrich
-      const customer = customerList.find(c => c.id === order.customer_id);
+      const customer = customerList.find((c) => c.id === order.customer_id);
       return {
         ...order,
         customerName: order.customerName || customer?.name || "",
         contact: order.contact || customer?.phone || "",
-        items: (order.items || []).map(it => {
-          const item = itemList.find(i => i.id === it.item_id);
+        items: (order.items || []).map((it) => {
+          const item = itemList.find((i) => i.id === it.item_id);
           return {
             ...it,
             name: it.name || item?.name || "",
@@ -189,9 +185,11 @@ export default function Orders() {
   const filteredOrders = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return orders;
-    return orders.filter((order) =>
-      (order.customerName || "").toLowerCase().includes(q)
-    );
+    return Array.isArray(orders)
+      ? orders.filter((order) =>
+          (order.customerName || "").toLowerCase().includes(q)
+        )
+      : [];
   }, [orders, search]);
 
   // Autocomplete change handler
@@ -234,7 +232,8 @@ export default function Orders() {
   };
 
   const handleItemChange = (i, field, value) => {
-    const v = field === "qty" || field === "price" ? parseFloat(value || 0) : value;
+    const v =
+      field === "qty" || field === "price" ? parseFloat(value || 0) : value;
     const items = [...formData.items];
     items[i] = { ...items[i], [field]: v };
     setFormData((p) => ({ ...p, items }));
@@ -264,11 +263,14 @@ export default function Orders() {
 
     // Calculate totals
     const items = (formData.items || []).map((it) => ({
-      item_id: itemList.find(item => item.name === it.name)?.id || "", // get item_id from itemList
+      item_id: itemList.find((item) => item.name === it.name)?.id || "", // get item_id from itemList
       price: Number(it.price || 0),
       quantity: String(it.qty || 0),
     }));
-    const total_amount = items.reduce((sum, it) => sum + Number(it.price) * Number(it.quantity), 0);
+    const total_amount = items.reduce(
+      (sum, it) => sum + Number(it.price) * Number(it.quantity),
+      0
+    );
 
     // Prepare payload as per backend
     const payload = {
@@ -291,7 +293,7 @@ export default function Orders() {
       setEditIndex(null);
       resetForm();
     };
-    const setSubmitting = () => { };
+    const setSubmitting = () => {};
 
     if (editIndex !== null && orders[editIndex]?.id) {
       dispatch(
@@ -320,6 +322,22 @@ export default function Orders() {
     setFormData(orders[i]);
     setShowForm(true);
   };
+  // ...existing code...
+
+  const downloadInvoicePDF = () => {
+    if (!invoiceRef.current) return;
+    // Options for PDF
+    const opt = {
+      margin: 0.5,
+      filename: `Invoice_${selectedOrder?.id || "Order"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    };
+    window.html2pdf().set(opt).from(invoiceRef.current).save();
+  };
+
+  // ...existing code...
 
   // Delete Order (API)
   const handleDelete = (i) => {
@@ -353,16 +371,21 @@ export default function Orders() {
   };
 
   const sumOrder = (order) =>
-    (order?.items || []).reduce((s, it) => s + Number(it.qty || 0) * Number(it.price || 0), 0);
-
-  const plainINR = (val) =>
-    new Intl.NumberFormat("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-      Number(val || 0)
+    (order?.items || []).reduce(
+      (s, it) => s + Number(it.qty || 0) * Number(it.price || 0),
+      0
     );
 
-  const selectedOrderTotal = useMemo(() => (selectedOrder ? sumOrder(selectedOrder) : 0), [
-    selectedOrder,
-  ]);
+  const plainINR = (val) =>
+    new Intl.NumberFormat("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number(val || 0));
+
+  const selectedOrderTotal = useMemo(
+    () => (selectedOrder ? sumOrder(selectedOrder) : 0),
+    [selectedOrder]
+  );
 
   const numberToWordsIndian = (num) => {
     if (num === null || num === undefined) return "";
@@ -392,7 +415,18 @@ export default function Orders() {
       "Eighteen",
       "Nineteen",
     ];
-    const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+    const tens = [
+      "",
+      "",
+      "Twenty",
+      "Thirty",
+      "Forty",
+      "Fifty",
+      "Sixty",
+      "Seventy",
+      "Eighty",
+      "Ninety",
+    ];
 
     const two = (n2) => {
       if (n2 < 20) return ones[n2];
@@ -431,7 +465,6 @@ export default function Orders() {
     return `${pw} Only`;
   };
 
-
   const todayStr = useMemo(() => {
     const d = new Date();
     const dd = String(d.getDate()).padStart(2, "0");
@@ -439,7 +472,6 @@ export default function Orders() {
     const yyyy = d.getFullYear();
     return `${dd}/${mm}/${yyyy}`;
   }, []);
-
 
   const invoiceRef = useRef(null);
 
@@ -465,7 +497,7 @@ export default function Orders() {
       .spaceRow td{border:none !important;height:36px}
     </style>
   `;
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    const printWindow = window.open("", "_blank", "width=800,height=600");
     printWindow.document.write(`
     <html>
       <head>
@@ -580,7 +612,7 @@ export default function Orders() {
       color: "#0b1b3a",
     },
     title: {
-      ...styles.title,
+      // ...styles.title,
       color: "#0b1b3a",
     },
     subtitle: {
@@ -674,12 +706,15 @@ export default function Orders() {
               boxShadow: "0 0 8px rgba(102,126,234,0.08)",
             }}
           >
-            <Search fontSize="small" style={{ color: "#667eea", marginRight: 8 }} />
+            <Search
+              fontSize="small"
+              style={{ color: "#667eea", marginRight: 8 }}
+            />
             <input
               type="text"
               placeholder="Search by customer name"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               style={{
                 flex: 1,
                 fontSize: 14,
@@ -691,7 +726,11 @@ export default function Orders() {
               }}
             />
           </div>
-          <button style={buttonStyles.primary} onClick={openForm} aria-label="Create order">
+          <button
+            style={buttonStyles.primary}
+            onClick={openForm}
+            aria-label="Create order"
+          >
             <span style={{ fontSize: 20, lineHeight: 1 }}></span>
             <span
               style={{
@@ -702,8 +741,6 @@ export default function Orders() {
               Add Order
             </span>
           </button>
-
-
         </div>
       </div>
 
@@ -711,7 +748,7 @@ export default function Orders() {
         <div style={{ textAlign: "center", marginTop: 40 }}>
           <CircularProgress />
         </div>
-      ) : filteredOrders.length === 0 ? (
+      ) : filteredOrders?.length === 0 ? (
         <div style={themedStyles.emptyWrap}>
           <div
             style={{
@@ -722,8 +759,6 @@ export default function Orders() {
           >
             🔄
           </div>
-
-
 
           <div
             style={{
@@ -763,16 +798,15 @@ export default function Orders() {
           >
             <span style={{ fontSize: 18 }}></span> Create Order
           </button>
-
-
         </div>
       ) : (
         <div style={themedStyles.cardContainer}>
-          {[...filteredOrders]
-            .map((order, i) => {
-              const originalIndex = orders.findIndex(o => o.id === order.id);
-              return (
-                <div key={order.id || i} style={{
+          {[...filteredOrders].map((order, i) => {
+            const originalIndex = orders.findIndex((o) => o.id === order.id);
+            return (
+              <div
+                key={order.id || i}
+                style={{
                   ...themedStyles.card,
                   display: "flex",
                   flexDirection: "row",
@@ -782,72 +816,100 @@ export default function Orders() {
                   padding: 18,
                   margin: 0,
                 }}
-                  onMouseOver={e => e.currentTarget.style.boxShadow = "0 12px 32px rgba(59,130,246,0.18)"}
-                  onMouseOut={e => e.currentTarget.style.boxShadow = themedStyles.card.boxShadow}
-                >
-
-                  <div style={{
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.boxShadow =
+                    "0 12px 32px rgba(59,130,246,0.18)")
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.boxShadow =
+                    themedStyles.card.boxShadow)
+                }
+              >
+                <div
+                  style={{
                     flex: "1 1 220px",
                     minWidth: 0,
                     display: "flex",
                     flexDirection: "column",
                     gap: 14,
                     justifyContent: "center",
-                  }}>
-                    <div style={{ ...themedStyles.row, fontSize: 20 }}>
-                      <span style={{ ...themedStyles.label, fontSize: 18 }}>Customer</span>
-                      <span style={{ ...themedStyles.value, fontSize: 20 }}>{order.customerName || "—"}</span>
-                    </div>
-                    <div style={{ ...themedStyles.row, fontSize: 20 }}>
-                      <span style={{ ...themedStyles.label, fontSize: 18 }}>Contact</span>
-                      <span style={{ ...themedStyles.value, fontSize: 20 }}>{order.contact || "—"}</span>
-                    </div>
-                    <div style={{ ...themedStyles.row, fontSize: 18 }}>
-                      <span style={{ ...themedStyles.label, fontSize: 16 }}>Date</span>
-                      <span style={{ ...themedStyles.value, fontSize: 16 }}>{order.date}</span>
-                    </div>
-                    <div style={{ ...themedStyles.totalRow, fontSize: 22, fontWeight: 700, marginTop: 8 }}>
-                      <span>Grand Total</span>
-                      <b>₹ {order.total_amount}</b>
-                    </div>
+                  }}
+                >
+                  <div style={{ ...themedStyles.row, fontSize: 20 }}>
+                    <span style={{ ...themedStyles.label, fontSize: 18 }}>
+                      Customer
+                    </span>
+                    <span style={{ ...themedStyles.value, fontSize: 20 }}>
+                      {order.customerName || "—"}
+                    </span>
                   </div>
-                  {/* Right side: Buttons */}
-                  <div style={{
+                  <div style={{ ...themedStyles.row, fontSize: 20 }}>
+                    <span style={{ ...themedStyles.label, fontSize: 18 }}>
+                      Contact
+                    </span>
+                    <span style={{ ...themedStyles.value, fontSize: 20 }}>
+                      {order.contact || "—"}
+                    </span>
+                  </div>
+                  <div style={{ ...themedStyles.row, fontSize: 18 }}>
+                    <span style={{ ...themedStyles.label, fontSize: 16 }}>
+                      Date
+                    </span>
+                    <span style={{ ...themedStyles.value, fontSize: 16 }}>
+                      {order.date}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      ...themedStyles.totalRow,
+                      fontSize: 22,
+                      fontWeight: 700,
+                      marginTop: 8,
+                    }}
+                  >
+                    <span>Grand Total</span>
+                    <b>₹ {order.total_amount}</b>
+                  </div>
+                </div>
+                {/* Right side: Buttons */}
+                <div
+                  style={{
                     display: "flex",
                     flexDirection: "column",
                     gap: 14,
                     alignItems: "flex-end",
                     justifyContent: "center",
                     minWidth: 140,
-                  }}>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleEdit(originalIndex)}
-                      title="Edit"
-                      sx={{ "&:hover": { backgroundColor: "#e3f2fd" } }}
-                    >
-                      <Edit />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(originalIndex)}
-                      title="Delete"
-                      sx={{ "&:hover": { backgroundColor: "#ffebee" } }}
-                    >
-                      <Delete />
-                    </IconButton>
-                    <IconButton
-                      color="success"
-                      onClick={() => handleView(order)}
-                      title="View Invoice"
-                      sx={{ "&:hover": { backgroundColor: "#e6f4ea" } }}
-                    >
-                      <Visibility />
-                    </IconButton>
-                  </div>
+                  }}
+                >
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleEdit(originalIndex)}
+                    title="Edit"
+                    sx={{ "&:hover": { backgroundColor: "#e3f2fd" } }}
+                  >
+                    <Edit />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDelete(originalIndex)}
+                    title="Delete"
+                    sx={{ "&:hover": { backgroundColor: "#ffebee" } }}
+                  >
+                    <Delete />
+                  </IconButton>
+                  <IconButton
+                    color="success"
+                    onClick={() => handleView(order)}
+                    title="View Invoice"
+                    sx={{ "&:hover": { backgroundColor: "#e6f4ea" } }}
+                  >
+                    <Visibility />
+                  </IconButton>
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -869,19 +931,31 @@ export default function Orders() {
               boxShadow: "0 12px 40px rgba(30,41,59,0.25)",
             }}
           >
-            <div style={{
-              ...themedStyles.invoiceBar,
-              background: "#f8fafc",
-              color: "#0b5ed7",
-              borderBottom: "#e6e8f0",
-              flex: "0 0 auto",
-              fontSize: 20,
-              fontWeight: 700,
-              letterSpacing: 1,
-              justifyContent: "space-between",
-            }}>
-              <span>{editIndex !== null ? "Edit Order" : "Create New Order"}</span>
-              <button style={themedButtonStyles.ghost} onClick={() => { setShowForm(false); setEditIndex(null); }}>✖</button>
+            <div
+              style={{
+                ...themedStyles.invoiceBar,
+                background: "#f8fafc",
+                color: "#0b5ed7",
+                borderBottom: "#e6e8f0",
+                flex: "0 0 auto",
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: 1,
+                justifyContent: "space-between",
+              }}
+            >
+              <span>
+                {editIndex !== null ? "Edit Order" : "Create New Order"}
+              </span>
+              <button
+                style={themedButtonStyles.ghost}
+                onClick={() => {
+                  setShowForm(false);
+                  setEditIndex(null);
+                }}
+              >
+                ✖
+              </button>
             </div>
             <form
               onSubmit={handleSubmit}
@@ -892,23 +966,35 @@ export default function Orders() {
                 minHeight: 0,
               }}
             >
-              <div style={{
-                padding: 28,
-                background: "#f9fafb",
-                color: "#18181b",
-                flex: 1,
-                overflowY: "auto",
-                minHeight: 0,
-                borderRadius: 0,
-              }}>
-                <div style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 24,
-                  marginBottom: 18,
-                }}>
+              <div
+                style={{
+                  padding: 28,
+                  background: "#f9fafb",
+                  color: "#18181b",
+                  flex: 1,
+                  overflowY: "auto",
+                  minHeight: 0,
+                  borderRadius: 0,
+                }}
+              >
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 24,
+                    marginBottom: 18,
+                  }}
+                >
                   <div>
-                    <label style={{ fontWeight: 600, fontSize: 15, marginBottom: 6, display: "block", color: "#0b1b3a" }}>
+                    <label
+                      style={{
+                        fontWeight: 600,
+                        fontSize: 15,
+                        marginBottom: 6,
+                        display: "block",
+                        color: "#0b1b3a",
+                      }}
+                    >
                       Customer Name
                     </label>
                     <Autocomplete
@@ -916,7 +1002,9 @@ export default function Orders() {
                       getOptionLabel={(option) => option.name || ""}
                       loading={customersLoading}
                       value={
-                        customerList.find((c) => c.id === formData.customerId) || null
+                        customerList.find(
+                          (c) => c.id === formData.customerId
+                        ) || null
                       }
                       onChange={handleCustomerChange}
                       renderInput={(params) => (
@@ -937,7 +1025,15 @@ export default function Orders() {
                     />
                   </div>
                   <div>
-                    <label style={{ fontWeight: 600, fontSize: 15, marginBottom: 6, display: "block", color: "#0b1b3a" }}>
+                    <label
+                      style={{
+                        fontWeight: 600,
+                        fontSize: 15,
+                        marginBottom: 6,
+                        display: "block",
+                        color: "#0b1b3a",
+                      }}
+                    >
                       Contact
                     </label>
                     <input
@@ -961,105 +1057,144 @@ export default function Orders() {
                   </div>
                 </div>
 
-                <div style={{
-                  fontWeight: 700,
-                  fontSize: 16,
-                  margin: "18px 0 8px",
-                  color: "#0b1b3a",
-                  letterSpacing: 0.5,
-                }}>Items</div>
-                <table style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  background: "#fff",
-                  color: "#18181b",
-                  marginBottom: 10,
-                  borderRadius: 10,
-                  overflow: "hidden",
-                  boxShadow: "0 2px 12px rgba(16,24,40,0.08)",
-                }}>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 16,
+                    margin: "18px 0 8px",
+                    color: "#0b1b3a",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Items
+                </div>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    background: "#fff",
+                    color: "#18181b",
+                    marginBottom: 10,
+                    borderRadius: 10,
+                    overflow: "hidden",
+                    boxShadow: "0 2px 12px rgba(16,24,40,0.08)",
+                  }}
+                >
                   <thead>
                     <tr>
-                      <th style={{
-                        background: "#d9d9ff",
-                        color: "#18181b",
-                        padding: "10px 6px",
-                        fontWeight: 700,
-                        fontSize: 14,
-                        border: "1px solid #e5e7eb",
-                        textAlign: "center",
-                      }}>S.No</th>
-                      <th style={{
-                        background: "#d9d9ff",
-                        color: "#18181b",
-                        padding: "10px 6px",
-                        fontWeight: 700,
-                        fontSize: 14,
-                        border: "1px solid #e5e7eb",
-                        textAlign: "center",
-                      }}>Particulars</th>
-                      <th style={{
-                        background: "#d9d9ff",
-                        color: "#18181b",
-                        padding: "10px 6px",
-                        fontWeight: 700,
-                        fontSize: 14,
-                        border: "1px solid #e5e7eb",
-                        textAlign: "center",
-                      }}>Qty</th>
-                      <th style={{
-                        background: "#d9d9ff",
-                        color: "#18181b",
-                        padding: "10px 6px",
-                        fontWeight: 700,
-                        fontSize: 14,
-                        border: "1px solid #e5e7eb",
-                        textAlign: "center",
-                      }}>Rate</th>
-                      <th style={{
-                        background: "#d9d9ff",
-                        color: "#18181b",
-                        padding: "10px 6px",
-                        fontWeight: 700,
-                        fontSize: 14,
-                        border: "1px solid #e5e7eb",
-                        textAlign: "center",
-                      }}>Total</th>
-                      <th style={{
-                        background: "#d9d9ff",
-                        border: "1px solid #e5e7eb",
-                        textAlign: "center",
-                        width: 40,
-                      }}></th>
+                      <th
+                        style={{
+                          background: "#d9d9ff",
+                          color: "#18181b",
+                          padding: "10px 6px",
+                          fontWeight: 700,
+                          fontSize: 14,
+                          border: "1px solid #e5e7eb",
+                          textAlign: "center",
+                        }}
+                      >
+                        S.No
+                      </th>
+                      <th
+                        style={{
+                          background: "#d9d9ff",
+                          color: "#18181b",
+                          padding: "10px 6px",
+                          fontWeight: 700,
+                          fontSize: 14,
+                          border: "1px solid #e5e7eb",
+                          textAlign: "center",
+                        }}
+                      >
+                        Particulars
+                      </th>
+                      <th
+                        style={{
+                          background: "#d9d9ff",
+                          color: "#18181b",
+                          padding: "10px 6px",
+                          fontWeight: 700,
+                          fontSize: 14,
+                          border: "1px solid #e5e7eb",
+                          textAlign: "center",
+                        }}
+                      >
+                        Qty
+                      </th>
+                      <th
+                        style={{
+                          background: "#d9d9ff",
+                          color: "#18181b",
+                          padding: "10px 6px",
+                          fontWeight: 700,
+                          fontSize: 14,
+                          border: "1px solid #e5e7eb",
+                          textAlign: "center",
+                        }}
+                      >
+                        Rate
+                      </th>
+                      <th
+                        style={{
+                          background: "#d9d9ff",
+                          color: "#18181b",
+                          padding: "10px 6px",
+                          fontWeight: 700,
+                          fontSize: 14,
+                          border: "1px solid #e5e7eb",
+                          textAlign: "center",
+                        }}
+                      >
+                        Total
+                      </th>
+                      <th
+                        style={{
+                          background: "#d9d9ff",
+                          border: "1px solid #e5e7eb",
+                          textAlign: "center",
+                          width: 40,
+                        }}
+                      ></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {(formData.items || []).length > 0 ? (
+                    {(formData.items || [])?.length > 0 ? (
                       formData.items.map((item, idx) => {
                         const qty = Number(item.qty || 0);
                         const price = Number(item.price || 0);
                         const lineTotal = qty * price;
                         return (
                           <tr key={idx}>
-                            <td style={{
-                              color: "#18181b",
-                              border: "1px solid #e5e7eb",
-                              textAlign: "center",
-                              fontWeight: 600,
-                              fontSize: 15,
-                              background: "#fff",
-                            }}>{idx + 1}</td>
-                            <td style={{
-                              border: "1px solid #e5e7eb",
-                              textAlign: "center",
-                              background: "#fff",
-                            }}>
+                            <td
+                              style={{
+                                color: "#18181b",
+                                border: "1px solid #e5e7eb",
+                                textAlign: "center",
+                                fontWeight: 600,
+                                fontSize: 15,
+                                background: "#fff",
+                              }}
+                            >
+                              {idx + 1}
+                            </td>
+                            <td
+                              style={{
+                                border: "1px solid #e5e7eb",
+                                textAlign: "center",
+                                background: "#fff",
+                              }}
+                            >
                               <Autocomplete
                                 options={itemList}
                                 getOptionLabel={(option) => option.name || ""}
                                 loading={itemsLoading}
-                                value={itemList.find((i) => i.name === item.name) || null}
-                                onChange={(e, value) => handleItemSelect(idx, value)}
+                                value={
+                                  itemList.find((i) => i.name === item.name) ||
+                                  null
+                                }
+                                onChange={(e, value) =>
+                                  handleItemSelect(idx, value)
+                                }
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
@@ -1071,7 +1206,12 @@ export default function Orders() {
                                       ...params.InputProps,
                                       endAdornment: (
                                         <>
-                                          {itemsLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                                          {itemsLoading ? (
+                                            <CircularProgress
+                                              color="inherit"
+                                              size={20}
+                                            />
+                                          ) : null}
                                           {params.InputProps.endAdornment}
                                         </>
                                       ),
@@ -1085,18 +1225,22 @@ export default function Orders() {
                                 }}
                               />
                             </td>
-                            <td style={{
-                              border: "1px solid #e5e7eb",
-                              textAlign: "center",
-                              background: "#fff",
-                            }}>
+                            <td
+                              style={{
+                                border: "1px solid #e5e7eb",
+                                textAlign: "center",
+                                background: "#fff",
+                              }}
+                            >
                               <input
                                 type="number"
                                 min="0"
                                 step="1"
                                 placeholder="Qty"
                                 value={item.qty}
-                                onChange={e => handleItemChange(idx, "qty", e.target.value)}
+                                onChange={(e) =>
+                                  handleItemChange(idx, "qty", e.target.value)
+                                }
                                 required
                                 style={{
                                   width: "60px",
@@ -1110,18 +1254,22 @@ export default function Orders() {
                                 }}
                               />
                             </td>
-                            <td style={{
-                              border: "1px solid #e5e7eb",
-                              textAlign: "center",
-                              background: "#fff",
-                            }}>
+                            <td
+                              style={{
+                                border: "1px solid #e5e7eb",
+                                textAlign: "center",
+                                background: "#fff",
+                              }}
+                            >
                               <input
                                 type="number"
                                 min="0"
                                 step="0.01"
                                 placeholder="Rate"
                                 value={item.price}
-                                onChange={e => handleItemChange(idx, "price", e.target.value)}
+                                onChange={(e) =>
+                                  handleItemChange(idx, "price", e.target.value)
+                                }
                                 required
                                 style={{
                                   width: "80px",
@@ -1135,20 +1283,24 @@ export default function Orders() {
                                 }}
                               />
                             </td>
-                            <td style={{
-                              border: "1px solid #e5e7eb",
-                              textAlign: "center",
-                              background: "#fff",
-                              fontWeight: 600,
-                              fontSize: 15,
-                            }}>
+                            <td
+                              style={{
+                                border: "1px solid #e5e7eb",
+                                textAlign: "center",
+                                background: "#fff",
+                                fontWeight: 600,
+                                fontSize: 15,
+                              }}
+                            >
                               {isNaN(lineTotal) ? "0.00" : lineTotal.toFixed(2)}
                             </td>
-                            <td style={{
-                              border: "1px solid #e5e7eb",
-                              textAlign: "center",
-                              background: "#fff",
-                            }}>
+                            <td
+                              style={{
+                                border: "1px solid #e5e7eb",
+                                textAlign: "center",
+                                background: "#fff",
+                              }}
+                            >
                               <button
                                 type="button"
                                 onClick={() => removeItem(idx)}
@@ -1160,27 +1312,42 @@ export default function Orders() {
                                   padding: "4px 8px",
                                   cursor: "pointer",
                                   fontWeight: 700,
-                                  margin: 10
+                                  margin: 10,
                                 }}
                                 title="Remove item"
-                              >❌</button>
+                              >
+                                ❌
+                              </button>
                             </td>
                           </tr>
                         );
                       })
                     ) : (
                       <tr>
-                        <td colSpan={6} style={{
-                          textAlign: "center",
-                          fontStyle: "italic",
-                          color: "#18181b",
-                          border: "1px solid #e5e7eb",
-                          background: "#fff",
-                        }}>No Items</td>
+                        <td
+                          colSpan={6}
+                          style={{
+                            textAlign: "center",
+                            fontStyle: "italic",
+                            color: "#18181b",
+                            border: "1px solid #e5e7eb",
+                            background: "#fff",
+                          }}
+                        >
+                          No Items
+                        </td>
                       </tr>
                     )}
                     <tr>
-                      <td colSpan={6} style={{ border: "none", padding: 0, textAlign: "left", background: "transparent" }}>
+                      <td
+                        colSpan={6}
+                        style={{
+                          border: "none",
+                          padding: 0,
+                          textAlign: "left",
+                          background: "transparent",
+                        }}
+                      >
                         <button
                           type="button"
                           onClick={addItem}
@@ -1194,53 +1361,64 @@ export default function Orders() {
                             fontWeight: 700,
                             cursor: "pointer",
                           }}
-                        >➕ Add Item</button>
+                        >
+                          ➕ Add Item
+                        </button>
                       </td>
                     </tr>
                   </tbody>
                 </table>
 
-                <div style={{
-                  padding: 10,
-                  borderTop: "1px solid #e5e7eb",
-                  color: "#18181b",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  fontWeight: "bold",
-                  fontSize: 17,
-                  background: "#f8fafc",
-                  borderRadius: 0,
-                }}>
+                <div
+                  style={{
+                    padding: 10,
+                    borderTop: "1px solid #e5e7eb",
+                    color: "#18181b",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    fontWeight: "bold",
+                    fontSize: 17,
+                    background: "#f8fafc",
+                    borderRadius: 0,
+                  }}
+                >
                   <span style={{ marginRight: 18 }}>Grand Total: </span>
                   <span>
                     {plainINR(
                       (formData.items || []).reduce(
-                        (s, it) => s + Number(it.qty || 0) * Number(it.price || 0),
+                        (s, it) =>
+                          s + Number(it.qty || 0) * Number(it.price || 0),
                         0
                       )
                     )}
                   </span>
                 </div>
               </div>
-              <div style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 12,
-                padding: 18,
-                borderTop: "1px solid #e5e7eb",
-                background: "#f8fafc",
-                flex: "0 0 auto",
-                borderRadius: "0 0 18px 18px",
-              }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: 12,
+                  padding: 18,
+                  borderTop: "1px solid #e5e7eb",
+                  background: "#f8fafc",
+                  flex: "0 0 auto",
+                  borderRadius: "0 0 18px 18px",
+                }}
+              >
                 <button
                   type="button"
                   style={buttonStyles.ghost}
-                  onClick={() => { setShowForm(false); setEditIndex(null); }}
-                >Cancel</button>
-                <button
-                  type="submit"
-                  style={buttonStyles.primary}
-                >Save</button>
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditIndex(null);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button type="submit" style={buttonStyles.primary}>
+                  Save
+                </button>
               </div>
             </form>
           </div>
@@ -1264,8 +1442,15 @@ export default function Orders() {
             <div style={themedStyles.invoiceBar}>
               <div style={themedStyles.invoiceTitle}></div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={printInvoice} style={themedButtonStyles.success} title="Print">Print</button>
-                <button style={themedButtonStyles.ghost} onClick={() => setShowInvoice(false)}>Close</button>
+                {/* <button onClick={printInvoice} style={themedButtonStyles.success} title="Print">Print</button>
+                <button style={themedButtonStyles.ghost} onClick={() => setShowInvoice(false)}>Close</button> */}
+                <button
+                  onClick={downloadInvoicePDF}
+                  style={themedButtonStyles.success}
+                  title="Download PDF"
+                >
+                  Download PDF
+                </button>
               </div>
             </div>
 
@@ -1283,25 +1468,28 @@ export default function Orders() {
                   <div style={invoiceStyles.header}>
                     <div style={invoiceStyles.title}>लक्ष्मी जनरल स्टोअर्स</div>
                     <div style={invoiceStyles.subTitle}>
-                      शालेय साहित्य, ऑफीस स्टेशनरी, प्रेझेंट आर्टिकल्स, टॉइज, गॉगल्स
-
-                      रेसिडेन्शिअल हायस्कूल समोर, <br />
+                      शालेय साहित्य, ऑफीस स्टेशनरी, प्रेझेंट आर्टिकल्स, टॉइज,
+                      गॉगल्स रेसिडेन्शिअल हायस्कूल समोर, <br />
                       मिरी रोड शेवगाव ता . शेवगाव, जि . अहिल्यानगर
                     </div>
-                    <div style={invoiceStyles.contact}>मो. नं . 9850837400
-                      9850332356</div>
+                    <div style={invoiceStyles.contact}>
+                      मो. नं . 9850837400 9850332356
+                    </div>
                   </div>
 
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <tbody>
                       <tr>
                         <td style={{ padding: 5, width: "70%" }}>
-                          <b>To,</b><br />
-                          {selectedOrder.customerName || "-"}<br />
+                          <b>To,</b>
+                          <br />
+                          {selectedOrder.customerName || "-"}
+                          <br />
                           Mobile: {selectedOrder.contact || "-"}
                         </td>
                         <td style={{ padding: 5, width: "30%" }}>
-                          <b>Bill No.:</b> INV_{selectedOrder.id || "-"}<br />
+                          <b>Bill No.:</b> INV_{selectedOrder.id || "-"}
+                          <br />
                           <b>Date:</b> {todayStr}
                         </td>
                       </tr>
@@ -1319,7 +1507,7 @@ export default function Orders() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(selectedOrder.items || []).length > 0 ? (
+                      {(selectedOrder.items || [])?.length > 0 ? (
                         selectedOrder.items.map((item, idx) => {
                           const qty = Number(item.pivot.quantity || 0);
                           const price = Number(item.pivot.price || 0);
@@ -1327,27 +1515,48 @@ export default function Orders() {
                           return (
                             <tr key={idx}>
                               <td style={invoiceStyles.td}>{idx + 1}</td>
-                              <td style={invoiceStyles.td}>{item.name || "-"}</td>
-                              <td style={invoiceStyles.tdRight}>{item.pivot.quantity}</td>
-                              <td style={invoiceStyles.tdRight}>{item.pivot.price}</td>
-                              <td style={invoiceStyles.tdRight}>{plainINR(lineTotal)}</td>
+                              <td style={invoiceStyles.td}>
+                                {item.name || "-"}
+                              </td>
+                              <td style={invoiceStyles.tdRight}>
+                                {item.pivot.quantity}
+                              </td>
+                              <td style={invoiceStyles.tdRight}>
+                                {item.pivot.price}
+                              </td>
+                              <td style={invoiceStyles.tdRight}>
+                                {plainINR(lineTotal)}
+                              </td>
                             </tr>
                           );
                         })
                       ) : (
                         <tr>
-                          <td colSpan={5} style={{ ...invoiceStyles.td, textAlign: "center", fontStyle: "italic" }}>No Items</td>
+                          <td
+                            colSpan={5}
+                            style={{
+                              ...invoiceStyles.td,
+                              textAlign: "center",
+                              fontStyle: "italic",
+                            }}
+                          >
+                            No Items
+                          </td>
                         </tr>
                       )}
                       <tr className="spaceRow">
-                        <td colSpan={5} style={{ height: 40, border: "none" }}></td>
+                        <td
+                          colSpan={5}
+                          style={{ height: 40, border: "none" }}
+                        ></td>
                       </tr>
                     </tbody>
                   </table>
 
                   <div style={{ padding: 5, borderTop: "1px solid #000" }}>
                     <div style={invoiceStyles.small}>
-                      <b>Bill Amount in Words:</b> {numberToWordsIndian(selectedOrder.total_amount) || "—"}
+                      <b>Bill Amount in Words:</b>{" "}
+                      {numberToWordsIndian(selectedOrder.total_amount) || "—"}
                     </div>
                     <div style={invoiceStyles.billFooter}>
                       <span>Bill Amount:</span>
@@ -1356,19 +1565,41 @@ export default function Orders() {
                   </div>
 
                   {/* Customer & Laxmi General Signatures */}
-                  <div style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginTop: 40,
-                    padding: "0 10px 10px 10px",
-                  }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginTop: 40,
+                      padding: "0 10px 10px 10px",
+                    }}
+                  >
                     <div style={{ textAlign: "center", width: "40%" }}>
-                      <div style={{ borderTop: "1px solid #000", margin: "0 auto", width: "80%" }}></div>
-                      <div style={{ marginTop: 4, fontSize: 13, fontWeight: 600 }}>Customer Signature</div>
+                      <div
+                        style={{
+                          borderTop: "1px solid #000",
+                          margin: "0 auto",
+                          width: "80%",
+                        }}
+                      ></div>
+                      <div
+                        style={{ marginTop: 4, fontSize: 13, fontWeight: 600 }}
+                      >
+                        Customer Signature
+                      </div>
                     </div>
                     <div style={{ textAlign: "center", width: "40%" }}>
-                      <div style={{ borderTop: "1px solid #000", margin: "0 auto", width: "80%" }}></div>
-                      <div style={{ marginTop: 4, fontSize: 13, fontWeight: 600 }}>Laxmi General Signature</div>
+                      <div
+                        style={{
+                          borderTop: "1px solid #000",
+                          margin: "0 auto",
+                          width: "80%",
+                        }}
+                      ></div>
+                      <div
+                        style={{ marginTop: 4, fontSize: 13, fontWeight: 600 }}
+                      >
+                        Laxmi General Signature
+                      </div>
                     </div>
                   </div>
                   {/* End signatures */}
@@ -1415,7 +1646,12 @@ const styles = {
   emptyTitle: { fontWeight: 700, color: "#0b1b3a" },
   emptyText: { color: "#55607a", fontSize: 13 },
 
-  cardContainer: { display: "flex", flexDirection: "column", gap: 16, marginTop: 12 },
+  cardContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 16,
+    marginTop: 12,
+  },
 
   card: {
     background: "rgba(255,255,255,0.9)",
@@ -1428,7 +1664,11 @@ const styles = {
     flexDirection: "column",
     gap: 10,
   },
-  cardHead: { display: "flex", alignItems: "center", justifyContent: "space-between" },
+  cardHead: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   badge: {
     background: "#eef2ff",
     color: "#3730a3",
@@ -1501,7 +1741,12 @@ const styles = {
     boxShadow: "0 30px 80px rgba(2,6,23,0.35)",
     border: "1px solid #e6e8f0",
   },
-  modalHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
+  modalHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
   modalTitle: { margin: 0, fontSize: 18, fontWeight: 800, color: "#0b1b3a" },
 
   formGrid: {
@@ -1509,7 +1754,14 @@ const styles = {
     gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
     gap: 10,
   },
-  labelBlock: { display: "flex", flexDirection: "column", gap: 6, fontSize: 13, fontWeight: 600, color: "#334155" },
+  labelBlock: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+    fontSize: 13,
+    fontWeight: 600,
+    color: "#334155",
+  },
   input: {
     display: "block",
     width: "100%",
@@ -1521,9 +1773,20 @@ const styles = {
     outline: "none",
     transition: "box-shadow .15s, border-color .15s",
   },
-  itemRow: { display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 8 },
+  itemRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 8,
+    alignItems: "center",
+    marginBottom: 8,
+  },
 
-  formActions: { display: "flex", justifyContent: "flex-end", marginTop: 14, gap: 10 },
+  formActions: {
+    display: "flex",
+    justifyContent: "flex-end",
+    marginTop: 14,
+    gap: 10,
+  },
 
   invoiceBar: {
     display: "flex",
@@ -1538,16 +1801,39 @@ const styles = {
 
 /* ===== Invoice Styles (SBH) – unchanged visuals ===== */
 const invoiceStyles = {
-  outer: { display: "flex", justifyContent: "center", alignItems: "flex-start", background: "#fff", padding: 0 },
-  container: { width: "595px", fontFamily: "Arial, sans-serif", border: "1px solid #000", fontSize: "14px", background: "#fff" },
+  outer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    background: "#fff",
+    padding: 0,
+  },
+  container: {
+    width: "595px",
+    fontFamily: "Arial, sans-serif",
+    border: "1px solid #000",
+    fontSize: "14px",
+    background: "#fff",
+  },
   header: { textAlign: "center", borderBottom: "1px solid #000", padding: 5 },
   title: { fontSize: "18px", fontWeight: "bold" },
   subTitle: { fontSize: "12px", margin: "5px 0", fontWeight: "bold" },
   contact: { fontSize: "12px", fontWeight: "bold" },
   table: { width: "100%", borderCollapse: "collapse", marginTop: 5 },
-  th: { border: "1px solid #000", background: "#d9d9ff", padding: 5, textAlign: "left" },
+  th: {
+    border: "1px solid #000",
+    background: "#d9d9ff",
+    padding: 5,
+    textAlign: "left",
+  },
   td: { border: "1px solid #000", padding: 5 },
   tdRight: { border: "1px solid #000", padding: 5, textAlign: "right" },
-  billFooter: { display: "flex", justifyContent: "space-between", padding: 5, borderTop: "1px solid #000", fontWeight: "bold" },
+  billFooter: {
+    display: "flex",
+    justifyContent: "space-between",
+    padding: 5,
+    borderTop: "1px solid #000",
+    fontWeight: "bold",
+  },
   small: { fontSize: "12px" },
 };

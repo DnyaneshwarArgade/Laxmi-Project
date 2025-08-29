@@ -6,14 +6,20 @@ import {
   postBillsData,
   updateBillsData,
   deleteBillsData,
-} from "../../store/components/Entities/billsSlice"; // ✅ Import API slice
+} from "../../store/components/Entities/billsSlice"; 
 import { customersGetData, itemsGetData } from "../../store/creators";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import { CircularProgress, IconButton } from "@mui/material";
-import { Search, Edit, Delete, Visibility } from "@mui/icons-material";
-import { borderRadius } from "@mui/system";
-
+import {
+  Button,
+  CircularProgress,
+  InputAdornment,
+  InputBase,
+  Typography,
+  Box
+} from "@mui/material";
+import { Search } from "@mui/icons-material";
+import { FaUser, FaCalendarAlt, FaRupeeSign, FaFileInvoice, FaTrash } from "react-icons/fa";
 // Update buttonStyles for Add Order and Save button color (same as customer page)
 const buttonStyles = {
   primary: {
@@ -163,7 +169,6 @@ export default function Orders() {
   const orders = useMemo(() => {
     if (!Array.isArray(bills.data)) return [];
     return bills.data?.map((order) => {
-      // customerName/contact enrich
       const customer = customerList.find((c) => c.id === order.customer_id);
       return {
         ...order,
@@ -326,18 +331,42 @@ export default function Orders() {
 
   const downloadInvoicePDF = () => {
     if (!invoiceRef.current) return;
-    // Options for PDF
-    const opt = {
-      margin: 0.5,
-      filename: `Invoice_${selectedOrder?.id || "Order"}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-    };
-    window.html2pdf().set(opt).from(invoiceRef.current).save();
+    Swal.fire({
+      title: "Download Invoice PDF?",
+      text: "Do you want to download this invoice as PDF?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Download",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#667eea",
+      cancelButtonColor: "#64748b",
+      background: "#fff",
+      color: "#18181b",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let customerName = selectedOrder?.customerName || "Customer";
+        customerName = customerName.replace(/[^a-zA-Z0-9]/g, "_");
+        const opt = {
+          margin: 0.5,
+          filename: `Invoice_${customerName}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+        };
+        window.html2pdf().set(opt).from(invoiceRef.current).save().then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Downloaded!",
+            text: "Invoice PDF has been downloaded.",
+            confirmButtonColor: "#667eea",
+            background: "#fff",
+            color: "#18181b",
+          });
+        });
+      }
+    });
   };
 
-  // ...existing code...
 
   // Delete Order (API)
   const handleDelete = (i) => {
@@ -669,81 +698,147 @@ export default function Orders() {
 
   return (
     <div style={themedStyles.page}>
-      <div style={themedStyles.header}>
-        <div style={themedStyles.headerLeft}>
-          <h2
-            style={{
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+        sx={{
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: { xs: 2, sm: 0 },
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: { xs: "100%", sm: "auto" },
+            mb: { xs: 1, sm: 0 },
+          }}
+        >
+          <Box
+            sx={{
               background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
+              display: "inline-block",
             }}
           >
-            Orders
-          </h2>
-          <h6
-            style={{
+            <Typography variant="h4" fontWeight="bold">
+              Orders
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            onClick={openForm}
+            sx={{
+              width: 40,
+              height: 40,
+              minWidth: 40,
+              borderRadius: "50%",
+              textTransform: "none",
+              fontSize: 20,
+              fontWeight: "bold",
               background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              display: { xs: "flex", sm: "none" },
             }}
           >
-            Create, view and manage your orders easily
-          </h6>
-        </div>
+            +
+          </Button>
+        </Box>
 
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          {/* Search Bar */}
-          <div
-            style={{
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            width: { xs: "100%", sm: "auto" },
+          }}
+        >
+          <Box
+            sx={{
               display: "flex",
               alignItems: "center",
-              width: 280,
-              background: "#ffffff",
+              width: { xs: "100%", sm: 280 },
+              background: "white",
               borderRadius: "25px",
               padding: "4px 12px",
               border: "2px solid #667eea",
               transition: "all 0.3s ease",
-              boxShadow: "0 0 8px rgba(102,126,234,0.08)",
+              "&:hover": {
+                borderColor: "#5a67d8",
+                boxShadow: "0 0 8px rgba(102,126,234,0.5)",
+              },
+              "&:focus-within": {
+                borderColor: "#5a67d8",
+                boxShadow: "0 0 8px rgba(90,103,216,0.6)",
+              },
             }}
           >
-            <Search
-              fontSize="small"
-              style={{ color: "#667eea", marginRight: 8 }}
-            />
-            <input
-              type="text"
+            <InputBase
               placeholder="Search by customer name"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{
+              sx={{
                 flex: 1,
                 fontSize: 14,
                 color: "#333",
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                padding: "8px 0",
+                "&::placeholder": { color: "#999" },
               }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <Search fontSize="small" sx={{ color: "#667eea", mr: 1 }} />
+                </InputAdornment>
+              }
+              endAdornment={
+                search && (
+                  <InputAdornment position="end">
+                    <Box
+                      onClick={() => setSearch("")}
+                      sx={{
+                        cursor: "pointer",
+                        color: "#555",
+                        fontSize: "13px",
+                        borderRadius: "50%",
+                        width: "28px",
+                        height: "28px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      ✖
+                    </Box>
+                  </InputAdornment>
+                )
+              }
             />
-          </div>
-          <button
-            style={buttonStyles.primary}
+          </Box>
+          <Button
+            variant="contained"
             onClick={openForm}
-            aria-label="Create order"
+            sx={{
+              width: 40,
+              height: 40,
+              minWidth: 40,
+              borderRadius: "50%",
+              textTransform: "none",
+              fontSize: 23,
+              fontWeight: "bold",
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              display: { xs: "none", sm: "flex" },
+              alignItems: "center",
+              justifyContent: "center",
+              p: 0,
+            }}
           >
-            <span style={{ fontSize: 20, lineHeight: 1 }}></span>
-            <span
-              style={{
-                color: "#f8f2f2ff", // Black text
-                fontWeight: "bold",
-              }}
-            >
-              Add Order
-            </span>
-          </button>
-        </div>
-      </div>
-
+            +
+          </Button>
+        </Box>
+      </Box>
       {isLoading ? (
         <div style={{ textAlign: "center", marginTop: 40 }}>
           <CircularProgress />
@@ -759,7 +854,6 @@ export default function Orders() {
           >
             🔄
           </div>
-
           <div
             style={{
               ...themedStyles.emptyTitle,
@@ -811,101 +905,89 @@ export default function Orders() {
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  alignItems: "stretch",
-                  gap: 0,
-                  padding: 18,
-                  margin: 0,
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "12px 16px",
+                  margin: "0 0 8px 0",
+                  boxShadow: "0 2px 8px rgba(59,130,246,0.08)",
+                  borderRadius: 14,
+                  minHeight: 70,
+                  flexWrap: "wrap",
                 }}
-                onMouseOver={(e) =>
-                  (e.currentTarget.style.boxShadow =
-                    "0 12px 32px rgba(59,130,246,0.18)")
-                }
-                onMouseOut={(e) =>
-                  (e.currentTarget.style.boxShadow =
-                    themedStyles.card.boxShadow)
-                }
               >
+                {/* Left: Basic Details */}
                 <div
                   style={{
-                    flex: "1 1 220px",
-                    minWidth: 0,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 14,
-                    justifyContent: "center",
+                    gap: 6,
+                    minWidth: 0,
+                    flex: 1,
                   }}
                 >
-                  <div style={{ ...themedStyles.row, fontSize: 20 }}>
-                    <span style={{ ...themedStyles.label, fontSize: 18 }}>
-                      Customer
-                    </span>
-                    <span style={{ ...themedStyles.value, fontSize: 20 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontWeight: 700, fontSize: 17, color: "#0b1b3a", display: "flex", alignItems: "center" }}>
+                      <FaUser style={{ marginRight: 4, color: "#667eea" }} />
                       {order.customerName || "—"}
                     </span>
                   </div>
-                  <div style={{ ...themedStyles.row, fontSize: 20 }}>
-                    <span style={{ ...themedStyles.label, fontSize: 18 }}>
-                      Contact
-                    </span>
-                    <span style={{ ...themedStyles.value, fontSize: 20 }}>
-                      {order.contact || "—"}
-                    </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#5b6b8c" }}>
+                    <FaCalendarAlt style={{ marginRight: 4, color: "#764ba2" }} />
+                    {order.date}
                   </div>
-                  <div style={{ ...themedStyles.row, fontSize: 18 }}>
-                    <span style={{ ...themedStyles.label, fontSize: 16 }}>
-                      Date
-                    </span>
-                    <span style={{ ...themedStyles.value, fontSize: 16 }}>
-                      {order.date}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      ...themedStyles.totalRow,
-                      fontSize: 22,
-                      fontWeight: 700,
-                      marginTop: 8,
-                    }}
-                  >
-                    <span>Grand Total</span>
-                    <b>₹ {order.total_amount}</b>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "#065f46", fontWeight: 600 }}>
+                    <FaRupeeSign style={{ marginRight: 4, color: "#16a34a" }} />
+                    {order.total_amount}
                   </div>
                 </div>
-                {/* Right side: Buttons */}
+                {/* Right: Action Buttons */}
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "column",
-                    gap: 14,
-                    alignItems: "flex-end",
-                    justifyContent: "center",
-                    minWidth: 140,
+                    flexDirection: "row",
+                    gap: 8,
+                    alignItems: "center",
+                    minWidth: 0,
                   }}
                 >
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleEdit(originalIndex)}
-                    title="Edit"
-                    sx={{ "&:hover": { backgroundColor: "#e3f2fd" } }}
-                  >
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDelete(originalIndex)}
-                    title="Delete"
-                    sx={{ "&:hover": { backgroundColor: "#ffebee" } }}
-                  >
-                    <Delete />
-                  </IconButton>
-                  <IconButton
-                    color="success"
-                    onClick={() => handleView(order)}
+                  <button
+                    style={{
+                      background: "#eef2ff",
+                      color: "#3730a3",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "8px 12px",
+                      fontWeight: 700,
+                      fontSize: 16,
+                      cursor: "pointer",
+                      transition: "background 0.2s",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
                     title="View Invoice"
-                    sx={{ "&:hover": { backgroundColor: "#e6f4ea" } }}
+                    onClick={() => handleView(order)}
                   >
-                    <Visibility />
-                  </IconButton>
+                    <FaFileInvoice style={{ marginRight: 6, color: "#0b5ed7" }} />
+                  </button>
+                  <button
+                    style={{
+                      background: "#fee2e2",
+                      color: "#991b1b",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "8px 12px",
+                      fontWeight: 700,
+                      fontSize: 16,
+                      cursor: "pointer",
+                      transition: "background 0.2s",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                    title="Delete"
+                    onClick={() => handleDelete(originalIndex)}
+                  >
+                    <FaTrash style={{ marginRight: 6, color: "#ef4444" }} />
+                  </button>
                 </div>
               </div>
             );
@@ -968,7 +1050,7 @@ export default function Orders() {
             >
               <div
                 style={{
-                  padding: 28,
+                  padding: 18,
                   background: "#f9fafb",
                   color: "#18181b",
                   flex: 1,
@@ -979,13 +1061,13 @@ export default function Orders() {
               >
                 <div
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 24,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 18,
                     marginBottom: 18,
                   }}
                 >
-                  <div>
+                  <div style={{ width: "100%" }}>
                     <label
                       style={{
                         fontWeight: 600,
@@ -1024,7 +1106,7 @@ export default function Orders() {
                       }}
                     />
                   </div>
-                  <div>
+                  <div style={{ width: "100%" }}>
                     <label
                       style={{
                         fontWeight: 600,
@@ -1442,14 +1524,19 @@ export default function Orders() {
             <div style={themedStyles.invoiceBar}>
               <div style={themedStyles.invoiceTitle}></div>
               <div style={{ display: "flex", gap: 8 }}>
-                {/* <button onClick={printInvoice} style={themedButtonStyles.success} title="Print">Print</button>
-                <button style={themedButtonStyles.ghost} onClick={() => setShowInvoice(false)}>Close</button> */}
                 <button
                   onClick={downloadInvoicePDF}
                   style={themedButtonStyles.success}
                   title="Download PDF"
                 >
                   Download PDF
+                </button>
+                <button
+                  style={themedButtonStyles.ghost}
+                  title="Close"
+                  onClick={() => setShowInvoice(false)}
+                >
+                  ✖
                 </button>
               </div>
             </div>
@@ -1466,14 +1553,14 @@ export default function Orders() {
               <div style={invoiceStyles.outer}>
                 <div style={invoiceStyles.container}>
                   <div style={invoiceStyles.header}>
-                    <div style={invoiceStyles.title}>लक्ष्मी जनरल स्टोअर्स</div>
+                    <div style={invoiceStyles.title}>Laxmi General Stores</div>
                     <div style={invoiceStyles.subTitle}>
-                      शालेय साहित्य, ऑफीस स्टेशनरी, प्रेझेंट आर्टिकल्स, टॉइज,
-                      गॉगल्स रेसिडेन्शिअल हायस्कूल समोर, <br />
-                      मिरी रोड शेवगाव ता . शेवगाव, जि . अहिल्यानगर
+                      School Supplies, Office Stationery, Gift Articles, Toys,<br />
+                      Goggles, Opp. Residential High School,<br />
+                      Miri Road, Shevgaon, Dist. Ahilyanagar
                     </div>
                     <div style={invoiceStyles.contact}>
-                      मो. नं . 9850837400 9850332356
+                      Mob. No. 9850837400, 9850332356
                     </div>
                   </div>
 

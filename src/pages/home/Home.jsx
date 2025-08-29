@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, Typography, Box, CircularProgress } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong"; 
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { countGetData } from "../../store/components/Dashboard/count";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function DashboardCards() {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state?.login);
-  const { count } = useSelector((state) => state?.dashboard?.count);
-
-  const [showCards, setShowCards] = useState(false);
+  const { count, isLoading } = useSelector((state) => state?.dashboard?.count);
 
   const data = {
     token: login?.token,
@@ -19,11 +23,6 @@ export default function DashboardCards() {
 
   useEffect(() => {
     dispatch(countGetData(data));
-    const timer = setTimeout(() => {
-      setShowCards(true);
-    }, 4000); // 4 seconds
-
-    return () => clearTimeout(timer);
   }, [dispatch, login?.token]);
 
   const cardData = [
@@ -50,7 +49,7 @@ export default function DashboardCards() {
     },
   ];
 
-  if (!showCards) {
+  if (isLoading) {
     return (
       <Box
         sx={{
@@ -102,13 +101,22 @@ export default function DashboardCards() {
               <Box>
                 <Typography
                   variant="subtitle2"
-                  sx={{ color: "#666", fontWeight: 600, fontSize: { xs: 16, sm: 18 } }}
+                  sx={{
+                    color: "#666",
+                    fontWeight: 600,
+                    fontSize: { xs: 16, sm: 18 },
+                  }}
                 >
                   {item.title}
                 </Typography>
                 <Typography
                   variant="h5"
-                  sx={{ fontWeight: "bold", mt: 1, color: "#111", fontSize: { xs: 22, sm: 26 } }}
+                  sx={{
+                    fontWeight: "bold",
+                    mt: 1,
+                    color: "#111",
+                    fontSize: { xs: 22, sm: 26 },
+                  }}
                 >
                   {item.value}
                 </Typography>

@@ -252,7 +252,7 @@ const Customers = () => {
           <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
+              {/* <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell> */}
               <TableCell sx={{ fontWeight: "bold" }}>Phone</TableCell>
               <TableCell align="right" sx={{ fontWeight: "bold" }}>Actions</TableCell>
             </TableRow>
@@ -264,15 +264,15 @@ const Customers = () => {
                 .map((row) => (
                   <TableRow key={row.id} hover>
                     <TableCell>{row.name}</TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       {row.address && row.address.length <= 30
                         ? row.address
                         : row.address && row.address.match(/.{1,30}/g).map((str, idx) => (
                           <React.Fragment key={idx}>{str}<br /></React.Fragment>
                         ))}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>{row.phone}</TableCell>
-                    <TableCell align="right">
+                    <TableCell align="right" style={{display:"flex"}}>
                       <IconButton color="primary" onClick={() => openEdit(row)}>
                         <Edit />
                       </IconButton>

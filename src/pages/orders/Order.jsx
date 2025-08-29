@@ -1,4 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
+import EventIcon from '@mui/icons-material/Event';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,6 +17,8 @@ import TextField from "@mui/material/TextField";
 import { CircularProgress, IconButton } from "@mui/material";
 import { Search, Edit, Delete, Visibility } from "@mui/icons-material";
 import { borderRadius } from "@mui/system";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { Pagination, Box } from "@mui/material";
 
 // Update buttonStyles for Add Order and Save button color (same as customer page)
 const buttonStyles = {
@@ -107,9 +113,14 @@ const buttonStyles = {
 };
 
 export default function Orders() {
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10;
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const token = login?.token;
+
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   // API data
   const { bills, isLoading, isPostLoading, isUpdateLoading, error } =
@@ -191,6 +202,11 @@ export default function Orders() {
         )
       : [];
   }, [orders, search]);
+
+  // Paginated orders
+  const paginatedOrders = useMemo(() => {
+    return filteredOrders.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  }, [filteredOrders, page]);
 
   // Autocomplete change handler
   const handleCustomerChange = (event, value) => {
@@ -669,80 +685,129 @@ export default function Orders() {
 
   return (
     <div style={themedStyles.page}>
-      <div style={themedStyles.header}>
-        <div style={themedStyles.headerLeft}>
-          <h2
-            style={{
-              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Orders
-          </h2>
-          <h6
-            style={{
-              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Create, view and manage your orders easily
-          </h6>
-        </div>
+      {/* Header - Items style for mobile */}
 
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          {/* Search Bar */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              width: 280,
-              background: "#ffffff",
-              borderRadius: "25px",
-              padding: "4px 12px",
-              border: "2px solid #667eea",
-              transition: "all 0.3s ease",
-              boxShadow: "0 0 8px rgba(102,126,234,0.08)",
-            }}
-          >
-            <Search
-              fontSize="small"
-              style={{ color: "#667eea", marginRight: 8 }}
-            />
-            <input
-              type="text"
-              placeholder="Search by customer name"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                flex: 1,
-                fontSize: 14,
-                color: "#333",
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                padding: "8px 0",
-              }}
-            />
-          </div>
-          <button
-            style={buttonStyles.primary}
-            onClick={openForm}
-            aria-label="Create order"
-          >
-            <span style={{ fontSize: 20, lineHeight: 1 }}></span>
-            <span
-              style={{
-                color: "#f8f2f2ff", // Black text
-                fontWeight: "bold",
-              }}
-            >
-              Add Order
-            </span>
-          </button>
-        </div>
+<div style={{ position: "relative", marginBottom: 16 }}>
+  <div
+    style={{
+      display: "flex",
+      flexDirection: isMobile ? "column" : "row",
+      justifyContent: "space-between",
+      alignItems: isMobile ? "stretch" : "center",
+      gap: isMobile ? 0 : 12,
+    }}
+  >
+    <div style={{ width: isMobile ? "100%" : "auto", marginBottom: isMobile ? 12 : 0, position: "relative" }}>
+      <span
+        style={{
+          background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          display: "inline-block",
+          fontSize: isMobile ? 28 : 32,
+          fontWeight: "bold",
+        }}
+      >
+        Orders
+      </span>
+      {/* Mobile: Add Order button fixed to right of header */}
+      {isMobile && (
+        <button
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: 40,
+            height: 40,
+            minWidth: 40,
+            borderRadius: "50%",
+            textTransform: "none",
+            fontSize: 23,
+            fontWeight: "bold",
+            background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+            color: "#fff",
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 2px 8px rgba(102,126,234,0.15)",
+            cursor: "pointer",
+            zIndex: 2,
+          }}
+          onClick={openForm}
+          aria-label="Create order"
+        >+
+        </button>
+      )}
+    </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 12, width: isMobile ? "100%" : "auto" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          width: isMobile ? "100%" : 280,
+          background: "#fff",
+          borderRadius: "25px",
+          padding: "4px 12px",
+          border: "2px solid #667eea",
+          transition: "all 0.3s ease",
+          boxShadow: "0 0 8px rgba(102,126,234,0.08)",
+        }}
+      >
+        <Search fontSize="small" style={{ color: "#667eea", marginRight: 8 }} />
+        <input
+          type="text"
+          placeholder="Search by order name"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          style={{
+            flex: 1,
+            fontSize: 14,
+            color: "#333",
+            border: "none",
+            outline: "none",
+            background: "transparent",
+            padding: "4px 0",
+          }}
+        />
+        {search && (
+          <span
+            onClick={() => setSearch("")}
+            style={{ cursor: "pointer", color: "#555", fontSize: "16px", marginLeft: 6 }}
+          >✖</span>
+        )}
       </div>
+      {/* Desktop: Add Order button next to search */}
+      {!isMobile && (
+        <button
+          style={{
+            width: 40,
+            height: 40,
+            minWidth: 40,
+            borderRadius: "50%",
+            textTransform: "none",
+            fontSize: 23,
+            fontWeight: "bold",
+            background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+            color: "#fff",
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 2px 8px rgba(102,126,234,0.15)",
+            cursor: "pointer",
+          }}
+          onClick={openForm}
+          aria-label="Create order"
+        >+
+        </button>
+      )}
+    </div>
+  </div>
+</div>
 
       {isLoading ? (
         <div style={{ textAlign: "center", marginTop: 40 }}>
@@ -801,7 +866,12 @@ export default function Orders() {
         </div>
       ) : (
         <div style={themedStyles.cardContainer}>
-          {[...filteredOrders].map((order, i) => {
+          {isLoading && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 120 }}>
+              <CircularProgress size={40} thickness={4} color="primary" />
+            </div>
+          )}
+          {!isLoading && paginatedOrders.map((order, i) => {
             const originalIndex = orders.findIndex((o) => o.id === order.id);
             return (
               <div
@@ -831,85 +901,70 @@ export default function Orders() {
                     minWidth: 0,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 14,
+                    gap: 12,
                     justifyContent: "center",
                   }}
                 >
-                  <div style={{ ...themedStyles.row, fontSize: 20 }}>
-                    <span style={{ ...themedStyles.label, fontSize: 18 }}>
-                      Customer
-                    </span>
-                    <span style={{ ...themedStyles.value, fontSize: 20 }}>
-                      {order.customerName || "—"}
-                    </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start', justifyContent: 'center', width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 24, width: '100%' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#e3f2fd', color: '#1976d2', borderRadius: '50%', width: 38, height: 38 }}>
+                        <AccountCircleIcon sx={{ fontSize: 24 }} />
+                      </span>
+                      <span style={{ ...themedStyles.value, fontSize: 16, textAlign: 'right', flex: 1 }}>{order.customerName || "—"}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 24, width: '100%' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#e8f5e9', color: '#388e3c', borderRadius: '50%', width: 38, height: 38 }}>
+                        <ContactPhoneIcon sx={{ fontSize: 24 }} />
+                      </span>
+                      <span style={{ ...themedStyles.value, fontSize: 16, textAlign: 'right', flex: 1 }}>{order.contact || "—"}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 24, width: '100%' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fffde7', color: '#fbc02d', borderRadius: '50%', width: 38, height: 38 }}>
+                        <EventIcon sx={{ fontSize: 24 }} />
+                      </span>
+                      <span style={{ ...themedStyles.value, fontSize: 14, textAlign: 'right', flex: 1 }}>{order.date}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 24, width: '100%' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffebee', color: '#d32f2f', borderRadius: '50%', width: 38, height: 38 }}>
+                        <MonetizationOnIcon sx={{ fontSize: 24 }} />
+                      </span>
+                      <span style={{ fontSize: 16, fontWeight: 700, textAlign: 'right', flex: 1 }}>₹ {order.total_amount}</span>
+                    </div>
                   </div>
-                  <div style={{ ...themedStyles.row, fontSize: 20 }}>
-                    <span style={{ ...themedStyles.label, fontSize: 18 }}>
-                      Contact
-                    </span>
-                    <span style={{ ...themedStyles.value, fontSize: 20 }}>
-                      {order.contact || "—"}
-                    </span>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 0, flexWrap: 'wrap' }}>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDelete(originalIndex)}
+                      title="Delete"
+                      sx={{ "&:hover": { backgroundColor: "#ffebee" } }}
+                    >
+                      <Delete />
+                    </IconButton>
+                    <IconButton
+                      color="success"
+                      onClick={() => handleView(order)}
+                      title="View Invoice"
+                      sx={{ "&:hover": { backgroundColor: "#e6f4ea" } }}
+                    >
+                      <Visibility />
+                    </IconButton>
                   </div>
-                  <div style={{ ...themedStyles.row, fontSize: 18 }}>
-                    <span style={{ ...themedStyles.label, fontSize: 16 }}>
-                      Date
-                    </span>
-                    <span style={{ ...themedStyles.value, fontSize: 16 }}>
-                      {order.date}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      ...themedStyles.totalRow,
-                      fontSize: 22,
-                      fontWeight: 700,
-                      marginTop: 8,
-                    }}
-                  >
-                    <span>Grand Total</span>
-                    <b>₹ {order.total_amount}</b>
-                  </div>
-                </div>
-                {/* Right side: Buttons */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 14,
-                    alignItems: "flex-end",
-                    justifyContent: "center",
-                    minWidth: 140,
-                  }}
-                >
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleEdit(originalIndex)}
-                    title="Edit"
-                    sx={{ "&:hover": { backgroundColor: "#e3f2fd" } }}
-                  >
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDelete(originalIndex)}
-                    title="Delete"
-                    sx={{ "&:hover": { backgroundColor: "#ffebee" } }}
-                  >
-                    <Delete />
-                  </IconButton>
-                  <IconButton
-                    color="success"
-                    onClick={() => handleView(order)}
-                    title="View Invoice"
-                    sx={{ "&:hover": { backgroundColor: "#e6f4ea" } }}
-                  >
-                    <Visibility />
-                  </IconButton>
                 </div>
               </div>
             );
           })}
+          {/* Pagination (MUI Box) */}
+          {filteredOrders.length > rowsPerPage && (
+            <Box display="flex" justifyContent="center" mt={2}>
+              <Pagination
+                count={Math.ceil(filteredOrders.length / rowsPerPage)}
+                page={page}
+                onChange={(e, value) => setPage(value)}
+                color="primary"
+                shape="rounded"
+              />
+            </Box>
+          )}
         </div>
       )}
 
@@ -935,7 +990,7 @@ export default function Orders() {
               style={{
                 ...themedStyles.invoiceBar,
                 background: "#f8fafc",
-                color: "#0b5ed7",
+                //color:"(90deg, #667eea 0%, #764ba2 100%)",
                 borderBottom: "#e6e8f0",
                 flex: "0 0 auto",
                 fontSize: 20,
@@ -980,8 +1035,8 @@ export default function Orders() {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 24,
+                    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+                    gap: isMobile ? 12 : 24,
                     marginBottom: 18,
                   }}
                 >
@@ -1068,18 +1123,20 @@ export default function Orders() {
                 >
                   Items
                 </div>
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    background: "#fff",
-                    color: "#18181b",
-                    marginBottom: 10,
-                    borderRadius: 10,
-                    overflow: "hidden",
-                    boxShadow: "0 2px 12px rgba(16,24,40,0.08)",
-                  }}
-                >
+                <div style={{ width: "100%", overflowX: "auto" }}>
+                  <table
+                    style={{
+                      width: "100%",
+                      minWidth: 340,
+                      borderCollapse: "collapse",
+                      background: "#fff",
+                      color: "#18181b",
+                      marginBottom: 10,
+                      borderRadius: 10,
+                      overflow: "hidden",
+                      boxShadow: "0 2px 12px rgba(16,24,40,0.08)",
+                    }}
+                  >
                   <thead>
                     <tr>
                       <th
@@ -1216,10 +1273,12 @@ export default function Orders() {
                                         </>
                                       ),
                                     }}
+                                    sx={{ fontSize: { xs: 13, sm: 15 } }}
                                   />
                                 )}
                                 sx={{
-                                  width: "89%",
+                                  width: "100%",
+                                  minWidth: 90,
                                   background: "#fff",
                                   borderRadius: 1,
                                 }}
@@ -1243,13 +1302,13 @@ export default function Orders() {
                                 }
                                 required
                                 style={{
-                                  width: "60px",
+                                  width: "48px",
                                   background: "#fff",
                                   color: "#18181b",
                                   border: "1px solid #cbd5e1",
                                   borderRadius: 6,
-                                  padding: "6px 8px",
-                                  fontSize: 15,
+                                  padding: "4px 6px",
+                                  fontSize: 14,
                                   textAlign: "center",
                                 }}
                               />
@@ -1272,13 +1331,13 @@ export default function Orders() {
                                 }
                                 required
                                 style={{
-                                  width: "80px",
+                                  width: "60px",
                                   background: "#fff",
                                   color: "#18181b",
                                   border: "1px solid #cbd5e1",
                                   borderRadius: 6,
-                                  padding: "6px 8px",
-                                  fontSize: 15,
+                                  padding: "4px 6px",
+                                  fontSize: 14,
                                   textAlign: "center",
                                 }}
                               />
@@ -1367,7 +1426,8 @@ export default function Orders() {
                       </td>
                     </tr>
                   </tbody>
-                </table>
+                  </table>
+                </div>
 
                 <div
                   style={{
@@ -1405,17 +1465,7 @@ export default function Orders() {
                   flex: "0 0 auto",
                   borderRadius: "0 0 18px 18px",
                 }}
-              >
-                <button
-                  type="button"
-                  style={buttonStyles.ghost}
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditIndex(null);
-                  }}
-                >
-                  Cancel
-                </button>
+              >                
                 <button type="submit" style={buttonStyles.primary}>
                   Save
                 </button>

@@ -249,6 +249,14 @@ const Customers = () => {
       {/* Table */}
       <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 2 }}>
         <Table>
+          <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
+            <TableRow>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Phone</TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
           <TableBody>
             {filtered.length > 0 ? (
               filtered

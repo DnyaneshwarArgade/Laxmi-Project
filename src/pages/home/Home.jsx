@@ -44,13 +44,13 @@ export default function DashboardCards() {
       color: "#FCE4EC",
       iconColor: "#C2185B",
     },
-    {
-      title: "Completed Orders",
-      value: count?.data?.orders?.complete ?? 0,
-      icon: <CheckCircleIcon fontSize="large" />,
-      color: "#E8F5E9",
-      iconColor: "#388E3C",
-    },
+    // {
+    //   title: "Completed Orders",
+    //   value: count?.data?.orders?.complete ?? 0,
+    //   icon: <CheckCircleIcon fontSize="large" />,
+    //   color: "#E8F5E9",
+    //   iconColor: "#388E3C",
+    // },
   ];
 
   return (

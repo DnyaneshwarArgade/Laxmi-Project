@@ -166,6 +166,7 @@ export default function Orders() {
 
   // Orders from backend (enrich with customer and item details)
   const orders = useMemo(() => {
+    if (!Array.isArray(bills.data)) return [];
     return bills.data?.map(order => {
       // customerName/contact enrich
       const customer = customerList.find(c => c.id === order.customer_id);
@@ -186,13 +187,15 @@ export default function Orders() {
   }, [bills, customerList, itemList]);
 
   // Filter orders by search
-  const filteredOrders = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return orders;
-    return orders.filter((order) =>
-      (order.customerName || "").toLowerCase().includes(q)
-    );
-  }, [orders, search]);
+const filteredOrders = useMemo(() => {
+  const q = search.trim().toLowerCase();
+  if (!q) return orders;
+  return Array.isArray(orders)
+    ? orders.filter((order) =>
+        (order.customerName || "").toLowerCase().includes(q)
+      )
+    : [];
+}, [orders, search]);
 
   // Autocomplete change handler
   const handleCustomerChange = (event, value) => {
@@ -580,7 +583,7 @@ export default function Orders() {
       color: "#0b1b3a",
     },
     title: {
-      ...styles.title,
+      // ...styles.title,
       color: "#0b1b3a",
     },
     subtitle: {
@@ -711,7 +714,7 @@ export default function Orders() {
         <div style={{ textAlign: "center", marginTop: 40 }}>
           <CircularProgress />
         </div>
-      ) : filteredOrders.length === 0 ? (
+      ) : filteredOrders?.length === 0 ? (
         <div style={themedStyles.emptyWrap}>
           <div
             style={{
@@ -1034,7 +1037,7 @@ export default function Orders() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(formData.items || []).length > 0 ? (
+                    {(formData.items || [])?.length > 0 ? (
                       formData.items.map((item, idx) => {
                         const qty = Number(item.qty || 0);
                         const price = Number(item.price || 0);
@@ -1319,7 +1322,7 @@ export default function Orders() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(selectedOrder.items || []).length > 0 ? (
+                      {(selectedOrder.items || [])?.length > 0 ? (
                         selectedOrder.items.map((item, idx) => {
                           const qty = Number(item.pivot.quantity || 0);
                           const price = Number(item.pivot.price || 0);

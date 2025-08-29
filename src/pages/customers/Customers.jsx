@@ -24,6 +24,9 @@ import {
   CircularProgress,
   useMediaQuery,
   useTheme,
+  Card,
+  CardContent,
+  Grid
 } from "@mui/material";
 import { Search, Delete, Edit, PersonAdd, Close } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
@@ -118,7 +121,7 @@ const Customers = () => {
         timer: 1500,
       });
     };
-    const setSubmitting = () => {};
+    const setSubmitting = () => { };
     if (editing?.id) {
       dispatch(
         actions.updateCustomersData({
@@ -140,28 +143,28 @@ const Customers = () => {
     }
   };
 
-const onDelete = (row) => {
-  Swal.fire({
-    title: `Delete ${row?.name}?`,   // ✅ बरोबर template literal
-    text: "You won't be able to revert this!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it!",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      dispatch(actions.deleteCustomersData({ id: row.id, data: { token } }));
-      Swal.fire({
-        icon: "success",
-        title: "Deleted!",
-        text: `${row?.name} has been deleted.`,
-        timer: 1500,              // ✅ auto-close after 1.5 sec
-        showConfirmButton: false, // ✅ button न दाखवता बंद होईल
-      });
-    }
-  });
-};
+  const onDelete = (row) => {
+    Swal.fire({
+      title: `Delete ${row?.name}?`,   // ✅ बरोबर template literal
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(actions.deleteCustomersData({ id: row.id, data: { token } }));
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: `${row?.name} has been deleted.`,
+          timer: 1500,              // ✅ auto-close after 1.5 sec
+          showConfirmButton: false, // ✅ button न दाखवता बंद होईल
+        });
+      }
+    });
+  };
 
 
   return (
@@ -246,14 +249,6 @@ const onDelete = (row) => {
       {/* Table */}
       <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 2 }}>
         <Table>
-          <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Phone</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>Actions</TableCell>
-            </TableRow>
-          </TableHead>
           <TableBody>
             {filtered.length > 0 ? (
               filtered
@@ -265,8 +260,8 @@ const onDelete = (row) => {
                       {row.address && row.address.length <= 30
                         ? row.address
                         : row.address && row.address.match(/.{1,30}/g).map((str, idx) => (
-                            <React.Fragment key={idx}>{str}<br /></React.Fragment>
-                          ))}
+                          <React.Fragment key={idx}>{str}<br /></React.Fragment>
+                        ))}
                     </TableCell>
                     <TableCell>{row.phone}</TableCell>
                     <TableCell align="right">
@@ -299,17 +294,17 @@ const onDelete = (row) => {
         </Table>
       </TableContainer>
 
-     {filtered.length > rowsPerPage && (
-  <Box display="flex" justifyContent="center" mt={2}>
-    <Pagination
-      count={Math.ceil(filtered.length / rowsPerPage)}
-      page={page}
-      onChange={(e, value) => setPage(value)}
-      color="primary"
-      shape="rounded"
-    />
-  </Box>
-)}
+      {filtered.length > rowsPerPage && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Pagination
+            count={Math.ceil(filtered.length / rowsPerPage)}
+            page={page}
+            onChange={(e, value) => setPage(value)}
+            color="primary"
+            shape="rounded"
+          />
+        </Box>
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={open} onClose={closeForm} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3, p: 1.5, boxShadow: 8 } }}>

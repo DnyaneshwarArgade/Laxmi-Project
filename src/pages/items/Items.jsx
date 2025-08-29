@@ -20,7 +20,8 @@ import {
   DialogActions,
   TextField,
   Pagination,
-  InputAdornment
+  InputAdornment,
+  CircularProgress
 } from "@mui/material";
 import { Search, Delete, Edit } from "@mui/icons-material";
 import Swal from "sweetalert2";
@@ -42,6 +43,8 @@ const Items = () => {
   const [formData, setFormData] = useState({ name: "", price: "", type: "Batla" });
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
+
+ const { data: itemsData, loading } = useSelector((state) => state.entities.items);
 
   useEffect(() => {
     if (login?.token) {
@@ -143,6 +146,11 @@ const Items = () => {
     ? items.data.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
     : [];
 
+     const paginatedItems = filteredItems.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
+
   return (
     <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh" }}>
       {/* Header */}
@@ -236,55 +244,55 @@ const Items = () => {
             </TableRow>
           </TableHead>
 
-          <TableBody>
-            {filteredItems.length > 0 ? (
-              filteredItems
-                .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                .map((item) => (
-                  <TableRow key={item.id} hover>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>₹ {item.price}</TableCell>
-                    <TableCell align="right">
-                      <IconButton color="primary" onClick={() => handleEdit(item)}>
-                        <Edit />
-                      </IconButton>
-                      <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={3} align="center" sx={{ py: 4, color: "#888" }}>
-                  {items?.data?.length === 0 ? (
-                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
-                      <Box sx={{ fontSize: 20, color: "#000" }}>🔄</Box>
-                      <span>No items available.</span>
-                    </Box>
-                  ) : (
-                    <Box sx={{ display: "flex", flexDirection: "column", fontStyle: "italic", alignItems: "center", gap: 1 }}>
-                      <span>No items found for "{search}"</span>
-                    </Box>
-                  )}
-                </TableCell>
-              </TableRow>
+        <TableBody>
+  {loading ? (
+    <TableRow>
+      <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
+        <CircularProgress size={28} />
+        <Typography variant="body2" sx={{ mt: 1 }}>Loading items...</Typography>
+      </TableCell>
+    </TableRow>
+  ) : filteredItems.length > 0 ? (
+    filteredItems
+      .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+      .map((item) => (
+        <TableRow key={item.id} hover>
+          <TableCell>{item.name}</TableCell>
+          <TableCell>₹ {item.price}</TableCell>
+          <TableCell align="right">
+            <IconButton color="primary" onClick={() => handleEdit(item)}>
+              <Edit />
+            </IconButton>
+            <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
+              <Delete />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+      ))
+  ) : (
+    <TableRow>
+      <TableCell colSpan={3} align="center" sx={{ py: 4, color: "#888" }}>
+        No items found.
+      </TableCell>
+    </TableRow>
+  )}
+</TableBody>
 
-            )}
-          </TableBody>
 
         </Table>
       </TableContainer>
 
-      <Box display="flex" justifyContent="center" mt={2}>
-        <Pagination
-          count={Math.ceil(filteredItems.length / rowsPerPage)}
-          page={page}
-          onChange={(e, value) => setPage(value)}
-          color="primary"
-          shape="rounded"
-        />
-      </Box>
+      {filteredItems.length > rowsPerPage && (
+  <Box display="flex" justifyContent="center" mt={2}>
+    <Pagination
+      count={Math.ceil(filteredItems.length / rowsPerPage)}
+      page={page}
+      onChange={(e, value) => setPage(value)}
+      color="primary"
+      shape="rounded"
+    />
+  </Box>
+)}
 
       {/* Add/Edit Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3, p: 1.5, boxShadow: 8 } }}>

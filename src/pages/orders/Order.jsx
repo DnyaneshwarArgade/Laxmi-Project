@@ -1,3 +1,4 @@
+import { formatDateDMY } from "../../Helpers/dateFormat";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toWords } from "number-to-words";
 import Swal from "sweetalert2";
@@ -7,7 +8,7 @@ import {
   postBillsData,
   updateBillsData,
   deleteBillsData,
-} from "../../store/components/Entities/billsSlice"; 
+} from "../../store/components/Entities/billsSlice";
 import { customersGetData, itemsGetData } from "../../store/creators";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
@@ -18,10 +19,18 @@ import {
   InputBase,
   Typography,
   Box,
-  Pagination
+  Pagination,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
-import { FaUser, FaCalendarAlt, FaRupeeSign, FaFileInvoice, FaTrash } from "react-icons/fa";
+import {
+  FaUser,
+  FaCalendarAlt,
+  FaRupeeSign,
+  FaRegFilePdf,
+  FaTrash,
+  FaPhone,
+} from "react-icons/fa";
+import { FaSquarePhone } from "react-icons/fa6";
 const buttonStyles = {
   primary: {
     background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", // Customer page color
@@ -120,7 +129,6 @@ export default function Orders() {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const token = login?.token;
-
 
   // API data
   const { bills, isLoading, isPostLoading, isUpdateLoading, error } =
@@ -352,20 +360,24 @@ export default function Orders() {
           html2canvas: { scale: 2 },
           jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
         };
-        window.html2pdf().set(opt).from(invoiceRef.current).save().then(() => {
-          Swal.fire({
-            icon: "success",
-            title: "Downloaded!",
-            text: "Invoice PDF has been downloaded.",
-            confirmButtonColor: "#667eea",
-            background: "#fff",
-            color: "#18181b",
+        window
+          .html2pdf()
+          .set(opt)
+          .from(invoiceRef.current)
+          .save()
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Downloaded!",
+              text: "Invoice PDF has been downloaded.",
+              confirmButtonColor: "#667eea",
+              background: "#fff",
+              color: "#18181b",
+            });
           });
-        });
       }
     });
   };
-
 
   // Delete Order (API)
   const handleDelete = (i) => {
@@ -415,7 +427,6 @@ export default function Orders() {
     [selectedOrder]
   );
 
-
   const numberToWordsIndian = (num) => {
     if (num === null || num === undefined) return "";
     let n = Math.round(Number(num) * 100) / 100;
@@ -437,18 +448,17 @@ export default function Orders() {
 
   const invoiceRef = useRef(null);
 
-
   const themedStyles = {
     ...styles,
     title: {
       color: "#1e40af", // Same as customer page: dark blue (you can use #1e40af or #0b1b3a)
     },
-  page: {
-    ...styles.page,
-    background: "linear-gradient(180deg, #f5f7ff 0%, #ffffff 40%)",
-    color: "#18181b",
-    paddingBottom: "64px", 
-  },
+    page: {
+      ...styles.page,
+      background: "linear-gradient(180deg, #f5f7ff 0%, #ffffff 40%)",
+      color: "#18181b",
+      paddingBottom: "64px",
+    },
     card: {
       ...styles.card,
       background: "#fff",
@@ -785,107 +795,196 @@ export default function Orders() {
       ) : (
         <div style={themedStyles.cardContainer}>
           {isLoading && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 120 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: 120,
+              }}
+            >
               <CircularProgress size={40} thickness={4} color="primary" />
             </div>
           )}
-          {!isLoading && paginatedOrders?.map((order, i) => {
-            const originalIndex = orders.findIndex((o) => o.id === order.id);
-            return (
-              <div
-                key={order.id || i}
-                style={{
-                  ...themedStyles.card,
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: "12px 16px",
-                  margin: "0 0 8px 0",
-                  boxShadow: "0 2px 8px rgba(59,130,246,0.08)",
-                  borderRadius: 14,
-                  minHeight: 70,
-                  flexWrap: "wrap",
-                }}
-              >
-                {/* Left: Basic Details */}
+          {!isLoading &&
+            paginatedOrders?.map((order, i) => {
+              // console.log('order', order)
+              const originalIndex = orders.findIndex((o) => o.id === order.id);
+              return (
                 <div
+                  key={order.id || i}
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 6,
-                    minWidth: 0,
-                    flex: 1,
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontWeight: 700, fontSize: 17, color: "#0b1b3a", display: "flex", alignItems: "center" }}>
-                      <FaUser style={{ marginRight: 4, color: "#667eea" }} />
-                      {order.customerName || "—"}
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#5b6b8c" }}>
-                    <FaCalendarAlt style={{ marginRight: 4, color: "#764ba2" }} />
-                    {order.date}
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "#065f46", fontWeight: 600 }}>
-                    <FaRupeeSign style={{ marginRight: 4, color: "#16a34a" }} />
-                    {order.total_amount}
-                  </div>
-                </div>
-                {/* Right: Action Buttons */}
-                <div
-                  style={{
+                    ...themedStyles.card,
                     display: "flex",
                     flexDirection: "row",
-                    gap: 8,
+                    justifyContent: "space-between",
                     alignItems: "center",
-                    minWidth: 0,
+                    gap: 12,
+                    padding: "12px 16px",
+                    margin: "0 0 8px 0",
+                    boxShadow: "0 2px 8px rgba(59,130,246,0.08)",
+                    borderRadius: 14,
+                    minHeight: 70,
+                    flexWrap: "wrap",
                   }}
                 >
-                  <button
+                  {/* Left: Basic Details */}
+                  <div
                     style={{
-                      background: "#eef2ff",
-                      color: "#3730a3",
-                      border: "none",
-                      borderRadius: 8,
-                      padding: "8px 12px",
-                      fontWeight: 700,
-                      fontSize: 16,
-                      cursor: "pointer",
-                      transition: "background 0.2s",
                       display: "flex",
-                      alignItems: "center",
+                      flexDirection: "column",
+                      gap: 6,
+                      minWidth: 0,
+                      flex: 1,
                     }}
-                    title="View Invoice"
-                    onClick={() => handleView(order)}
                   >
-                    <FaFileInvoice style={{ marginRight: 6, color: "#0b5ed7" }} />
-                  </button>
-                  <button
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 6,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <FaUser style={{ color: "#667eea", fontSize: 18 }} />
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 17,
+                            color: "#0b1b3a",
+                          }}
+                        >
+                          {order.customerName || "—"}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <FaCalendarAlt
+                          style={{ color: "#764ba2", fontSize: 16 }}
+                        />
+                        <span style={{ fontSize: 14, color: "#5b6b8c" }}>
+                          {formatDateDMY(order.date)}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <FaRupeeSign
+                          style={{ color: "#16a34a", fontSize: 16 }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 15,
+                            color: "#065f46",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {order.total_amount}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Right: Action Buttons */}
+                  <div
                     style={{
-                      background: "#fee2e2",
-                      color: "#991b1b",
-                      border: "none",
-                      borderRadius: 8,
-                      padding: "8px 12px",
-                      fontWeight: 700,
-                      fontSize: 16,
-                      cursor: "pointer",
-                      transition: "background 0.2s",
                       display: "flex",
+                      flexDirection: "row",
+                      gap: 8,
                       alignItems: "center",
+                      minWidth: 0,
                     }}
-                    title="Delete"
-                    onClick={() => handleDelete(originalIndex)}
                   >
-                    <FaTrash style={{ marginRight: 6, color: "#ef4444" }} />
-                  </button>
+                    <button
+                      style={{
+                        background: "#eef2ff",
+                        color: "#3730a3",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "8px 12px",
+                        fontWeight: 700,
+                        fontSize: 16,
+                        cursor: "pointer",
+                        transition: "background 0.2s",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 6,
+                      }}
+                      title="View Invoice"
+                      onClick={() => handleView(order)}
+                    >
+                      <FaRegFilePdf
+                        style={{ fontSize: 20, color: "#0b5ed7" }}
+                      />
+                    </button>
+                    <a
+                      href={`tel:${order.customer?.phone}`}
+                      style={{
+                        background: "#e0f2fe",
+                        color: "#075985",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "8px 12px",
+                        fontWeight: 700,
+                        fontSize: 16,
+                        cursor: "pointer",
+                        transition: "background 0.2s",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 6,
+                        textDecoration: "none",
+                      }}
+                      title="Call Customer"
+                    >
+                      <FaSquarePhone style={{ fontSize: 20, color: "#0b5ed7" }} />
+                    </a>
+                    <button
+                      style={{
+                        background: "#fee2e2",
+                        color: "#991b1b",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "8px 12px",
+                        fontWeight: 700,
+                        fontSize: 16,
+                        cursor: "pointer",
+                        transition: "background 0.2s",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 6,
+                      }}
+                      title="Delete"
+                      onClick={() => handleDelete(originalIndex)}
+                    >
+                      <FaTrash
+                        style={{
+                          color: "#ef4444",
+                          fontSize: 20,
+                          display: "block",
+                        }}
+                      />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
           {/* Pagination (MUI Box) */}
           {filteredOrders.length > rowsPerPage && (
             <Box display="flex" justifyContent="center" mt={2}>
@@ -1070,295 +1169,302 @@ export default function Orders() {
                       boxShadow: "0 2px 12px rgba(16,24,40,0.08)",
                     }}
                   >
-                  <thead>
-                    <tr>
-                      <th
-                        style={{
-                          background: "#d9d9ff",
-                          color: "#18181b",
-                          padding: "10px 6px",
-                          fontWeight: 700,
-                          fontSize: 14,
-                          border: "1px solid #e5e7eb",
-                          textAlign: "center",
-                        }}
-                      >
-                        S.No
-                      </th>
-                      <th
-                        style={{
-                          background: "#d9d9ff",
-                          color: "#18181b",
-                          padding: "10px 6px",
-                          fontWeight: 700,
-                          fontSize: 14,
-                          border: "1px solid #e5e7eb",
-                          textAlign: "center",
-                        }}
-                      >
-                        Particulars
-                      </th>
-                      <th
-                        style={{
-                          background: "#d9d9ff",
-                          color: "#18181b",
-                          padding: "10px 6px",
-                          fontWeight: 700,
-                          fontSize: 14,
-                          border: "1px solid #e5e7eb",
-                          textAlign: "center",
-                        }}
-                      >
-                        Qty
-                      </th>
-                      <th
-                        style={{
-                          background: "#d9d9ff",
-                          color: "#18181b",
-                          padding: "10px 6px",
-                          fontWeight: 700,
-                          fontSize: 14,
-                          border: "1px solid #e5e7eb",
-                          textAlign: "center",
-                        }}
-                      >
-                        Rate
-                      </th>
-                      <th
-                        style={{
-                          background: "#d9d9ff",
-                          color: "#18181b",
-                          padding: "10px 6px",
-                          fontWeight: 700,
-                          fontSize: 14,
-                          border: "1px solid #e5e7eb",
-                          textAlign: "center",
-                        }}
-                      >
-                        Total
-                      </th>
-                      <th
-                        style={{
-                          background: "#d9d9ff",
-                          border: "1px solid #e5e7eb",
-                          textAlign: "center",
-                          width: 40,
-                        }}
-                      ></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(formData.items || [])?.length > 0 ? (
-                      formData.items.map((item, idx) => {
-                        const qty = Number(item.qty || 0);
-                        const price = Number(item.price || 0);
-                        const lineTotal = qty * price;
-                        return (
-                          <tr key={idx}>
-                            <td
-                              style={{
-                                color: "#18181b",
-                                border: "1px solid #e5e7eb",
-                                textAlign: "center",
-                                fontWeight: 600,
-                                fontSize: 15,
-                                background: "#fff",
-                              }}
-                            >
-                              {idx + 1}
-                            </td>
-                            <td
-                              style={{
-                                border: "1px solid #e5e7eb",
-                                textAlign: "center",
-                                background: "#fff",
-                              }}
-                            >
-                              <Autocomplete
-                                options={itemList}
-                                getOptionLabel={(option) => option.name || ""}
-                                loading={itemsLoading}
-                                value={
-                                  itemList.find((i) => i.name === item.name) ||
-                                  null
-                                }
-                                onChange={(e, value) =>
-                                  handleItemSelect(idx, value)
-                                }
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select Item"
-                                    variant="outlined"
-                                    size="small"
-                                    required
-                                    InputProps={{
-                                      ...params.InputProps,
-                                      endAdornment: (
-                                        <>
-                                          {itemsLoading ? (
-                                            <CircularProgress
-                                              color="inherit"
-                                              size={20}
-                                            />
-                                          ) : null}
-                                          {params.InputProps.endAdornment}
-                                        </>
-                                      ),
-                                    }}
-                                    sx={{ fontSize: { xs: 13, sm: 15 } }}
-                                  />
-                                )}
-                                sx={{
-                                  width: "100%",
-                                  minWidth: 90,
-                                  background: "#fff",
-                                  borderRadius: 1,
-                                }}
-                              />
-                            </td>
-                            <td
-                              style={{
-                                border: "1px solid #e5e7eb",
-                                textAlign: "center",
-                                background: "#fff",
-                              }}
-                            >
-                              <input
-                                type="number"
-                                min="0"
-                                step="1"
-                                placeholder="Qty"
-                                value={item.qty}
-                                onChange={(e) =>
-                                  handleItemChange(idx, "qty", e.target.value)
-                                }
-                                required
+                    <thead>
+                      <tr>
+                        <th
+                          style={{
+                            background: "#d9d9ff",
+                            color: "#18181b",
+                            padding: "10px 6px",
+                            fontWeight: 700,
+                            fontSize: 14,
+                            border: "1px solid #e5e7eb",
+                            textAlign: "center",
+                          }}
+                        >
+                          S.No
+                        </th>
+                        <th
+                          style={{
+                            background: "#d9d9ff",
+                            color: "#18181b",
+                            padding: "10px 6px",
+                            fontWeight: 700,
+                            fontSize: 14,
+                            border: "1px solid #e5e7eb",
+                            textAlign: "center",
+                          }}
+                        >
+                          Particulars
+                        </th>
+                        <th
+                          style={{
+                            background: "#d9d9ff",
+                            color: "#18181b",
+                            padding: "10px 6px",
+                            fontWeight: 700,
+                            fontSize: 14,
+                            border: "1px solid #e5e7eb",
+                            textAlign: "center",
+                          }}
+                        >
+                          Qty
+                        </th>
+                        <th
+                          style={{
+                            background: "#d9d9ff",
+                            color: "#18181b",
+                            padding: "10px 6px",
+                            fontWeight: 700,
+                            fontSize: 14,
+                            border: "1px solid #e5e7eb",
+                            textAlign: "center",
+                          }}
+                        >
+                          Rate
+                        </th>
+                        <th
+                          style={{
+                            background: "#d9d9ff",
+                            color: "#18181b",
+                            padding: "10px 6px",
+                            fontWeight: 700,
+                            fontSize: 14,
+                            border: "1px solid #e5e7eb",
+                            textAlign: "center",
+                          }}
+                        >
+                          Total
+                        </th>
+                        <th
+                          style={{
+                            background: "#d9d9ff",
+                            border: "1px solid #e5e7eb",
+                            textAlign: "center",
+                            width: 40,
+                          }}
+                        ></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(formData.items || [])?.length > 0 ? (
+                        formData.items.map((item, idx) => {
+                          const qty = Number(item.qty || 0);
+                          const price = Number(item.price || 0);
+                          const lineTotal = qty * price;
+                          return (
+                            <tr key={idx}>
+                              <td
                                 style={{
-                                  width: "48px",
-                                  background: "#fff",
                                   color: "#18181b",
-                                  border: "1px solid #cbd5e1",
-                                  borderRadius: 6,
-                                  padding: "4px 6px",
-                                  fontSize: 14,
+                                  border: "1px solid #e5e7eb",
                                   textAlign: "center",
-                                }}
-                              />
-                            </td>
-                            <td
-                              style={{
-                                border: "1px solid #e5e7eb",
-                                textAlign: "center",
-                                background: "#fff",
-                              }}
-                            >
-                              <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                placeholder="Rate"
-                                value={item.price}
-                                onChange={(e) =>
-                                  handleItemChange(idx, "price", e.target.value)
-                                }
-                                required
-                                style={{
-                                  width: "60px",
+                                  fontWeight: 600,
+                                  fontSize: 15,
                                   background: "#fff",
-                                  color: "#18181b",
-                                  border: "1px solid #cbd5e1",
-                                  borderRadius: 6,
-                                  padding: "4px 6px",
-                                  fontSize: 14,
-                                  textAlign: "center",
                                 }}
-                              />
-                            </td>
-                            <td
-                              style={{
-                                border: "1px solid #e5e7eb",
-                                textAlign: "center",
-                                background: "#fff",
-                                fontWeight: 600,
-                                fontSize: 15,
-                              }}
-                            >
-                              {isNaN(lineTotal) ? "0.00" : lineTotal.toFixed(2)}
-                            </td>
-                            <td
-                              style={{
-                                border: "1px solid #e5e7eb",
-                                textAlign: "center",
-                                background: "#fff",
-                              }}
-                            >
-                              <button
-                                type="button"
-                                onClick={() => removeItem(idx)}
-                                style={{
-                                  background: "#fee2e2",
-                                  color: "#991b1b",
-                                  border: "none",
-                                  borderRadius: 6,
-                                  padding: "4px 8px",
-                                  cursor: "pointer",
-                                  fontWeight: 700,
-                                  margin: 10,
-                                }}
-                                title="Remove item"
                               >
-                                ❌
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    ) : (
+                                {idx + 1}
+                              </td>
+                              <td
+                                style={{
+                                  border: "1px solid #e5e7eb",
+                                  textAlign: "center",
+                                  background: "#fff",
+                                }}
+                              >
+                                <Autocomplete
+                                  options={itemList}
+                                  getOptionLabel={(option) => option.name || ""}
+                                  loading={itemsLoading}
+                                  value={
+                                    itemList.find(
+                                      (i) => i.name === item.name
+                                    ) || null
+                                  }
+                                  onChange={(e, value) =>
+                                    handleItemSelect(idx, value)
+                                  }
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select Item"
+                                      variant="outlined"
+                                      size="small"
+                                      required
+                                      InputProps={{
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                          <>
+                                            {itemsLoading ? (
+                                              <CircularProgress
+                                                color="inherit"
+                                                size={20}
+                                              />
+                                            ) : null}
+                                            {params.InputProps.endAdornment}
+                                          </>
+                                        ),
+                                      }}
+                                      sx={{ fontSize: { xs: 13, sm: 15 } }}
+                                    />
+                                  )}
+                                  sx={{
+                                    width: "100%",
+                                    minWidth: 90,
+                                    background: "#fff",
+                                    borderRadius: 1,
+                                  }}
+                                />
+                              </td>
+                              <td
+                                style={{
+                                  border: "1px solid #e5e7eb",
+                                  textAlign: "center",
+                                  background: "#fff",
+                                }}
+                              >
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="1"
+                                  placeholder="Qty"
+                                  value={item.qty}
+                                  onChange={(e) =>
+                                    handleItemChange(idx, "qty", e.target.value)
+                                  }
+                                  required
+                                  style={{
+                                    width: "48px",
+                                    background: "#fff",
+                                    color: "#18181b",
+                                    border: "1px solid #cbd5e1",
+                                    borderRadius: 6,
+                                    padding: "4px 6px",
+                                    fontSize: 14,
+                                    textAlign: "center",
+                                  }}
+                                />
+                              </td>
+                              <td
+                                style={{
+                                  border: "1px solid #e5e7eb",
+                                  textAlign: "center",
+                                  background: "#fff",
+                                }}
+                              >
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  placeholder="Rate"
+                                  value={item.price}
+                                  onChange={(e) =>
+                                    handleItemChange(
+                                      idx,
+                                      "price",
+                                      e.target.value
+                                    )
+                                  }
+                                  required
+                                  style={{
+                                    width: "60px",
+                                    background: "#fff",
+                                    color: "#18181b",
+                                    border: "1px solid #cbd5e1",
+                                    borderRadius: 6,
+                                    padding: "4px 6px",
+                                    fontSize: 14,
+                                    textAlign: "center",
+                                  }}
+                                />
+                              </td>
+                              <td
+                                style={{
+                                  border: "1px solid #e5e7eb",
+                                  textAlign: "center",
+                                  background: "#fff",
+                                  fontWeight: 600,
+                                  fontSize: 15,
+                                }}
+                              >
+                                {isNaN(lineTotal)
+                                  ? "0.00"
+                                  : lineTotal.toFixed(2)}
+                              </td>
+                              <td
+                                style={{
+                                  border: "1px solid #e5e7eb",
+                                  textAlign: "center",
+                                  background: "#fff",
+                                }}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => removeItem(idx)}
+                                  style={{
+                                    background: "#fee2e2",
+                                    color: "#991b1b",
+                                    border: "none",
+                                    borderRadius: 6,
+                                    padding: "4px 8px",
+                                    cursor: "pointer",
+                                    fontWeight: 700,
+                                    margin: 10,
+                                  }}
+                                  title="Remove item"
+                                >
+                                  ❌
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            style={{
+                              textAlign: "center",
+                              fontStyle: "italic",
+                              color: "#18181b",
+                              border: "1px solid #e5e7eb",
+                              background: "#fff",
+                            }}
+                          >
+                            No Items
+                          </td>
+                        </tr>
+                      )}
                       <tr>
                         <td
                           colSpan={6}
                           style={{
-                            textAlign: "center",
-                            fontStyle: "italic",
-                            color: "#18181b",
-                            border: "1px solid #e5e7eb",
-                            background: "#fff",
+                            border: "none",
+                            padding: 0,
+                            textAlign: "left",
+                            background: "transparent",
                           }}
                         >
-                          No Items
+                          <button
+                            type="button"
+                            onClick={addItem}
+                            style={{
+                              margin: 8,
+                              background: "#e0f2fe",
+                              color: "#075985",
+                              border: "1px solid #bae6fd",
+                              borderRadius: 8,
+                              padding: "6px 14px",
+                              fontWeight: 700,
+                              cursor: "pointer",
+                            }}
+                          >
+                            ➕ Add Item
+                          </button>
                         </td>
                       </tr>
-                    )}
-                    <tr>
-                      <td
-                        colSpan={6}
-                        style={{
-                          border: "none",
-                          padding: 0,
-                          textAlign: "left",
-                          background: "transparent",
-                        }}
-                      >
-                        <button
-                          type="button"
-                          onClick={addItem}
-                          style={{
-                            margin: 8,
-                            background: "#e0f2fe",
-                            color: "#075985",
-                            border: "1px solid #bae6fd",
-                            borderRadius: 8,
-                            padding: "6px 14px",
-                            fontWeight: 700,
-                            cursor: "pointer",
-                          }}
-                        >
-                          ➕ Add Item
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
+                    </tbody>
                   </table>
                 </div>
 
@@ -1398,7 +1504,7 @@ export default function Orders() {
                   flex: "0 0 auto",
                   borderRadius: "0 0 18px 18px",
                 }}
-              >                
+              >
                 <button type="submit" style={buttonStyles.primary}>
                   Save
                 </button>
@@ -1456,8 +1562,10 @@ export default function Orders() {
                   <div style={invoiceStyles.header}>
                     <div style={invoiceStyles.title}>Laxmi General Stores</div>
                     <div style={invoiceStyles.subTitle}>
-                      School Supplies, Office Stationery, Gift Articles, Toys,<br />
-                      Goggles, Opp. Residential High School,<br />
+                      School Supplies, Office Stationery, Gift Articles, Toys,
+                      <br />
+                      Goggles, Opp. Residential High School,
+                      <br />
                       Miri Road, Shevgaon, Dist. Ahilyanagar
                     </div>
                     <div style={invoiceStyles.contact}>

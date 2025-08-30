@@ -33,7 +33,7 @@ const Items = () => {
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
-  const { items } = useSelector((state) => state.entities.items);
+  const {isLoading, items } = useSelector((state) => state.entities.items);
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
@@ -166,7 +166,7 @@ const Items = () => {
   );
 
   return (
-    <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh", pb: { xs: 8, sm: 3 } }}>
+    <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh" }}>
       {/* Header */}
       <Box
         display="flex"
@@ -322,80 +322,95 @@ const Items = () => {
           </Button>
         </Box>
       </Box>
+      {isLoading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: 120,
+          }}
+        >
+          <CircularProgress size={40} thickness={4} color="primary" />
+        </div>
+      ) : (
+        <>
+          {/* Table */}
+          <TableContainer
+            component={Paper}
+            sx={{ borderRadius: "12px", boxShadow: 2 }}
+          >
+            <Table>
+              <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Price</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-      {/* Table */}
-      <TableContainer
-        component={Paper}
-        sx={{ borderRadius: "12px", boxShadow: 2 }}
-      >
-        <Table>
-          <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Price</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                  <CircularProgress size={28} />
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    Loading items...
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : filteredItems.length > 0 ? (
-              filteredItems
-                .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                .map((item) => (
-                  <TableRow key={item.id} hover>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>₹ {item.price}</TableCell>
-                    <TableCell align="right">
-                      <IconButton
-                        color="primary"
-                        onClick={() => handleEdit(item)}
-                      >
-                        <Edit />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleDeleteClick(item.id)}
-                      >
-                        <Delete />
-                      </IconButton>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
+                      <CircularProgress size={28} />
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        Loading items...
+                      </Typography>
                     </TableCell>
                   </TableRow>
-                ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={3}
-                  align="center"
-                  sx={{ py: 4, color: "#888" }}
-                >
-                  No items found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {filteredItems.length > rowsPerPage && (
-        <Box display="flex" justifyContent="center" mt={2}>
-          <Pagination
-            count={Math.ceil(filteredItems.length / rowsPerPage)}
-            page={page}
-            onChange={(e, value) => setPage(value)}
-            color="primary"
-            shape="rounded"
-          />
-        </Box>
+                ) : filteredItems.length > 0 ? (
+                  filteredItems
+                    .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                    .map((item) => (
+                      <TableRow key={item.id} hover>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>₹ {item.price}</TableCell>
+                        <TableCell align="right">
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleEdit(item)}
+                          >
+                            <Edit />
+                          </IconButton>
+                          <IconButton
+                            color="error"
+                            onClick={() => handleDeleteClick(item.id)}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={3}
+                      align="center"
+                      sx={{ py: 4, color: "#888" }}
+                    >
+                      No items found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {filteredItems.length > rowsPerPage && (
+            <Box display="flex" justifyContent="center" mt={2}>
+              <Pagination
+                count={Math.ceil(filteredItems.length / rowsPerPage)}
+                page={page}
+                onChange={(e, value) => setPage(value)}
+                color="primary"
+                shape="rounded"
+              />
+            </Box>
+          )}
+        </>
       )}
       {/* Add/Edit Dialog */}
       <Dialog

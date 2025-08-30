@@ -20,7 +20,8 @@ import {
   InputAdornment,
   InputBase,
   Typography,
-  Box
+  Box,
+  Pagination
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { FaUser, FaCalendarAlt, FaRupeeSign, FaFileInvoice, FaTrash } from "react-icons/fa";
@@ -124,13 +125,11 @@ export default function Orders() {
   const { login } = useSelector((state) => state.login);
   const token = login?.token;
 
-  const isMobile = useMediaQuery("(max-width:600px)");
 
   // API data
   const { bills, isLoading, isPostLoading, isUpdateLoading, error } =
     useSelector((state) => state.entities.bills);
 
-  console.log("bills", bills);
   const { customers, isLoading: customersLoading } = useSelector(
     (state) => state.entities.customers
   );
@@ -518,49 +517,6 @@ export default function Orders() {
 
   const invoiceRef = useRef(null);
 
-  const printInvoice = () => {
-    if (!invoiceRef.current) return;
-    const invoiceHTML = invoiceRef.current.outerHTML;
-    const styles = `
-    <style>
-      *{box-sizing:border-box}
-      @page{size:A4;margin:12mm}
-      body{margin:0;font-family:Arial, sans-serif}
-      .print-container{width:210mm;max-width:210mm;margin:0 auto}
-      .header{text-align:center;border-bottom:1px solid #000;padding:6px 0}
-      .title{font-size:18px;font-weight:bold}
-      .subTitle{font-size:12px;margin:5px 0}
-      .contact{font-size:12px}
-      .table{width:100%;border-collapse:collapse;margin-top:6px}
-      .table th,.table td{border:1px solid #000;padding:5px}
-      .table thead th{background:#d9d9ff;text-align:left}
-      .tdRight{text-align:right}
-      .billFooter{display:flex;justify-content:space-between;padding:5px;border-top:1px solid #000;font-weight:bold}
-      .small{font-size:12px}
-      .spaceRow td{border:none !important;height:36px}
-    </style>
-  `;
-    const printWindow = window.open("", "_blank", "width=800,height=600");
-    printWindow.document.write(`
-    <html>
-      <head>
-        <title></title>
-        ${styles}
-      </head>
-      <body>
-        <div class="print-container">
-          ${invoiceHTML}
-        </div>
-      </body>
-    </html>
-  `);
-    printWindow.document.close();
-    setTimeout(() => {
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
-    }, 500);
-  };
 
   // Styles (only light mode)
   const themedStyles = {
@@ -857,7 +813,7 @@ export default function Orders() {
         <div style={{ textAlign: "center", marginTop: 40 }}>
           <CircularProgress />
         </div>
-      ) : filteredOrders?.length === 0 ? (
+      ) : paginatedOrders?.length === 0 ? (
         <div style={themedStyles.emptyWrap}>
           <div
             style={{
@@ -914,7 +870,7 @@ export default function Orders() {
               <CircularProgress size={40} thickness={4} color="primary" />
             </div>
           )}
-          {!isLoading && paginatedOrders.map((order, i) => {
+          {!isLoading && paginatedOrders?.map((order, i) => {
             const originalIndex = orders.findIndex((o) => o.id === order.id);
             return (
               <div

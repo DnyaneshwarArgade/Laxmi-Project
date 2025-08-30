@@ -21,7 +21,7 @@ import {
   TextField,
   Pagination,
   InputAdornment,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import { Search, Delete, Edit } from "@mui/icons-material";
 import Swal from "sweetalert2";
@@ -40,11 +40,17 @@ const Items = () => {
   const data = { token: login?.token };
 
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", price: "", type: "Batla" });
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    type: "Batla",
+  });
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
 
- const { data: itemsData, loading } = useSelector((state) => state.entities.items);
+  const { data: itemsData, loading } = useSelector(
+    (state) => state.entities.items
+  );
 
   useEffect(() => {
     if (login?.token) {
@@ -55,7 +61,7 @@ const Items = () => {
   useEffect(() => {
     if (search && items?.data?.length > 0) {
       // search केलेल्या पहिल्या item चा index शोधा
-      const firstIndex = items.data.findIndex(item =>
+      const firstIndex = items.data.findIndex((item) =>
         item.name.toLowerCase().includes(search.toLowerCase())
       );
       if (firstIndex >= 0) {
@@ -65,7 +71,6 @@ const Items = () => {
       }
     }
   }, [search, items]);
-
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -77,7 +82,11 @@ const Items = () => {
     if (!formData.name || formData.name.trim().length < 2) {
       newErrors.name = "Name is required (min 2 chars)";
     }
-    if (!formData.price || isNaN(formData.price) || Number(formData.price) <= 0) {
+    if (
+      !formData.price ||
+      isNaN(formData.price) ||
+      Number(formData.price) <= 0
+    ) {
       newErrors.price = "Price must be a positive number";
     }
     setErrors(newErrors);
@@ -85,7 +94,10 @@ const Items = () => {
 
     if (editMode && editId) {
       dispatch(
-        actions.updateItemsData({ data: { token: login?.token, id: editId }, items: formData })
+        actions.updateItemsData({
+          data: { token: login?.token, id: editId },
+          items: formData,
+        })
       );
       toast.success("Item updated successfully ✏");
     } else {
@@ -143,10 +155,12 @@ const Items = () => {
   };
 
   const filteredItems = Array.isArray(items?.data)
-    ? items.data.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
+    ? items.data.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      )
     : [];
 
-     const paginatedItems = filteredItems.slice(
+  const paginatedItems = filteredItems.slice(
     (page - 1) * rowsPerPage,
     page * rowsPerPage
   );
@@ -159,20 +173,65 @@ const Items = () => {
         justifyContent="space-between"
         alignItems="center"
         mb={2}
-        sx={{ flexDirection: { xs: "column", sm: "row" }, alignItems: { xs: "stretch", sm: "center" }, gap: { xs: 2, sm: 0 } }}
+        sx={{
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: { xs: 2, sm: 0 },
+        }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: { xs: "100%", sm: "auto" }, mb: { xs: 1, sm: 0 } }}>
-          <Box sx={{ background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}>
-            <Typography variant="h4" fontWeight="bold">Items</Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: { xs: "100%", sm: "auto" },
+            mb: { xs: 1, sm: 0 },
+          }}
+        >
+          <Box
+            sx={{
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              display: "inline-block",
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold">
+              Items
+            </Typography>
           </Box>
           <Button
             variant="contained"
-            onClick={() => { setFormData({ name: "", price: "", type: "Batla" }); setEditMode(false); setEditId(null); setOpen(true); }}
-            sx={{ width: 40, height: 40, minWidth: 40, borderRadius: "50%", textTransform: "none", fontSize: 20, fontWeight: "bold", background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", display: { xs: "flex", sm: "none" } }}
-          >+</Button>
+            onClick={() => {
+              setFormData({ name: "", price: "", type: "Batla" });
+              setEditMode(false);
+              setEditId(null);
+              setOpen(true);
+            }}
+            sx={{
+              width: 40,
+              height: 40,
+              minWidth: 40,
+              borderRadius: "50%",
+              textTransform: "none",
+              fontSize: 20,
+              fontWeight: "bold",
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              display: { xs: "flex", sm: "none" },
+            }}
+          >
+            +
+          </Button>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, width: { xs: "100%", sm: "auto" } }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            width: { xs: "100%", sm: "auto" },
+          }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -183,15 +242,26 @@ const Items = () => {
               padding: "4px 12px",
               border: "2px solid #42a5f5",
               transition: "all 0.3s ease",
-              "&:hover": { borderColor: "#1e88e5", boxShadow: "0 0 8px rgba(66,165,245,0.5)" },
-              "&:focus-within": { borderColor: "#1e88e5", boxShadow: "0 0 8px rgba(30,136,229,0.6)" },
+              "&:hover": {
+                borderColor: "#1e88e5",
+                boxShadow: "0 0 8px rgba(66,165,245,0.5)",
+              },
+              "&:focus-within": {
+                borderColor: "#1e88e5",
+                boxShadow: "0 0 8px rgba(30,136,229,0.6)",
+              },
             }}
           >
             <InputBase
               placeholder="Search by item name"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              sx={{ flex: 1, fontSize: 14, color: "#333", "&::placeholder": { color: "#999" } }}
+              sx={{
+                flex: 1,
+                fontSize: 14,
+                color: "#333",
+                "&::placeholder": { color: "#999" },
+              }}
               startAdornment={
                 <InputAdornment position="start">
                   <Search fontSize="small" sx={{ color: "#42a5f5", mr: 1 }} />
@@ -227,88 +297,177 @@ const Items = () => {
 
           <Button
             variant="contained"
-            onClick={() => { setFormData({ name: "", price: "", type: "Batla" }); setEditMode(false); setEditId(null); setOpen(true); }}
-            sx={{ width: 40, height: 40, minWidth: 40, borderRadius: "50%", textTransform: "none", fontSize: 23, fontWeight: "bold", background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", display: { xs: "none", sm: "flex" }, alignItems: "center", justifyContent: "center", p: 0 }}
-          >+</Button>
+            onClick={() => {
+              setFormData({ name: "", price: "", type: "Batla" });
+              setEditMode(false);
+              setEditId(null);
+              setOpen(true);
+            }}
+            sx={{
+              width: 40,
+              height: 40,
+              minWidth: 40,
+              borderRadius: "50%",
+              textTransform: "none",
+              fontSize: 23,
+              fontWeight: "bold",
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              display: { xs: "none", sm: "flex" },
+              alignItems: "center",
+              justifyContent: "center",
+              p: 0,
+            }}
+          >
+            +
+          </Button>
         </Box>
       </Box>
 
       {/* Table */}
-      <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: 2 }}>
+      <TableContainer
+        component={Paper}
+        sx={{ borderRadius: "12px", boxShadow: 2 }}
+      >
         <Table>
           <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Price</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>Actions</TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
 
-        <TableBody>
-  {loading ? (
-    <TableRow>
-      <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-        <CircularProgress size={28} />
-        <Typography variant="body2" sx={{ mt: 1 }}>Loading items...</Typography>
-      </TableCell>
-    </TableRow>
-  ) : filteredItems.length > 0 ? (
-    filteredItems
-      .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-      .map((item) => (
-        <TableRow key={item.id} hover>
-          <TableCell>{item.name}</TableCell>
-          <TableCell>₹ {item.price}</TableCell>
-          <TableCell align="right">
-            <IconButton color="primary" onClick={() => handleEdit(item)}>
-              <Edit />
-            </IconButton>
-            <IconButton color="error" onClick={() => handleDeleteClick(item.id)}>
-              <Delete />
-            </IconButton>
-          </TableCell>
-        </TableRow>
-      ))
-  ) : (
-    <TableRow>
-      <TableCell colSpan={3} align="center" sx={{ py: 4, color: "#888" }}>
-        No items found.
-      </TableCell>
-    </TableRow>
-  )}
-</TableBody>
-
-
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
+                  <CircularProgress size={28} />
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    Loading items...
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : filteredItems.length > 0 ? (
+              filteredItems
+                .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                .map((item) => (
+                  <TableRow key={item.id} hover>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>₹ {item.price}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleEdit(item)}
+                      >
+                        <Edit />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleDeleteClick(item.id)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={3}
+                  align="center"
+                  sx={{ py: 4, color: "#888" }}
+                >
+                  No items found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
         </Table>
       </TableContainer>
-
       {filteredItems.length > rowsPerPage && (
-  <Box display="flex" justifyContent="center" mt={2}>
-    <Pagination
-      count={Math.ceil(filteredItems.length / rowsPerPage)}
-      page={page}
-      onChange={(e, value) => setPage(value)}
-      color="primary"
-      shape="rounded"
-    />
-  </Box>
-)}
-
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Pagination
+            count={Math.ceil(filteredItems.length / rowsPerPage)}
+            page={page}
+            onChange={(e, value) => setPage(value)}
+            color="primary"
+            shape="rounded"
+          />
+        </Box>
+      )}
       {/* Add/Edit Dialog */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3, p: 1.5, boxShadow: 8 } }}>
-        <DialogTitle sx={{ bgcolor: "linear-gradient(135deg, #1976d2 30%, #42a5f5 90%)", color: "white", borderTopLeftRadius: 12, borderTopRightRadius: 12, py: 2, px: 3 }}>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Box sx={{ background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}>
-              <Typography fontWeight="bold" fontSize={20}>{editMode ? "Edit Item" : "Add Item"}</Typography>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{ sx: { borderRadius: 3, p: 1.5, boxShadow: 8 } }}
+      >
+        <DialogTitle
+          sx={{
+            bgcolor: "linear-gradient(135deg, #1976d2 30%, #42a5f5 90%)",
+            color: "white",
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            py: 2,
+            px: 3,
+          }}
+        >
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Box
+              sx={{
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                display: "inline-block",
+              }}
+            >
+              <Typography fontWeight="bold" fontSize={20}>
+                {editMode ? "Edit Item" : "Add Item"}
+              </Typography>
             </Box>
-            <Box onClick={() => setOpen(false)} sx={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", fontSize: 22, fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", "&:hover": { background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)" } }}>×</Box>
+            <Box
+              onClick={() => setOpen(false)}
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                fontSize: 22,
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                "&:hover": {
+                  background:
+                    "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+                },
+              }}
+            >
+              ×
+            </Box>
           </Box>
         </DialogTitle>
 
         <DialogContent sx={{ mt: 0 }}>
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
             {/* Item Name */}
-            <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
+            <Typography
+              variant="subtitle2"
+              fontWeight="bold"
+              color="text.secondary"
+            >
               Item Name
             </Typography>
             <TextField
@@ -344,7 +503,11 @@ const Items = () => {
             />
 
             {/* Price */}
-            <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
+            <Typography
+              variant="subtitle2"
+              fontWeight="bold"
+              color="text.secondary"
+            >
               Price
             </Typography>
             <TextField
@@ -383,12 +546,21 @@ const Items = () => {
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-          <Button onClick={handleSubmit} variant="contained" sx={{ px: 4, borderRadius: 2, textTransform: "none", background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)" }}>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            sx={{
+              px: 4,
+              borderRadius: 2,
+              textTransform: "none",
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+            }}
+          >
             {editMode ? "Update" : "Submit"}
           </Button>
         </DialogActions>
       </Dialog>
-    </Box >
+    </Box>
   );
 };
 

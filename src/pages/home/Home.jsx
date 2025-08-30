@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import CountUp from "react-countup";
+import { motion } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -68,76 +70,108 @@ export default function DashboardCards() {
   return (
     <Box
       sx={{
-        display: "grid",
-        gridTemplateColumns: { xs: "1fr", sm: "1fr", md: "repeat(3, 1fr)" },
-        gap: { xs: 2, sm: 3, md: 3 },
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: { xs: 2, sm: 3, md: 4 },
         maxWidth: "1200px",
         width: "100%",
         p: { xs: 2, sm: 3, md: 4 },
-        bgcolor: "#f4f6f8",
+        bgcolor: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)",
         mx: "auto",
+        minHeight: "70vh",
       }}
     >
       {cardData.map((item, index) => (
-        <Card
+        <motion.div
           key={index}
-          sx={{
-            borderRadius: "16px",
-            background: "#fff",
-            boxShadow: "0 2px 10px rgba(178, 175, 175, 0.1)",
-            height: "auto",
-            transition: "0.3s",
-            "&:hover": { transform: "translateY(-4px)", boxShadow: 4 },
-          }}
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          whileHover={{ scale: 1.04, boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)" }}
+          transition={{ duration: 0.7, delay: index * 0.2 }}
+          style={{ width: "100%", maxWidth: 350 }}
         >
-          <CardContent sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: "#666",
-                    fontWeight: 600,
-                    fontSize: { xs: 16, sm: 18 },
-                  }}
-                >
-                  {item.title}
-                </Typography>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontWeight: "bold",
-                    mt: 1,
-                    color: "#111",
-                    fontSize: { xs: 22, sm: 26 },
-                  }}
-                >
-                  {item.value}
-                </Typography>
-              </Box>
-
+          <Card
+            sx={{
+              borderRadius: "28px",
+              background: "linear-gradient(135deg, rgba(255,255,255,0.85) 60%, rgba(220,230,255,0.7) 100%)",
+              boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.17)",
+              backdropFilter: "blur(12px)",
+              border: "none",
+              height: "auto",
+              transition: "0.4s",
+              position: "relative",
+              overflow: "hidden",
+              "&:hover": {
+                boxShadow: "0 16px 40px 0 rgba(31, 38, 135, 0.27)",
+                background: "linear-gradient(135deg, rgba(255,255,255,0.95) 60%, rgba(220,230,255,0.8) 100%)",
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
               <Box
                 sx={{
-                  backgroundColor: item.color,
-                  borderRadius: "12px",
-                  p: 1.5,
                   display: "flex",
+                  justifyContent: "space-between",
                   alignItems: "center",
-                  justifyContent: "center",
-                  color: item.iconColor,
                 }}
               >
-                {item.icon}
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: "#444",
+                      fontWeight: 700,
+                      fontSize: { xs: 18, sm: 20 },
+                      letterSpacing: 1,
+                    }}
+                  >
+                    {item.title}
+                  </Typography>
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      fontWeight: "bold",
+                      mt: 1,
+                      color: "#222",
+                      fontSize: { xs: 32, sm: 38 },
+                      textShadow: "0 2px 8px rgba(31,38,135,0.07)",
+                    }}
+                  >
+                    <CountUp end={item.value} duration={1.5} separator="," />
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    background: `linear-gradient(135deg, ${item.color} 60%, #fff 100%)`,
+                    borderRadius: "16px",
+                    p: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: item.iconColor,
+                    boxShadow: "0 2px 8px rgba(31,38,135,0.09)",
+                  }}
+                >
+                  {item.icon}
+                </Box>
               </Box>
-            </Box>
-          </CardContent>
-        </Card>
+            </CardContent>
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                width: "100%",
+                height: "8px",
+                background: `linear-gradient(90deg, ${item.iconColor} 0%, transparent 100%)`,
+                opacity: 0.18,
+              }}
+            />
+          </Card>
+        </motion.div>
       ))}
     </Box>
   );

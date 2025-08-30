@@ -33,7 +33,7 @@ const Items = () => {
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
-  const {isLoading, items } = useSelector((state) => state.entities.items);
+  const { isLoading, items } = useSelector((state) => state.entities.items);
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
@@ -400,7 +400,14 @@ const Items = () => {
           </TableContainer>
 
           {filteredItems.length > rowsPerPage && (
-            <Box display="flex" justifyContent="center" mt={2}>
+            <Box
+              display="flex"
+              justifyContent="center"
+              mt={2}
+              sx={{
+                mb: { xs: 7, sm: 2 }, 
+              }}
+            >
               <Pagination
                 count={Math.ceil(filteredItems.length / rowsPerPage)}
                 page={page}

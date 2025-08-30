@@ -26,7 +26,7 @@ import {
   useTheme,
   Card,
   CardContent,
-  Grid
+  Grid,
 } from "@mui/material";
 import { Search, Delete, Edit, PersonAdd, Close } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
@@ -47,7 +47,8 @@ const Customers = () => {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const token = login?.token;
-  const { customers, isLoading, isPostLoading, isUpdateLoading, error } = useSelector((state) => state.entities.customers);
+  const { customers, isLoading, isPostLoading, isUpdateLoading, error } =
+    useSelector((state) => state.entities.customers);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -78,7 +79,9 @@ const Customers = () => {
 
   useEffect(() => {
     if (search && list.length > 0) {
-      const firstIndex = list.findIndex((c) => (c?.name || "").toLowerCase().includes(search.toLowerCase()));
+      const firstIndex = list.findIndex((c) =>
+        (c?.name || "").toLowerCase().includes(search.toLowerCase())
+      );
       if (firstIndex >= 0) {
         setPage(Math.floor(firstIndex / rowsPerPage) + 1);
       } else {
@@ -121,7 +124,7 @@ const Customers = () => {
         timer: 1500,
       });
     };
-    const setSubmitting = () => { };
+    const setSubmitting = () => {};
     if (editing?.id) {
       dispatch(
         actions.updateCustomersData({
@@ -145,7 +148,7 @@ const Customers = () => {
 
   const onDelete = (row) => {
     Swal.fire({
-      title: `Delete ${row?.name}?`,   // ✅ बरोबर template literal
+      title: `Delete ${row?.name}?`, // ✅ बरोबर template literal
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
@@ -159,13 +162,12 @@ const Customers = () => {
           icon: "success",
           title: "Deleted!",
           text: `${row?.name} has been deleted.`,
-          timer: 1500,              // ✅ auto-close after 1.5 sec
+          timer: 1500, // ✅ auto-close after 1.5 sec
           showConfirmButton: false, // ✅ button न दाखवता बंद होईल
         });
       }
     });
   };
-
 
   return (
     <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh" }}>
@@ -357,10 +359,16 @@ const Customers = () => {
                         </TableCell> */}
                         <TableCell>{row.phone}</TableCell>
                         <TableCell align="right" style={{ display: "flex" }}>
-                          <IconButton color="primary" onClick={() => openEdit(row)}>
+                          <IconButton
+                            color="primary"
+                            onClick={() => openEdit(row)}
+                          >
                             <Edit />
                           </IconButton>
-                          <IconButton color="error" onClick={() => onDelete(row)}>
+                          <IconButton
+                            color="error"
+                            onClick={() => onDelete(row)}
+                          >
                             <Delete />
                           </IconButton>
                         </TableCell>
@@ -406,7 +414,14 @@ const Customers = () => {
           </TableContainer>
 
           {filtered.length > rowsPerPage && (
-            <Box display="flex" justifyContent="center" mt={2}>
+            <Box
+              display="flex"
+              justifyContent="center"
+              mt={2}
+              sx={{
+                mb: { xs: 7, sm: 2 },
+              }}
+            >
               <Pagination
                 count={Math.ceil(filtered.length / rowsPerPage)}
                 page={page}

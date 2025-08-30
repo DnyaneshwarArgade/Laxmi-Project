@@ -903,7 +903,7 @@ export default function Orders() {
                   <div
                     style={{
                       display: "flex",
-                      flexDirection: "row",
+                      flexDirection: "column",
                       gap: 8,
                       alignItems: "center",
                       minWidth: 0,

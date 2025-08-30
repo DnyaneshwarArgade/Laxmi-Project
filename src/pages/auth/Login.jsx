@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { FaUserCircle } from "react-icons/fa";
+import { CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -48,18 +50,27 @@ export default function Login() {
   };
 
   return (
-    <div style={styles.container} className="bg-light">
-      <div style={styles.card} className="bg-white">
-        <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXVBASNO7C59zz-GfBusZjc47ZNrbLpTT1mA&s"
-          alt="login"
-          style={styles.image}
+    <div
+      style={{ ...styles.container, padding: "0 10px", minHeight: "100vh" }}
+      className="bg-light"
+    >
+      <div
+        style={{ ...styles.card, width: "100%", maxWidth: 400, margin: "auto" }}
+        className="bg-white"
+      >
+        <FaUserCircle
+          style={{
+            ...styles.image,
+            color: "#36d1dc",
+            background: "none",
+            border: "none",
+          }}
         />
 
-        <h2 style={styles.heading}>Laxmi Genral Store...!!!</h2>
-        <p style={styles.subHeading}>Login to your account</p>
+        <h2 style={styles.heading}>Welcome Back...!</h2>
+        <p style={styles.subHeading}>Sign in your account to continue</p>
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} style={{ width: "100%" }}>
           <div style={styles.inputContainer}>
             <label style={styles.label}>Email</label>
             <input
@@ -67,7 +78,7 @@ export default function Login() {
               placeholder="Enter Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={styles.input}
+              style={{ ...styles.input, minWidth: 0 }}
               className="shadow-sm rounded-pill form-control "
             />
           </div>
@@ -79,7 +90,7 @@ export default function Login() {
               placeholder="Enter Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
+              style={{ ...styles.input, minWidth: 0 }}
               className="shadow-sm rounded-pill form-control "
             />
           </div>
@@ -95,8 +106,13 @@ export default function Login() {
               (e.currentTarget.style.background =
                 "linear-gradient(90deg, #36d1dc, #5b86e5)")
             }
+            disabled={isLoading}
           >
-            <span style={styles.btnText}>Login</span>
+            {isLoading ? (
+              <CircularProgress size={24} sx={{ color: "#fff" }} />
+            ) : (
+              <span style={styles.btnText}>Login</span>
+            )}
           </button>
         </form>
       </div>
@@ -109,8 +125,11 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    height: "100vh",
+    minHeight: "100vh",
     fontFamily: "Segoe UI, sans-serif",
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "0 10px",
   },
   card: {
     background: "rgba(255,255,255,0.1)",

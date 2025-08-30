@@ -168,7 +168,7 @@ const Customers = () => {
 
 
   return (
-    <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh" }}>
+    <Box sx={{ p: 3, backgroundColor: "#f9fbff", minHeight: "100vh", pb: { xs: 8, sm: 3 } }}>
       {/* Header */}
       <Box
         display="flex"

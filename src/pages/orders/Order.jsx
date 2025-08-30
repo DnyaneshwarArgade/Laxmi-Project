@@ -1,8 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
-import EventIcon from '@mui/icons-material/Event';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toWords } from "number-to-words";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -25,7 +22,6 @@ import {
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { FaUser, FaCalendarAlt, FaRupeeSign, FaFileInvoice, FaTrash } from "react-icons/fa";
-// Update buttonStyles for Add Order and Save button color (same as customer page)
 const buttonStyles = {
   primary: {
     background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", // Customer page color
@@ -153,7 +149,6 @@ export default function Orders() {
   const [showForm, setShowForm] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  console.log("selectedOrder", selectedOrder);
   const [editIndex, setEditIndex] = useState(null);
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState({
@@ -304,7 +299,6 @@ export default function Orders() {
       returned_items: [],
       items,
     };
-    console.log(formData.customerId);
 
     const toggle = () => {
       setShowForm(false);
@@ -333,14 +327,6 @@ export default function Orders() {
       );
     }
   };
-
-  // Edit Order
-  const handleEdit = (i) => {
-    setEditIndex(i);
-    setFormData(orders[i]);
-    setShowForm(true);
-  };
-  // ...existing code...
 
   const downloadInvoicePDF = () => {
     if (!invoiceRef.current) return;
@@ -429,82 +415,16 @@ export default function Orders() {
     [selectedOrder]
   );
 
+
   const numberToWordsIndian = (num) => {
     if (num === null || num === undefined) return "";
     let n = Math.round(Number(num) * 100) / 100;
     if (n === 0) return "Zero Rupees Only";
     const rupees = Math.floor(n);
     const paise = Math.round((n - rupees) * 100);
-    const ones = [
-      "",
-      "One",
-      "Two",
-      "Three",
-      "Four",
-      "Five",
-      "Six",
-      "Seven",
-      "Eight",
-      "Nine",
-      "Ten",
-      "Eleven",
-      "Twelve",
-      "Thirteen",
-      "Fourteen",
-      "Fifteen",
-      "Sixteen",
-      "Seventeen",
-      "Eighteen",
-      "Nineteen",
-    ];
-    const tens = [
-      "",
-      "",
-      "Twenty",
-      "Thirty",
-      "Forty",
-      "Fifty",
-      "Sixty",
-      "Seventy",
-      "Eighty",
-      "Ninety",
-    ];
-
-    const two = (n2) => {
-      if (n2 < 20) return ones[n2];
-      const t = Math.floor(n2 / 10);
-      const r = n2 % 10;
-      return tens[t] + (r ? " " + ones[r] : "");
-    };
-    const three = (n3) => {
-      const h = Math.floor(n3 / 100);
-      const r = n3 % 100;
-      return (h ? ones[h] + " Hundred" + (r ? " " : "") : "") + two(r);
-    };
-
-    const words = (x) => {
-      if (x === 0) return "Zero";
-      const crore = Math.floor(x / 10000000);
-      x = x % 10000000;
-      const lakh = Math.floor(x / 100000);
-      x = x % 100000;
-      const thousand = Math.floor(x / 1000);
-      x = x % 1000;
-      const hundred = x;
-      let str = "";
-      if (crore) str += three(crore) + " Crore";
-      if (lakh) str += (str ? " " : "") + three(lakh) + " Lakh";
-      if (thousand) str += (str ? " " : "") + three(thousand) + " Thousand";
-      if (hundred) str += (str ? " " : "") + three(hundred);
-      return str.trim();
-    };
-
-    const rw = words(rupees);
-    const pw = paise ? words(paise) + " Paise" : "";
-
-    if (rupees && paise) return `${rw} Rupees and ${pw} Only`;
-    if (rupees) return `${rw} Rupees Only`;
-    return `${pw} Only`;
+    let words = toWords(rupees) + " Rupees";
+    if (paise) words += ` and ${toWords(paise)} Paise`;
+    return words + " Only";
   };
 
   const todayStr = useMemo(() => {
@@ -518,18 +438,17 @@ export default function Orders() {
   const invoiceRef = useRef(null);
 
 
-  // Styles (only light mode)
   const themedStyles = {
     ...styles,
     title: {
-      // ...styles.title,
       color: "#1e40af", // Same as customer page: dark blue (you can use #1e40af or #0b1b3a)
     },
-    page: {
-      ...styles.page,
-      background: "linear-gradient(180deg, #f5f7ff 0%, #ffffff 40%)",
-      color: "#18181b",
-    },
+  page: {
+    ...styles.page,
+    background: "linear-gradient(180deg, #f5f7ff 0%, #ffffff 40%)",
+    color: "#18181b",
+    paddingBottom: "64px", 
+  },
     card: {
       ...styles.card,
       background: "#fff",

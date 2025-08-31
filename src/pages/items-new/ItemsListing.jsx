@@ -10,7 +10,6 @@ import {
   ModalBody,
   Row,
   Col,
-  Label,
   InputGroup,
   ModalFooter,
   Input,
@@ -105,8 +104,8 @@ function ItemsListing() {
   return (
     <Card className="w-100">
       <CardHeader className="bg-white text-dark p-0">
-        <div className="d-flex bg-info p-2 align-items-center justify-content-between mb-2 flex-wrap">
-          <strong className="pl-2 text-white">Items Details</strong>
+        <div className="d-flex bg-light p-2 align-items-center justify-content-between mb-2 flex-wrap">
+          <strong className="pl-2 text-dark">Items Details</strong>
           <Button className="btn-success p-2" onClick={toggle}>
             <i className="fa fa-plus text-white mr-2" />
             Add New
@@ -233,7 +232,7 @@ function ItemsListing() {
         {isLoading ? (
           <CircularLoading />
         ) : (
-          <div className="table-responsive">
+          <div className="table-responsive" style={{ paddingBottom: '5rem' }}>
             <table
               className="table table-bordered table-striped"
               style={{ minWidth: "320px" }}

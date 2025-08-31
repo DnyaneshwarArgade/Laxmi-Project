@@ -48,9 +48,6 @@ const Items = () => {
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const { data: itemsData, loading } = useSelector(
-    (state) => state.entities.items
-  );
 
   useEffect(() => {
     if (login?.token) {

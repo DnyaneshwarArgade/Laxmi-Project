@@ -29,6 +29,9 @@ import { Box, Typography } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download"
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import SearchIcon from "@mui/icons-material/Search";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import AddIcon from "@mui/icons-material/Add";
 
 function ItemsListing() {
   const dispatch = useDispatch();
@@ -175,7 +178,7 @@ function ItemsListing() {
             <Button
               onClick={toggle} className="gradientButton"
             >
-              +
+              <AddIcon />
             </Button>
           </Box>
         </Box>
@@ -199,7 +202,7 @@ function ItemsListing() {
               className="me-2"
               onClick={() => setSearchFilter(true)}
             >
-              <FaSearch />
+                <SearchIcon />
             </Button>
             <Button
               type="reset"
@@ -210,7 +213,7 @@ function ItemsListing() {
               }}
               className="me-2"
             >
-              <RiResetRightFill />
+              <RestartAltIcon />
             </Button>
           </div>
         </div>

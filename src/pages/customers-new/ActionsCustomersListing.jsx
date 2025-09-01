@@ -18,6 +18,8 @@ import Swal from "sweetalert2";
 import CustomTextField from "../../Component/MuiComponents/CustomTextField";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import LinerLoader from "../../Component/loaders/LinerLoader";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function ActionsCustomersListing(props) {
     const dispatch = useDispatch();
@@ -68,7 +70,8 @@ function ActionsCustomersListing(props) {
         <div>
             <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
                 <Button className="btn-success p-1" onClick={toggle}>
-                    <FaEdit />
+                    {/* <FaEdit /> */}
+                      <EditIcon />
                 </Button>
 
                 <Button
@@ -77,7 +80,7 @@ function ActionsCustomersListing(props) {
                         deleteSelectedItem(data.id);
                     }}
                 >
-                    <FaTrash />
+                    <DeleteIcon />
                 </Button>
             </div>
 

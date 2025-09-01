@@ -3,7 +3,7 @@ import BottomNavigation from "./Component/BottomNavigation";
 import Header from "./Component/Header";
 import { useSelector } from "react-redux";
 import Home from "./pages/home/Home";
-import Customers from "./pages/customers/Customers";
+import Customers from "./pages/customers-new/CustomersListing";
 import Items from "./pages/items-new/ItemsListing";
 import Orders from "./pages/orders/Order";
 import Login from "./pages/auth/Login";

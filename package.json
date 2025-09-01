@@ -22,6 +22,7 @@
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
     "date-fns": "^4.1.0",
+    "file-saver": "^2.0.5",
     "formik": "^2.4.6",
     "framer-motion": "^12.23.12",
     "html2pdf.js": "^0.11.2",
@@ -41,6 +42,7 @@
     "redux-thunk": "^3.1.0",
     "sweetalert2": "^11.22.4",
     "use-debounce": "^10.0.5",
+    "xlsx": "^0.18.5",
     "yup": "^1.7.0"
   },
   "devDependencies": {

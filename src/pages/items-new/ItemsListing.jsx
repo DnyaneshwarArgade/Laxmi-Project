@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import * as Yup from "yup";
+import "../Style.css";
 import {
   Card,
   CardHeader,
@@ -24,6 +25,10 @@ import { MenuItem, Select, TextField, Tooltip } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { RiResetRightFill } from "react-icons/ri";
 import LinerLoader from "../../Component/loaders/LinerLoader";
+import { Box, Typography } from "@mui/material";
+import DownloadIcon from "@mui/icons-material/Download"
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 function ItemsListing() {
   const dispatch = useDispatch();
@@ -50,26 +55,26 @@ function ItemsListing() {
   const rows = items?.isLoading
     ? []
     : items?.data?.length > 0
-    ? items?.data?.filter((item) => {
+      ? items?.data?.filter((item) => {
         return (
           (searchValue && searchFilter
             ? item?.name
-                ?.toLowerCase()
-                .includes(searchValue.trim().toLowerCase())
+              ?.toLowerCase()
+              .includes(searchValue.trim().toLowerCase())
             : item) ||
           (searchValue && searchFilter
             ? item?.type
-                ?.toLowerCase()
-                .includes(searchValue.trim().toLowerCase())
+              ?.toLowerCase()
+              .includes(searchValue.trim().toLowerCase())
             : item) ||
           (searchValue && searchFilter
             ? item?.address
-                ?.toLowerCase()
-                .includes(searchValue.trim().toLowerCase())
+              ?.toLowerCase()
+              .includes(searchValue.trim().toLowerCase())
             : item)
         );
       })
-    : [];
+      : [];
 
   // Pagination logic
   const totalRows = rows.length;
@@ -91,6 +96,31 @@ function ItemsListing() {
     setModal(!modal);
   };
 
+  const handleExport = () => {
+    if (!items?.data || items?.data?.length === 0) {
+      alert("No data available to export");
+      return;
+    }
+
+    // JSON to worksheet
+    const worksheet = XLSX.utils.json_to_sheet(items?.data);
+
+    // Workbook तयार करा
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Items");
+
+    // Buffer तयार करा
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    // Blob तयार करा
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(data, "items_data.xlsx");
+  };
+
+
   const handleSubmit = (values, { setSubmitting }) => {
     let items = new FormData();
     items.append("name", values.name);
@@ -104,13 +134,52 @@ function ItemsListing() {
   return (
     <Card className="w-100">
       <CardHeader className="bg-white text-dark p-0">
-        <div className="d-flex bg-light p-2 align-items-center justify-content-between mb-2 flex-wrap">
-          <strong className="pl-2 text-dark">Items Details</strong>
-          <Button className="btn-success p-2" onClick={toggle}>
-            <i className="fa fa-plus text-white mr-2" />
-            Add New
-          </Button>
-        </div>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            width: "100%",
+            mb: 2,
+            p: 2,
+            bgcolor: "background.paper",
+            borderRadius: 1,
+          }}
+        >
+          {/* Title */}
+          <Box
+            sx={{
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              display: "inline-block",
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold">
+              Items
+            </Typography>
+          </Box>
+
+          {/* Buttons group */}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {/* Download Button */}
+            <Button
+              onClick={handleExport}
+              className="gradientButton"
+            >
+              <DownloadIcon />
+            </Button>
+
+            {/* Add Button (mobile only) */}
+            <Button
+              onClick={toggle} className="gradientButton"
+            >
+              +
+            </Button>
+          </Box>
+        </Box>
+
         <div className="d-flex p-2 align-items-center justify-content-between flex-wrap">
           <Input
             type="text"
@@ -205,6 +274,7 @@ function ItemsListing() {
                           disabled={formProps.isSubmitting}
                           color="primary"
                           block
+                          className="mt-3"
                         >
                           Submit
                         </Button>

@@ -1560,16 +1560,16 @@ export default function Orders() {
               <div style={invoiceStyles.outer}>
                 <div style={invoiceStyles.container}>
                   <div style={invoiceStyles.header}>
-                    <div style={invoiceStyles.title}>Laxmi General Stores</div>
+                    <div style={invoiceStyles.title}>लक्ष्मी जनरल स्टोअर्स</div>
                     <div style={invoiceStyles.subTitle}>
-                      School Supplies, Office Stationery, Gift Articles, Toys,
+                      शालेय साहित्य, ऑफिस स्टेशनरी, गिफ्ट वस्तू, खेळणी,
                       <br />
-                      Goggles, Opp. Residential High School,
+                      गॉगल्स, रहिवासी हायस्कूल समोर,
                       <br />
-                      Miri Road, Shevgaon, Dist. Ahilyanagar
+                      मिरी रोड, शेवगाव, जि. अहमदनगर
                     </div>
                     <div style={invoiceStyles.contact}>
-                      Mob. No. 9850837400, 9850332356
+                     मो. नं. ९८५०८३७४००, ९८५०३३२३५६
                     </div>
                   </div>
 
@@ -1649,7 +1649,7 @@ export default function Orders() {
                     </tbody>
                   </table>
 
-                  <div style={{ padding: 5, borderTop: "1px solid #000" }}>
+                  <div style={{ padding: 5, borderTop: "1px solid #000", textTransform: "capitalize" }}>
                     <div style={invoiceStyles.small}>
                       <b>Bill Amount in Words:</b>{" "}
                       {numberToWordsIndian(selectedOrder.total_amount) || "—"}

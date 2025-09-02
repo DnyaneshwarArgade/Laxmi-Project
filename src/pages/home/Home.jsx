@@ -78,7 +78,7 @@ export default function DashboardCards() {
         maxWidth: "1200px",
         width: "100%",
         p: { xs: 2, sm: 3, md: 4 },
-        bgcolor: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)",
+        bgcolor: "linear-gradient(135deg, #f9fbff 0%, #eef3f9 100%)", // ✅ Light background
         mx: "auto",
         minHeight: "70vh",
       }}
@@ -88,27 +88,27 @@ export default function DashboardCards() {
           key={index}
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          whileHover={{ scale: 1.04, boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)" }}
+          whileHover={{ scale: 1.04 }}
           transition={{ duration: 0.7, delay: index * 0.2 }}
           style={{ width: "100%", maxWidth: 350 }}
         >
           <Card
+            elevation={0}   // ✅ Shadow काढण्यासाठी
             sx={{
-              borderRadius: "28px",
-              background: "linear-gradient(135deg, rgba(255,255,255,0.85) 60%, rgba(220,230,255,0.7) 100%)",
-              boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.17)",
-              backdropFilter: "blur(12px)",
-              border: "none",
+              borderRadius: "20px",
+              background: "#fff",
+              border: "1px solid #f0f0f0",
               height: "auto",
-              transition: "0.4s",
+              transition: "0.3s",
               position: "relative",
               overflow: "hidden",
+              boxShadow: "none",  // ✅ अजून खात्रीसाठी
               "&:hover": {
-                boxShadow: "0 16px 40px 0 rgba(31, 38, 135, 0.27)",
-                background: "linear-gradient(135deg, rgba(255,255,255,0.95) 60%, rgba(220,230,255,0.8) 100%)",
+                // हवे असल्यास hover ला काही style देऊ शकतो
               },
             }}
           >
+
             <CardContent sx={{ p: 3 }}>
               <Box
                 sx={{
@@ -136,7 +136,6 @@ export default function DashboardCards() {
                       mt: 1,
                       color: "#222",
                       fontSize: { xs: 32, sm: 38 },
-                      textShadow: "0 2px 8px rgba(31,38,135,0.07)",
                     }}
                   >
                     <CountUp end={item.value} duration={1.5} separator="," />
@@ -152,7 +151,7 @@ export default function DashboardCards() {
                     alignItems: "center",
                     justifyContent: "center",
                     color: item.iconColor,
-                    boxShadow: "0 2px 8px rgba(31,38,135,0.09)",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
                   }}
                 >
                   {item.icon}
@@ -165,9 +164,9 @@ export default function DashboardCards() {
                 bottom: 0,
                 left: 0,
                 width: "100%",
-                height: "8px",
-                background: `linear-gradient(90deg, ${item.iconColor} 0%, transparent 100%)`,
-                opacity: 0.18,
+                height: "6px",
+                //background: `linear-gradient(90deg, ${item.iconColor} 0%, transparent 100%)`,
+                opacity: 0.2,
               }}
             />
           </Card>

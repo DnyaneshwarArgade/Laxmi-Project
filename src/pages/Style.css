@@ -1,50 +1,53 @@
 .gradientButton {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  border-radius: 50%;
-  text-transform: none;
-  font-size: 20px;
-  color: #fff;
-  font-weight: bold;
+  padding: 8px 12px;
   background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #991b1b;
+  border: none;
+  font-weight: "bold";
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
   display: flex;
   align-items: center;
-  /* vertical center */
   justify-content: center;
-  /* horizontal center */
+  gap: 6px;
+  height: 44px;
 }
 
 .deleteButton {
-  background: #fee2e2;
+  background: transparent !important;  /* remove background completely */
   color: #991b1b;
   border: none;
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 0;   /* remove rounded effect */
+  padding: 0 !important;  /* remove any spacing */
+  margin: 0;  /* just in case */
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  height: 20px;
+  width: 10px;
 }
 
 .editButton {
-  background: #dbeafe;
-  /* हलका निळा */
+  background: transparent !important;  /* remove background completely */
   color: #2955e6;
-  /* गडद निळा */
   border: none;
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 0;
+  padding: 0 !important;
+  margin: 0;
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+   height: 20px;
+  width: 16px;
 }

@@ -203,8 +203,8 @@ export default function Orders() {
     if (!q) return orders;
     return Array.isArray(orders)
       ? orders.filter((order) =>
-          (order.customerName || "").toLowerCase().includes(q)
-        )
+        (order.customerName || "").toLowerCase().includes(q)
+      )
       : [];
   }, [orders, search]);
 
@@ -297,7 +297,7 @@ export default function Orders() {
     const payload = {
       customer_id: formData.customerId,
       discription: "", // Add description if needed
-      date: new Date().toISOString().slice(0, 10), // YYYY-MM-DD
+      date: formData.date && formData.date !== "" ? formData.date : null,
       total_amount,
       paid_amount: "0",
       unpaid_amount: total_amount,
@@ -313,7 +313,7 @@ export default function Orders() {
       setEditIndex(null);
       resetForm();
     };
-    const setSubmitting = () => {};
+    const setSubmitting = () => { };
 
     if (editIndex !== null && orders[editIndex]?.id) {
       dispatch(
@@ -1121,15 +1121,13 @@ export default function Orders() {
                         color: "#0b1b3a",
                       }}
                     >
-                      Contact
+                      Date
                     </label>
                     <input
-                      type="text"
-                      name="contact"
-                      placeholder="Contact"
-                      value={formData.contact}
-                      onChange={handleChange}
-                      required
+                      type="date"
+                      name="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData((p) => ({ ...p, date: e.target.value }))}
                       style={{
                         ...themedStyles.input,
                         fontSize: 16,
@@ -1139,7 +1137,6 @@ export default function Orders() {
                         color: "#18181b",
                         marginBottom: 0,
                       }}
-                      disabled
                     />
                   </div>
                 </div>
@@ -1569,7 +1566,7 @@ export default function Orders() {
                       मिरी रोड, शेवगाव, जि. अहमदनगर
                     </div>
                     <div style={invoiceStyles.contact}>
-                     मो. नं. ९८५०८३७४००, ९८५०३३२३५६
+                      मो. नं. ९८५०८३७४००, ९८५०३३२३५६
                     </div>
                   </div>
 
@@ -1586,7 +1583,7 @@ export default function Orders() {
                         <td style={{ padding: 5, width: "30%" }}>
                           <b>Bill No.:</b> INV_{selectedOrder.id || "-"}
                           <br />
-                          <b>Date:</b> {todayStr}
+                          <b>Date:</b> {selectedOrder.date && selectedOrder.date !== null && selectedOrder.date !== "" ? formatDateDMY(selectedOrder.date) : "-"}
                         </td>
                       </tr>
                     </tbody>
@@ -1660,6 +1657,7 @@ export default function Orders() {
                     </div>
                   </div>
 
+                  
                   {/* Customer & Laxmi General Signatures */}
                   <div
                     style={{

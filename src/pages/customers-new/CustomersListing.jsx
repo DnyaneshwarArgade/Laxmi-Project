@@ -125,11 +125,11 @@ function CustomersListing() {
     };
 
 
-    const handleSubmit = (values, { setSubmitting }) => { 
+    const handleSubmit = (values, { setSubmitting }) => {
         let customers = {
             name: values.name,
             phone: values.phone,
-            address: values.address,    
+            address: values.address,
         };
         dispatch(actions.postCustomersData({ data, customers, toggle, setSubmitting }));
         setSubmitting(true);
@@ -204,7 +204,7 @@ function CustomersListing() {
                             className="me-2"
                             onClick={() => setSearchFilter(true)}
                         >
-                             <SearchIcon />
+                            <SearchIcon />
                         </Button>
                         <Button
                             type="reset"
@@ -215,7 +215,7 @@ function CustomersListing() {
                             }}
                             className="me-2"
                         >
-                             <RestartAltIcon />
+                            <RestartAltIcon />
 
                         </Button>
                     </div>
@@ -270,7 +270,7 @@ function CustomersListing() {
                                                         formProps={formProps}
                                                         name="phone"
                                                         label="Enter Phone *"
-                                                        type="number"
+                                                        type="text"
                                                     />
                                                 </InputGroup>
                                             </Col>

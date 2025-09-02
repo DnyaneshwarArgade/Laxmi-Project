@@ -202,7 +202,7 @@ function ItemsListing() {
               className="me-2"
               onClick={() => setSearchFilter(true)}
             >
-                <SearchIcon />
+              <SearchIcon />
             </Button>
             <Button
               type="reset"

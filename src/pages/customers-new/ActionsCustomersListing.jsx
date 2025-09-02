@@ -69,19 +69,46 @@ function ActionsCustomersListing(props) {
     return (
         <div>
             <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
-                <Button className="btn-success p-1" onClick={toggle}>
-                    {/* <FaEdit /> */}
+                {/* <Button className="btn-success p-1" onClick={toggle}>
                       <EditIcon />
-                </Button>
+                </Button> */}
+                <button
+                    className="editButton"
+                    title="Edit"
+                    onClick={toggle}
+                >
+                    <EditIcon
+                        style={{
+                            color: "#1369f5ff", // निळा रंग (तू हवा तो बदलू शकतोस)
+                            fontSize: 20,
+                            display: "block",
+                        }}
+                    />
+                </button>
 
-                <Button
+                {/* <Button
                     className="bg-danger text-white p-1"
                     onClick={() => {
                         deleteSelectedItem(data.id);
                     }}
                 >
                     <DeleteIcon />
-                </Button>
+                </Button> */}
+                <button
+                    className="deleteButton"
+                    title="Delete"
+                    onClick={() => {
+                        deleteSelectedItem(data.id);
+                    }}
+                >
+                    <FaTrash
+                        style={{
+                            color: "#ef4444",
+                            fontSize: 20,
+                            display: "block",
+                        }}
+                    />
+                </button>
             </div>
 
             <Modal className="modal-lg" isOpen={modal} toggle={toggle}>

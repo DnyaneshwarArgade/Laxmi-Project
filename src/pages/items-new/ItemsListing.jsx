@@ -167,19 +167,23 @@ function ItemsListing() {
           {/* Buttons group */}
           <Box sx={{ display: "flex", gap: 1 }}>
             {/* Download Button */}
-            <Button
-              onClick={handleExport}
-              className="gradientButton"
-            >
-              <DownloadIcon />
-            </Button>
+            <Box sx={{ borderRadius: "100%" }}>
+              <Button
+                onClick={handleExport}
+                className="gradientButton"
+              >
+                <DownloadIcon />
+              </Button>
+            </Box>
 
             {/* Add Button (mobile only) */}
-            <Button
-              onClick={toggle} className="gradientButton"
-            >
-              <AddIcon />
-            </Button>
+            <Box sx={{ borderRadius: "100%" }}>
+              <Button
+                onClick={toggle} className="gradientButton"
+              >
+                <AddIcon />
+              </Button>
+            </Box>
           </Box>
         </Box>
 
@@ -198,20 +202,22 @@ function ItemsListing() {
           <div className="d-flex align-items-center" style={{ gap: "5px" }}>
             <Button
               type="button"
-              color="success"
-              className="me-2"
+              // color="success"
+              className="me-2 editButton"
               onClick={() => setSearchFilter(true)}
+              style={{ background: "#dbeafe", color: "#3b82f6", border: "none", borderRadius: "100%", }}
             >
-                <SearchIcon />
+              <SearchIcon />
             </Button>
+
             <Button
               type="reset"
-              color="danger"
               onClick={() => {
                 setSearchValue("");
                 setSearchFilter(false);
               }}
-              className="me-2"
+              className="me-2 editButton"
+              style={{ background: "#dbeafe", color: "red", border: "none", borderRadius: "100%", }}
             >
               <RestartAltIcon />
             </Button>
@@ -273,6 +279,16 @@ function ItemsListing() {
                     <Row style={{ justifyContent: "center" }} className="mt-3">
                       <Col md={4}>
                         <Button
+                          type="reset"
+                          color="danger"
+                          block
+                          className="mt-3"
+                        >
+                          <b>Reset</b>
+                        </Button>
+                      </Col>
+                      <Col md={4}>
+                        <Button
                           type="submit"
                           disabled={formProps.isSubmitting}
                           color="primary"
@@ -280,16 +296,6 @@ function ItemsListing() {
                           className="mt-3"
                         >
                           Submit
-                        </Button>
-                      </Col>
-                      <Col md={4}>
-                        <Button
-                          type="reset"
-                          color="danger"
-                          block
-                          className="mt-3"
-                        >
-                          <b>Reset</b>
                         </Button>
                       </Col>
                     </Row>
@@ -329,7 +335,7 @@ function ItemsListing() {
                 ) : (
                   paginatedRows.map((row) => (
                     <tr key={row.id}>
-                      <td className="text-center">
+                      <td className="text-center w-25">
                         <ActionItemsListing data={row} index={row.id} />
                       </td>
                       <td>
@@ -370,6 +376,7 @@ function ItemsListing() {
                   ))}
                 </Select>
               </div>
+
               <div
                 className="d-flex align-items-center justify-content-center"
                 style={{ gap: "0.5rem" }}

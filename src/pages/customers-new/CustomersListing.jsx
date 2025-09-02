@@ -49,7 +49,7 @@ function CustomersListing() {
         { key: "actions", label: "Actions" },
         { key: "name", label: "Name" },
         { key: "phone", label: "Phone" },
-        { key: "address", label: "Address" },
+        // { key: "address", label: "Address" },
     ];
 
     const [searchFilter, setSearchFilter] = useState(false);
@@ -125,11 +125,11 @@ function CustomersListing() {
     };
 
 
-    const handleSubmit = (values, { setSubmitting }) => { 
+    const handleSubmit = (values, { setSubmitting }) => {
         let customers = {
             name: values.name,
             phone: values.phone,
-            address: values.address,    
+            // address: values.address,
         };
         dispatch(actions.postCustomersData({ data, customers, toggle, setSubmitting }));
         setSubmitting(true);
@@ -167,21 +167,25 @@ function CustomersListing() {
                     </Box>
 
                     {/* Buttons group */}
-                    <Box sx={{ display: "flex", gap: 1 }}>
+                    <Box sx={{ display: "flex", gap: 1, }}>
                         {/* Download Button */}
-                        <Button
-                            onClick={handleExport}
-                            className="gradientButton"
-                        >
-                            <DownloadIcon />
-                        </Button>
+                        <Box sx={{ borderRadius: "100%", }}>
+                            <Button
+                                onClick={handleExport}
+                                className="gradientButton"
+                            >
+                                <DownloadIcon />
+                            </Button>
+                        </Box>
 
                         {/* Add Button (mobile only) */}
-                        <Button
-                            onClick={toggle} className="gradientButton"
-                        >
-                            <AddIcon />
-                        </Button>
+                        <Box sx={{ borderRadius: "100%", }}>
+                            <Button
+                                onClick={toggle} className="gradientButton"
+                            >
+                                <AddIcon />
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
 
@@ -203,8 +207,9 @@ function CustomersListing() {
                             color="success"
                             className="me-2"
                             onClick={() => setSearchFilter(true)}
+                            style={{ background: "#dbeafe", color: "#3b82f6", border: "none", borderRadius: "100%",  }}
                         >
-                             <SearchIcon />
+                            <SearchIcon />
                         </Button>
                         <Button
                             type="reset"
@@ -213,9 +218,10 @@ function CustomersListing() {
                                 setSearchValue("");
                                 setSearchFilter(false);
                             }}
+                            style={{ background: "#dbeafe", color: "red", border: "none", borderRadius: "100%",  }}
                             className="me-2"
                         >
-                             <RestartAltIcon />
+                            <RestartAltIcon />
 
                         </Button>
                     </div>
@@ -236,7 +242,7 @@ function CustomersListing() {
                             initialValues={{
                                 name: "",
                                 phone: "",
-                                address: "",
+                                // address: "",
                             }}
                             onSubmit={handleSubmit}
                             validationSchema={Yup.object().shape({
@@ -270,24 +276,34 @@ function CustomersListing() {
                                                         formProps={formProps}
                                                         name="phone"
                                                         label="Enter Phone *"
-                                                        type="number"
+                                                        type="text"
                                                     />
                                                 </InputGroup>
                                             </Col>
                                         </Row>
                                         <Row className="form-group">
                                             <Col md={12} className="mt-3">
-                                                <InputGroup>
+                                                {/* <InputGroup>
                                                     <CustomTextField
                                                         formProps={formProps}
                                                         name="address"
                                                         label="Enter Address "
                                                     />
-                                                </InputGroup>
+                                                </InputGroup> */}
                                             </Col>
                                         </Row>
 
                                         <Row style={{ justifyContent: "center" }} className="mt-3">
+                                            <Col md={4}>
+                                                <Button
+                                                    type="reset"
+                                                    color="danger"
+                                                    block
+                                                    className="mt-3"
+                                                >
+                                                    <b>Reset</b>
+                                                </Button>
+                                            </Col>
                                             <Col md={4}>
                                                 <Button
                                                     type="submit"
@@ -297,16 +313,6 @@ function CustomersListing() {
                                                     className="mt-3"
                                                 >
                                                     Submit
-                                                </Button>
-                                            </Col>
-                                            <Col md={4}>
-                                                <Button
-                                                    type="reset"
-                                                    color="danger"
-                                                    block
-                                                    className="mt-3"
-                                                >
-                                                    <b>Reset</b>
                                                 </Button>
                                             </Col>
                                         </Row>
@@ -355,7 +361,7 @@ function CustomersListing() {
                                                 </Tooltip>
                                             </td>
                                             <td className="text-center">{row.phone}</td>
-                                            <td className="text-center">{row.address}</td>
+                                            {/* <td className="text-center">{row.address}</td> */}
                                         </tr>
                                     ))
                                 )}

@@ -166,16 +166,64 @@ function ItemsListing() {
           {/* Buttons group */}
           <Box sx={{ display: "flex", gap: 1 }}>
             {/* Download Button */}
-            <Box sx={{ borderRadius: "100%" }}>
-              <Button onClick={handleExport} className="gradientButton">
-                <DownloadIcon />
+            <Box sx={{
+              borderRadius: "50%",
+              width: 44,
+              height: 44,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: 1,
+              bgcolor: "#dbeafe",
+              p: 0,
+            }}>
+              <Button
+                onClick={handleExport}
+                className="gradientButton"
+                style={{
+                  width: 44,
+                  height: 44,
+                  minWidth: 44,
+                  minHeight: 44,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                }}
+              >
+                <DownloadIcon style={{ fontSize: 24 }} />
               </Button>
             </Box>
 
             {/* Add Button (mobile only) */}
-            <Box sx={{ borderRadius: "100%" }}>
-              <Button onClick={toggle} className="gradientButton">
-                <AddIcon />
+            <Box sx={{
+              borderRadius: "50%",
+              width: 44,
+              height: 44,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: 1,
+              bgcolor: "#dbeafe",
+              p: 0,
+            }}>
+              <Button
+                onClick={toggle}
+                className="gradientButton"
+                style={{
+                  width: 44,
+                  height: 44,
+                  minWidth: 44,
+                  minHeight: 44,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                }}
+              >
+                <AddIcon style={{ fontSize: 24 }} />
               </Button>
             </Box>
           </Box>

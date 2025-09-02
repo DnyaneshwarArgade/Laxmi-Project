@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -7,8 +8,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../store/creators";
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -19,11 +21,23 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
+    // Phone validation: must be 10 digits, numeric
+    const phoneRegex = /^\d{10}$/;
+    if (!phone || !password) {
       Swal.fire({
         icon: "warning",
         title: "Missing Fields",
-        text: "⚠️ Please enter Email and Password!",
+        text: "⚠️ Please enter Phone and Password!",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      return;
+    }
+    if (!phoneRegex.test(phone)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid Phone",
+        text: "⚠️ Please enter a valid 10-digit phone number!",
         showConfirmButton: false,
         timer: 2000,
       });
@@ -31,7 +45,7 @@ export default function Login() {
     }
     // Dispatch Redux login
     const resultAction = await dispatch(
-      actions.postLogin({ data: { email, password } })
+      actions.postLogin({ data: { phone, password } })
     );
     if (actions.postLogin.fulfilled.match(resultAction)) {
       const { success, token } = resultAction.payload;
@@ -72,12 +86,17 @@ export default function Login() {
 
         <form onSubmit={handleLogin} style={{ width: "100%" }}>
           <div style={styles.inputContainer}>
-            <label style={styles.label}>Email</label>
+            <label style={styles.label}>Mobile Number</label>
             <input
-              type="email"
-              placeholder="Enter Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="tel"
+              placeholder="Enter Mobile Number"
+              value={phone}
+              maxLength={10}
+              pattern="\d{10}"
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^\d]/g, "");
+                setPhone(val);
+              }}
               style={{ ...styles.input, minWidth: 0 }}
               className="shadow-sm rounded-pill form-control "
             />
@@ -85,14 +104,30 @@ export default function Login() {
 
           <div style={styles.inputContainer}>
             <label style={styles.label}>Password</label>
-            <input
-              type="password"
-              placeholder="Enter Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{ ...styles.input, minWidth: 0 }}
-              className="shadow-sm rounded-pill form-control "
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ ...styles.input, minWidth: 0, paddingRight: 40 }}
+                className="shadow-sm rounded-pill form-control "
+              />
+              <span
+                style={{
+                  position: "absolute",
+                  right: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  color: "#888",
+                  fontSize: 20,
+                }}
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
           </div>
 
           <button

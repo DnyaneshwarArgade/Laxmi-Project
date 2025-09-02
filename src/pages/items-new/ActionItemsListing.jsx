@@ -71,42 +71,54 @@ function ActionItemsListing(props) {
         className="d-flex justify-content-center align-items-center"
         style={{ gap: "0.5rem" }}
       >
-        {/* <Button className="btn-success p-1" onClick={toggle}>
-          <EditIcon />
-        </Button> */}
-
-        <button className="editButton" title="Edit" onClick={toggle}>
-          <EditIcon
-            style={{
-              color: "#3b82f6", // निळा रंग (तू हवा तो बदलू शकतोस)
-              fontSize: 20,
-              display: "block",
-            }}
-          />
-        </button>
-
-        {/* <Button
-          className="bg-danger text-white p-1"
-          onClick={() => {
-            deleteSelectedItem(data.id);
+        <button
+          className="editButton"
+          title="Edit"
+          onClick={toggle}
+          style={{
+            width: 32,
+            height: 32,
+            minWidth: 32,
+            minHeight: 32,
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#dbeafe",
+            border: "none",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+            padding: 0,
+            cursor: "pointer",
+            transition: "background 0.2s",
           }}
         >
-           <DeleteIcon />
-        </Button> */}
+          <EditIcon style={{ color: "#3b82f6", fontSize: 16 }} />
+        </button>
+
         <button
           className="deleteButton"
           title="Delete"
           onClick={() => {
             deleteSelectedItem(data.id);
           }}
+          style={{
+            width: 30,
+            height: 30,
+            minWidth: 30,
+            minHeight: 30,
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#dbeafe",
+            border: "none",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+            padding: 0,
+            cursor: "pointer",
+            transition: "background 0.2s",
+          }}
         >
-          <FaTrash
-            style={{
-              color: "#ef4444",
-              fontSize: 20,
-              display: "block",
-            }}
-          />
+          <FaTrash style={{ color: "#ef4444", fontSize: 16 }} />
         </button>
       </div>
 

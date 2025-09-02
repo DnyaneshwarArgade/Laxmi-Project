@@ -36,74 +36,40 @@ const Header = () => {
   };
 
   return (
-    <header
-      className="common-header light-header"
-      style={{
-        background: "linear-gradient(90deg, #36d1dc 0%, #5b86e5 100%)",
-        boxShadow: "0 2px 12px rgba(59,130,246,0.08)",
-        padding: "10px 0",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        borderRadius: "0 0 18px 18px",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <img
-          src={Logo}
-          alt="Logo"
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: "50%",
-            boxShadow: "0 2px 8px rgba(59,130,246,0.12)",
-            border: "2px solid #fff",
-            background: "#fff",
-            marginLeft: 18,
-          }}
-        />
+    <header className="common-header light-header">
+      <div className="header-left">
+        <img src={Logo} alt="Logo" className="header-logo" />
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 18, marginRight: 18 }}>
+      <div className="header-right">
         <span
+          className="welcome"
           style={{
-            color: "#fff",
-            fontWeight: 500,
-            fontSize: 16,
-            background: "rgba(255,255,255,0.12)",
-            padding: "6px 16px",
-            borderRadius: 12,
-            boxShadow: "0 1px 4px rgba(59,130,246,0.08)",
-          }}
-        >
-          Welcome, {name}
-        </span>
-        <button
-          className="logout-btn mobile-friendly"
-          onClick={handleLogout}
-          title="Logout"
-          style={{
-            background: "linear-gradient(90deg, #ff6a00, #ee0979)",
-            border: "none",
-            borderRadius: "50%",
-            width: 40,
-            height: 40,
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            color: "#fff",
-            boxShadow: "0 2px 8px rgba(59,130,246,0.10)",
-            cursor: "pointer",
-            transition: "background 0.2s",
+            gap: 4,
+            fontSize: "0.98rem",
+            padding: "2px 10px",
+            background: "#f5f5f5",
+            borderRadius: 8,
+            color: "#1976d2",
+            fontWeight: 500,
+            border: "1px solid #e3e3e3",
+            minWidth: 0,
+            boxShadow: "0 1px 4px rgba(25,118,210,0.06)",
           }}
         >
-          <FiLogOut size={22} />
+          <span style={{ fontWeight: 500, fontSize: "0.98em", color: "#1976d2" }}>Welcome, {name}</span>
+        </span>
+        <button
+          className="logout-btn"
+          onClick={handleLogout}
+          title="Logout"
+        >
+          <FiLogOut size={20} />
         </button>
       </div>
     </header>
   );
-};
+}
 
 export default Header;

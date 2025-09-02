@@ -74,14 +74,28 @@ function ActionsCustomersListing(props) {
         className="d-flex justify-content-center align-items-center"
         style={{ gap: "0.5rem" }}
       >
-        <button className="editButton" title="Edit" onClick={toggle}>
-          <EditIcon
-            style={{
-              color: "#1369f5ff",
-              fontSize: 20,
-              display: "block",
-            }}
-          />
+        <button
+          className="editButton"
+          title="Edit"
+          onClick={toggle}
+          style={{
+            width: 30,
+            height: 30,
+            minWidth: 30,
+            minHeight: 30,
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#dbeafe",
+            border: "none",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+            padding: 0,
+            cursor: "pointer",
+            transition: "background 0.2s",
+          }}
+        >
+          <EditIcon style={{ color: "#1369f5ff", fontSize: 16 }} />
         </button>
         <button
           className="deleteButton"
@@ -89,14 +103,24 @@ function ActionsCustomersListing(props) {
           onClick={() => {
             deleteSelectedItem(data.id);
           }}
+          style={{
+            width: 32,
+            height: 32,
+            minWidth: 32,
+            minHeight: 32,
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#dbeafe",
+            border: "none",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+            padding: 0,
+            cursor: "pointer",
+            transition: "background 0.2s",
+          }}
         >
-          <FaTrash
-            style={{
-              color: "#ef4444",
-              fontSize: 20,
-              display: "block",
-            }}
-          />
+          <FaTrash style={{ color: "#ef4444", fontSize: 16 }} />
         </button>
       </div>
 

@@ -28,9 +28,10 @@ import {
   FaRupeeSign,
   FaRegFilePdf,
   FaTrash,
-  FaPhone,
 } from "react-icons/fa";
 import { FaSquarePhone } from "react-icons/fa6";
+import AddIcon from "@mui/icons-material/Add";
+import { FiX } from "react-icons/fi";
 const buttonStyles = {
   primary: {
     background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", // Customer page color
@@ -203,8 +204,8 @@ export default function Orders() {
     if (!q) return orders;
     return Array.isArray(orders)
       ? orders.filter((order) =>
-        (order.customerName || "").toLowerCase().includes(q)
-      )
+          (order.customerName || "").toLowerCase().includes(q)
+        )
       : [];
   }, [orders, search]);
 
@@ -313,7 +314,7 @@ export default function Orders() {
       setEditIndex(null);
       resetForm();
     };
-    const setSubmitting = () => { };
+    const setSubmitting = () => {};
 
     if (editIndex !== null && orders[editIndex]?.id) {
       dispatch(
@@ -629,23 +630,37 @@ export default function Orders() {
               Orders
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            onClick={openForm}
+          <Box
             sx={{
-              width: 40,
-              height: 40,
-              minWidth: 40,
               borderRadius: "50%",
-              textTransform: "none",
-              fontSize: 20,
-              fontWeight: "bold",
-              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              display: { xs: "flex", sm: "none" },
+              width: 44,
+              height: 44,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: 1,
+              bgcolor: "#dbeafe",
+              p: 0,
             }}
           >
-            +
-          </Button>
+            <Button
+              onClick={openForm}
+              className="gradientButton"
+              style={{
+                width: 44,
+                height: 44,
+                minWidth: 44,
+                minHeight: 44,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 0,
+              }}
+            >
+              <AddIcon style={{ fontSize: 24 }} htmlColor="#fff" />
+            </Button>
+          </Box>
         </Box>
 
         <Box
@@ -954,7 +969,9 @@ export default function Orders() {
                       }}
                       title="Call Customer"
                     >
-                      <FaSquarePhone style={{ fontSize: 20, color: "#0b5ed7" }} />
+                      <FaSquarePhone
+                        style={{ fontSize: 20, color: "#0b5ed7" }}
+                      />
                     </a>
                     <button
                       style={{
@@ -1037,14 +1054,25 @@ export default function Orders() {
                 {editIndex !== null ? "Edit Order" : "Create New Order"}
               </span>
               <button
-                style={themedButtonStyles.ghost}
-                onClick={() => {
-                  setShowForm(false);
-                  setEditIndex(null);
-                }}
-              >
-                ✖
-              </button>
+                  style={{
+                    ...themedButtonStyles.ghost,
+                    width: 44,
+                    height: 44,
+                    minWidth: 44,
+                    minHeight: 44,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 0,
+                  }}
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditIndex(null);
+                  }}
+                >
+                  <FiX style={{ fontSize: 24, color: "#fff" }} />
+                </button>
             </div>
             <form
               onSubmit={handleSubmit}
@@ -1129,7 +1157,9 @@ export default function Orders() {
                       type="date"
                       name="date"
                       value={formData.date}
-                      onChange={(e) => setFormData((p) => ({ ...p, date: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, date: e.target.value }))
+                      }
                       style={{
                         ...themedStyles.input,
                         fontSize: 16,
@@ -1538,12 +1568,23 @@ export default function Orders() {
                   Download PDF
                 </button>
                 <button
-                  style={themedButtonStyles.ghost}
-                  title="Close"
-                  onClick={() => setShowInvoice(false)}
-                >
-                  ✖
-                </button>
+                    style={{
+                      ...themedButtonStyles.ghost,
+                      width: 44,
+                      height: 44,
+                      minWidth: 44,
+                      minHeight: 44,
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: 0,
+                    }}
+                    title="Close"
+                    onClick={() => setShowInvoice(false)}
+                  >
+                    <FiX style={{ fontSize: 24, color: "#fff" }} />
+                  </button>
               </div>
             </div>
 
@@ -1585,7 +1626,12 @@ export default function Orders() {
                         <td style={{ padding: 5, width: "30%" }}>
                           <b>Bill No.:</b> INV_{selectedOrder.id || "-"}
                           <br />
-                          <b>Date:</b> {selectedOrder.date && selectedOrder.date !== null && selectedOrder.date !== "" ? formatDateDMY(selectedOrder.date) : "-"}
+                          <b>Date:</b>{" "}
+                          {selectedOrder.date &&
+                          selectedOrder.date !== null &&
+                          selectedOrder.date !== ""
+                            ? formatDateDMY(selectedOrder.date)
+                            : "-"}
                         </td>
                       </tr>
                     </tbody>
@@ -1648,7 +1694,13 @@ export default function Orders() {
                     </tbody>
                   </table>
 
-                  <div style={{ padding: 5, borderTop: "1px solid #000", textTransform: "capitalize" }}>
+                  <div
+                    style={{
+                      padding: 5,
+                      borderTop: "1px solid #000",
+                      textTransform: "capitalize",
+                    }}
+                  >
                     <div style={invoiceStyles.small}>
                       <b>Bill Amount in Words:</b>{" "}
                       {numberToWordsIndian(selectedOrder.total_amount) || "—"}
@@ -1659,7 +1711,6 @@ export default function Orders() {
                     </div>
                   </div>
 
-                  
                   {/* Customer & Laxmi General Signatures */}
                   <div
                     style={{

@@ -203,9 +203,9 @@ function ItemsListing() {
             <Button
               type="button"
               // color="success"
-              className="me-2 editButton"
+              className="me-2"
               onClick={() => setSearchFilter(true)}
-              style={{ background: "#dbeafe", color: "#3b82f6", border: "none", borderRadius: "100%", }}
+              style={{ background: "#dbeafe", color: "#3b82f6", border: "none", borderRadius: "100%", height: 44 }}
             >
               <SearchIcon />
             </Button>
@@ -216,8 +216,8 @@ function ItemsListing() {
                 setSearchValue("");
                 setSearchFilter(false);
               }}
-              className="me-2 editButton"
-              style={{ background: "#dbeafe", color: "red", border: "none", borderRadius: "100%", }}
+              className="me-2"
+              style={{ background: "#dbeafe", color: "red", border: "none", borderRadius: "100%", height: 44 }}
             >
               <RestartAltIcon />
             </Button>

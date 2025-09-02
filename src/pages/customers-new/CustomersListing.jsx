@@ -207,7 +207,7 @@ function CustomersListing() {
                             color="success"
                             className="me-2"
                             onClick={() => setSearchFilter(true)}
-                            style={{ background: "#dbeafe", color: "#3b82f6", border: "none", borderRadius: "100%",  }}
+                            style={{ background: "#dbeafe", color: "#3b82f6", border: "none", borderRadius: "100%", height: 44 }}
                         >
                             <SearchIcon />
                         </Button>
@@ -218,7 +218,7 @@ function CustomersListing() {
                                 setSearchValue("");
                                 setSearchFilter(false);
                             }}
-                            style={{ background: "#dbeafe", color: "red", border: "none", borderRadius: "100%",  }}
+                            style={{ background: "#dbeafe", color: "red", border: "none", borderRadius: "100%", height: 44 }}
                             className="me-2"
                         >
                             <RestartAltIcon />

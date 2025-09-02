@@ -352,7 +352,7 @@ function CustomersListing() {
                                 ) : (
                                     paginatedRows.map((row) => (
                                         <tr key={row.id}>
-                                            <td className="text-center">
+                                            <td className="text-center actionColumn">
                                                 <ActionCustomersListing data={row} index={row.id} />
                                             </td>
                                             <td>

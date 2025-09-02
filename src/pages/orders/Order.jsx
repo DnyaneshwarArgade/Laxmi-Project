@@ -863,20 +863,22 @@ export default function Orders() {
                           {order.customerName || "—"}
                         </span>
                       </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                        }}
-                      >
-                        <FaCalendarAlt
-                          style={{ color: "#764ba2", fontSize: 16 }}
-                        />
-                        <span style={{ fontSize: 14, color: "#5b6b8c" }}>
-                          {formatDateDMY(order.date)}
-                        </span>
-                      </div>
+                      {order.date ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
+                          <FaCalendarAlt
+                            style={{ color: "#764ba2", fontSize: 16 }}
+                          />
+                          <span style={{ fontSize: 14, color: "#5b6b8c" }}>
+                            {formatDateDMY(order.date)}
+                          </span>
+                        </div>
+                      ) : null}
                       <div
                         style={{
                           display: "flex",

@@ -26,7 +26,7 @@ import { FaSearch } from "react-icons/fa";
 import { RiResetRightFill } from "react-icons/ri";
 import LinerLoader from "../../Component/loaders/LinerLoader";
 import { Box, Typography } from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download"
+import DownloadIcon from "@mui/icons-material/Download";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import SearchIcon from "@mui/icons-material/Search";
@@ -58,26 +58,26 @@ function ItemsListing() {
   const rows = items?.isLoading
     ? []
     : items?.data?.length > 0
-      ? items?.data?.filter((item) => {
+    ? items?.data?.filter((item) => {
         return (
           (searchValue && searchFilter
             ? item?.name
-              ?.toLowerCase()
-              .includes(searchValue.trim().toLowerCase())
+                ?.toLowerCase()
+                .includes(searchValue.trim().toLowerCase())
             : item) ||
           (searchValue && searchFilter
             ? item?.type
-              ?.toLowerCase()
-              .includes(searchValue.trim().toLowerCase())
+                ?.toLowerCase()
+                .includes(searchValue.trim().toLowerCase())
             : item) ||
           (searchValue && searchFilter
             ? item?.address
-              ?.toLowerCase()
-              .includes(searchValue.trim().toLowerCase())
+                ?.toLowerCase()
+                .includes(searchValue.trim().toLowerCase())
             : item)
         );
       })
-      : [];
+    : [];
 
   // Pagination logic
   const totalRows = rows.length;
@@ -123,7 +123,6 @@ function ItemsListing() {
     saveAs(data, "items_data.xlsx");
   };
 
-
   const handleSubmit = (values, { setSubmitting }) => {
     let items = new FormData();
     items.append("name", values.name);
@@ -168,19 +167,14 @@ function ItemsListing() {
           <Box sx={{ display: "flex", gap: 1 }}>
             {/* Download Button */}
             <Box sx={{ borderRadius: "100%" }}>
-              <Button
-                onClick={handleExport}
-                className="gradientButton"
-              >
+              <Button onClick={handleExport} className="gradientButton">
                 <DownloadIcon />
               </Button>
             </Box>
 
             {/* Add Button (mobile only) */}
             <Box sx={{ borderRadius: "100%" }}>
-              <Button
-                onClick={toggle} className="gradientButton"
-              >
+              <Button onClick={toggle} className="gradientButton">
                 <AddIcon />
               </Button>
             </Box>
@@ -205,7 +199,13 @@ function ItemsListing() {
               // color="success"
               className="me-2"
               onClick={() => setSearchFilter(true)}
-              style={{ background: "#dbeafe", color: "#3b82f6", border: "none", borderRadius: "100%", height: 44 }}
+              style={{
+                background: "#dbeafe",
+                color: "#3b82f6",
+                border: "none",
+                borderRadius: "100%",
+                height: 44,
+              }}
             >
               <SearchIcon />
             </Button>
@@ -217,7 +217,13 @@ function ItemsListing() {
                 setSearchFilter(false);
               }}
               className="me-2"
-              style={{ background: "#dbeafe", color: "red", border: "none", borderRadius: "100%", height: 44 }}
+              style={{
+                background: "#dbeafe",
+                color: "red",
+                border: "none",
+                borderRadius: "100%",
+                height: 44,
+              }}
             >
               <RestartAltIcon />
             </Button>
@@ -311,7 +317,7 @@ function ItemsListing() {
         {isLoading ? (
           <CircularLoading />
         ) : (
-          <div className="table-responsive" style={{ paddingBottom: '5rem' }}>
+          <div className="table-responsive" style={{ paddingBottom: "5rem" }}>
             <table
               className="table table-bordered table-striped"
               style={{ minWidth: "320px" }}
@@ -335,7 +341,7 @@ function ItemsListing() {
                 ) : (
                   paginatedRows.map((row) => (
                     <tr key={row.id}>
-                      <td className="text-center w-25">
+                      <td className="text-center actionColumn">
                         <ActionItemsListing data={row} index={row.id} />
                       </td>
                       <td>

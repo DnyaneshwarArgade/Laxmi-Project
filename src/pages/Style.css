@@ -51,3 +51,7 @@
    height: 20px;
   width: 16px;
 }
+.actionColumn{
+  width: 80px;
+  text-align: center;
+}

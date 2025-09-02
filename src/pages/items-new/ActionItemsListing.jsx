@@ -67,16 +67,15 @@ function ActionItemsListing(props) {
 
   return (
     <div>
-      <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ gap: "0.5rem" }}
+      >
         {/* <Button className="btn-success p-1" onClick={toggle}>
           <EditIcon />
         </Button> */}
 
-        <button
-          className="editButton"
-          title="Edit"
-          onClick={toggle}
-        >
+        <button className="editButton" title="Edit" onClick={toggle}>
           <EditIcon
             style={{
               color: "#3b82f6", // निळा रंग (तू हवा तो बदलू शकतोस)
@@ -170,7 +169,12 @@ function ActionItemsListing(props) {
                       </Button>
                     </Col>
                     <Col md={4}>
-                      <Button type="reset" color="danger" block className="mt-3">
+                      <Button
+                        type="reset"
+                        color="danger"
+                        block
+                        className="mt-3"
+                      >
                         <b>Reset</b>
                       </Button>
                     </Col>

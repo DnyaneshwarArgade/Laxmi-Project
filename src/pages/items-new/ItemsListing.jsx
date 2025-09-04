@@ -166,17 +166,19 @@ function ItemsListing() {
           {/* Buttons group */}
           <Box sx={{ display: "flex", gap: 1 }}>
             {/* Download Button */}
-            <Box sx={{
-              borderRadius: "50%",
-              width: 44,
-              height: 44,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: 1,
-              bgcolor: "#dbeafe",
-              p: 0,
-            }}>
+            <Box
+              sx={{
+                borderRadius: "50%",
+                width: 44,
+                height: 44,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: 1,
+                bgcolor: "#dbeafe",
+                p: 0,
+              }}
+            >
               <Button
                 onClick={handleExport}
                 className="gradientButton"
@@ -197,17 +199,19 @@ function ItemsListing() {
             </Box>
 
             {/* Add Button (mobile only) */}
-            <Box sx={{
-              borderRadius: "50%",
-              width: 44,
-              height: 44,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: 1,
-              bgcolor: "#dbeafe",
-              p: 0,
-            }}>
+            <Box
+              sx={{
+                borderRadius: "50%",
+                width: 44,
+                height: 44,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: 1,
+                bgcolor: "#dbeafe",
+                p: 0,
+              }}
+            >
               <Button
                 onClick={toggle}
                 className="gradientButton"
@@ -333,16 +337,6 @@ function ItemsListing() {
                     <Row style={{ justifyContent: "center" }} className="mt-3">
                       <Col md={4}>
                         <Button
-                          type="reset"
-                          color="danger"
-                          block
-                          className="mt-3"
-                        >
-                          <b>Reset</b>
-                        </Button>
-                      </Col>
-                      <Col md={4}>
-                        <Button
                           type="submit"
                           disabled={formProps.isSubmitting}
                           color="primary"
@@ -350,6 +344,16 @@ function ItemsListing() {
                           className="mt-3"
                         >
                           Submit
+                        </Button>
+                      </Col>
+                      <Col md={4}>
+                        <Button
+                          type="reset"
+                          color="danger"
+                          block
+                          className="mt-3"
+                        >
+                          <b>Reset</b>
                         </Button>
                       </Col>
                     </Row>

@@ -166,6 +166,7 @@ export default function Orders() {
     customerName: "",
     contact: "",
     items: [],
+    paid_amount: "0",
   });
 
   // Fetch API data
@@ -253,6 +254,22 @@ export default function Orders() {
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
+  // Calculate unpaid_amount
+  const grandTotal = (formData.items || []).reduce(
+    (s, it) => s + Number(it.qty || 0) * Number(it.price || 0),
+    0
+  );
+  // Set paid_amount to grandTotal by default when items change and paid_amount is empty or zero
+  useEffect(() => {
+    // If user entered more than grandTotal, reset to grandTotal
+    if (Number(formData.paid_amount) > grandTotal) {
+      setFormData((prev) => ({ ...prev, paid_amount: grandTotal.toString() }));
+    }
+  }, [grandTotal, showForm]);
+
+  const paidAmount = Math.min(Number(formData.paid_amount || 0), grandTotal);
+  const unpaidAmount = Math.max(grandTotal - paidAmount, 0);
+
   const handleItemChange = (i, field, value) => {
     const v =
       field === "qty" || field === "price" ? parseFloat(value || 0) : value;
@@ -277,6 +294,7 @@ export default function Orders() {
       customerName: "",
       contact: "",
       items: [],
+      paid_amount: "0",
     });
 
   // Add/Edit Order (API)
@@ -295,15 +313,19 @@ export default function Orders() {
     );
 
     // Prepare payload as per backend
+    const unpaid_amount = Math.max(
+      total_amount - Number(formData.paid_amount || 0),
+      0
+    );
     const payload = {
       customer_id: formData.customerId,
       discription: "", // Add description if needed
       date: formData.date && formData.date !== "" ? formData.date : null,
       total_amount,
-      paid_amount: "0",
-      unpaid_amount: total_amount,
+      paid_amount: formData.paid_amount || "0",
+      unpaid_amount,
       discount: "0",
-      status: "Completed",
+      status: unpaid_amount === 0 ? "Completed" : "Pending",
       has_returned: false,
       returned_items: [],
       items,
@@ -630,12 +652,13 @@ export default function Orders() {
               Orders
             </Typography>
           </Box>
+          {/* Only show Add button on mobile view */}
           <Box
             sx={{
               borderRadius: "50%",
               width: 44,
               height: 44,
-              display: "flex",
+              display: { xs: "flex", sm: "none" },
               alignItems: "center",
               justifyContent: "center",
               boxShadow: 1,
@@ -731,6 +754,7 @@ export default function Orders() {
               }
             />
           </Box>
+          {/* Only show Add button on desktop view */}
           <Button
             variant="contained"
             onClick={openForm}
@@ -1054,25 +1078,25 @@ export default function Orders() {
                 {editIndex !== null ? "Edit Order" : "Create New Order"}
               </span>
               <button
-                  style={{
-                    ...themedButtonStyles.ghost,
-                    width: 44,
-                    height: 44,
-                    minWidth: 44,
-                    minHeight: 44,
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: 0,
-                  }}
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditIndex(null);
-                  }}
-                >
-                  <FiX style={{ fontSize: 24, color: "#fff" }} />
-                </button>
+                style={{
+                  ...themedButtonStyles.ghost,
+                  width: 44,
+                  height: 44,
+                  minWidth: 44,
+                  minHeight: 44,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                }}
+                onClick={() => {
+                  setShowForm(false);
+                  setEditIndex(null);
+                }}
+              >
+                <FiX style={{ fontSize: 24, color: "#fff" }} />
+              </button>
             </div>
             <form
               onSubmit={handleSubmit}
@@ -1503,23 +1527,62 @@ export default function Orders() {
                     borderTop: "1px solid #e5e7eb",
                     color: "#18181b",
                     display: "flex",
-                    justifyContent: "flex-end",
+                    flexDirection: "column",
+                    alignItems: "flex-end",
                     fontWeight: "bold",
                     fontSize: 17,
                     background: "#f8fafc",
                     borderRadius: 0,
                   }}
                 >
-                  <span style={{ marginRight: 18 }}>Grand Total: </span>
-                  <span>
-                    {plainINR(
-                      (formData.items || []).reduce(
-                        (s, it) =>
-                          s + Number(it.qty || 0) * Number(it.price || 0),
-                        0
-                      )
-                    )}
-                  </span>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <span style={{ marginRight: 18 }}>Grand Total: </span>
+                    <span>{plainINR(grandTotal)}</span>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <span style={{ marginRight: 18 }}>Paid Amount: </span>
+                    <input
+                      type="number"
+                      min="0"
+                      max={grandTotal}
+                      name="paid_amount"
+                      value={formData.paid_amount}
+                      onChange={(e) => {
+                        let value = e.target.value;
+                        if (Number(value) > grandTotal)
+                          value = grandTotal.toString();
+                        setFormData((p) => ({ ...p, paid_amount: value }));
+                      }}
+                      placeholder="Enter paid amount"
+                      style={{
+                        width: "120px",
+                        background: "#fff",
+                        color: "#18181b",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        padding: "4px 8px",
+                        fontSize: 15,
+                        textAlign: "right",
+                        fontWeight: "bold",
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ marginRight: 18 }}>Unpaid Amount: </span>
+                    <span>{plainINR(unpaidAmount)}</span>
+                  </div>
                 </div>
               </div>
               <div
@@ -1568,23 +1631,23 @@ export default function Orders() {
                   Download PDF
                 </button>
                 <button
-                    style={{
-                      ...themedButtonStyles.ghost,
-                      width: 44,
-                      height: 44,
-                      minWidth: 44,
-                      minHeight: 44,
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: 0,
-                    }}
-                    title="Close"
-                    onClick={() => setShowInvoice(false)}
-                  >
-                    <FiX style={{ fontSize: 24, color: "#fff" }} />
-                  </button>
+                  style={{
+                    ...themedButtonStyles.ghost,
+                    width: 44,
+                    height: 44,
+                    minWidth: 44,
+                    minHeight: 44,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 0,
+                  }}
+                  title="Close"
+                  onClick={() => setShowInvoice(false)}
+                >
+                  <FiX style={{ fontSize: 24, color: "#fff" }} />
+                </button>
               </div>
             </div>
 
@@ -1604,9 +1667,9 @@ export default function Orders() {
                     <div style={invoiceStyles.subTitle}>
                       शालेय साहित्य, ऑफिस स्टेशनरी, गिफ्ट वस्तू, खेळणी,
                       <br />
-                      गॉगल्स, रहिवासी हायस्कूल समोर,
+                      गॉगल्स, रेसिडेन्शियल हायस्कूल समोर,
                       <br />
-                      मिरी रोड, शेवगाव, जि. अहमदनगर
+                      मिरी रोड, शेवगाव, जि. अहिल्यानगर
                     </div>
                     <div style={invoiceStyles.contact}>
                       मो. नं. ९८५०८३७४००, ९८५०३३२३५६
@@ -1685,15 +1748,22 @@ export default function Orders() {
                           </td>
                         </tr>
                       )}
-                      <tr className="spaceRow">
-                        <td
-                          colSpan={5}
-                          style={{ height: 40, border: "none" }}
-                        ></td>
-                      </tr>
                     </tbody>
                   </table>
-
+                  <div style={invoiceStyles.billFooter}>
+                    <span>Bill Amount:</span>
+                    <span>&#8377;&nbsp;{selectedOrder.total_amount}</span>
+                  </div>
+                  <div style={invoiceStyles.billFooter}>
+                    <span>Paid Amount:</span>
+                    <span>&#8377;&nbsp;{selectedOrder.paid_amount}</span>
+                  </div>
+                  {Number(selectedOrder.unpaid_amount) > 0 && (
+                    <div style={invoiceStyles.billFooter}>
+                      <span>Unpaid Amount:</span>
+                      <span>&#8377;&nbsp;{selectedOrder.unpaid_amount}</span>
+                    </div>
+                  )}
                   <div
                     style={{
                       padding: 5,
@@ -1705,12 +1775,21 @@ export default function Orders() {
                       <b>Bill Amount in Words:</b>{" "}
                       {numberToWordsIndian(selectedOrder.total_amount) || "—"}
                     </div>
-                    <div style={invoiceStyles.billFooter}>
-                      <span>Bill Amount:</span>
-                      <span>{selectedOrder.total_amount}</span>
+                  </div>
+                  <div
+                    style={{
+                      padding: 5,
+                      borderTop: "1px solid #000",
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    <div style={invoiceStyles.small}>
+                      <b>Bank Details:</b>{" "}
+                      <div>Account name-Laxmi general</div>
+                      <div>Account number-42100200000374</div>
+                      <div>IFSC Code-BARB0SHEVGA</div>
                     </div>
                   </div>
-
                   {/* Customer & Laxmi General Signatures */}
                   <div
                     style={{

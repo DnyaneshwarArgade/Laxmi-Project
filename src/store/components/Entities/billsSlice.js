@@ -92,7 +92,7 @@ export const updateBillsData = createAsyncThunk(
 
       dispatch(billsGetData(data));
       dispatch(customersGetData(data));
-      dispatch(billsGetByCustomer(data));
+      // dispatch(billsGetByCustomer(data));
       showSuccessAlert("Order Successfully Updated!");
       toggle?.();
       setSubmitting?.(false);

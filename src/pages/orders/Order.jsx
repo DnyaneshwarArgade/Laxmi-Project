@@ -32,6 +32,8 @@ import {
 import { FaSquarePhone } from "react-icons/fa6";
 import AddIcon from "@mui/icons-material/Add";
 import { FiX } from "react-icons/fi";
+import EditOrderModal from "./EditOrderModal";
+import { MdEdit } from "react-icons/md";
 const buttonStyles = {
   primary: {
     background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)", // Customer page color
@@ -130,7 +132,8 @@ export default function Orders() {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state.login);
   const token = login?.token;
-
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editOrderData, setEditOrderData] = useState(null);
   // API data
   const { bills, isLoading, isPostLoading, isUpdateLoading, error } =
     useSelector((state) => state.entities.bills);
@@ -141,7 +144,10 @@ export default function Orders() {
   const { items, isLoading: itemsLoading } = useSelector(
     (state) => state.entities.items
   );
-
+  const handleEditOrder = (order) => {
+    setEditOrderData(order);
+    setShowEditModal(true);
+  };
   // Lists for Autocomplete
   const customerList = useMemo(() => {
     if (Array.isArray(customers)) return customers;
@@ -1024,6 +1030,26 @@ export default function Orders() {
                         }}
                       />
                     </button>
+                    <button
+                      style={{
+                        background: "#e0e7ff",
+                        color: "#3730a3",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "8px 12px",
+                        fontWeight: 700,
+                        fontSize: 16,
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 6,
+                      }}
+                      title="Edit Order"
+                      onClick={() => handleEditOrder(order)}
+                    >
+                      <MdEdit color="#111106ff" fontSize={20} display="block" />
+                    </button>
                   </div>
                 </div>
               );
@@ -1042,7 +1068,13 @@ export default function Orders() {
           )}
         </div>
       )}
-
+      {showEditModal && editOrderData && (
+        <EditOrderModal
+          isOpen={showEditModal}
+          toggle={() => setShowEditModal(false)}
+          order={editOrderData}
+        />
+      )}
       {showForm && (
         <div style={themedStyles.modal} role="dialog" aria-modal="true">
           <div
@@ -1065,7 +1097,6 @@ export default function Orders() {
               style={{
                 ...themedStyles.invoiceBar,
                 background: "#f8fafc",
-                //color:"(90deg, #667eea 0%, #764ba2 100%)",
                 borderBottom: "#e6e8f0",
                 flex: "0 0 auto",
                 fontSize: 20,
@@ -1784,8 +1815,7 @@ export default function Orders() {
                     }}
                   >
                     <div style={invoiceStyles.small}>
-                      <b>Bank Details:</b>{" "}
-                      <div>Account name-Laxmi general</div>
+                      <b>Bank Details:</b> <div>Account name-Laxmi general</div>
                       <div>Account number-42100200000374</div>
                       <div>IFSC Code-BARB0SHEVGA</div>
                     </div>

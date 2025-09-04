@@ -861,19 +861,19 @@ export default function Orders() {
                   style={{
                     ...themedStyles.card,
                     display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: 12,
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
+                    alignItems: "stretch",
+                    gap: 8,
                     padding: "12px 16px",
                     margin: "0 0 8px 0",
                     boxShadow: "0 2px 8px rgba(59,130,246,0.08)",
                     borderRadius: 14,
                     minHeight: 70,
-                    flexWrap: "wrap",
+                    position: "relative",
                   }}
                 >
-                  {/* Left: Basic Details */}
+                  {/* Left: Basic Details (column layout) */}
                   <div
                     style={{
                       display: "flex",
@@ -881,6 +881,7 @@ export default function Orders() {
                       gap: 6,
                       minWidth: 0,
                       flex: 1,
+                      position: "relative",
                     }}
                   >
                     <div
@@ -890,70 +891,54 @@ export default function Orders() {
                         gap: 6,
                       }}
                     >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                        }}
-                      >
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <FaUser style={{ color: "#667eea", fontSize: 18 }} />
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            fontSize: 17,
-                            color: "#0b1b3a",
-                          }}
-                        >
+                        <span style={{ fontWeight: 700, fontSize: 17, color: "#0b1b3a" }}>
                           {order.customerName || "—"}
                         </span>
                       </div>
-                      {order.date ? (
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 8,
-                          }}
-                        >
-                          <FaCalendarAlt
-                            style={{ color: "#764ba2", fontSize: 16 }}
-                          />
+                      {order.date && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <FaCalendarAlt style={{ color: "#764ba2", fontSize: 16 }} />
                           <span style={{ fontSize: 14, color: "#5b6b8c" }}>
                             {formatDateDMY(order.date)}
                           </span>
                         </div>
-                      ) : null}
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                        }}
-                      >
-                        <FaRupeeSign
-                          style={{ color: "#16a34a", fontSize: 16 }}
-                        />
-                        <span
-                          style={{
-                            fontSize: 15,
-                            color: "#065f46",
-                            fontWeight: 600,
-                          }}
-                        >
+                      )}
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <FaRupeeSign style={{ color: "#16a34a", fontSize: 16 }} />
+                        <span style={{ fontSize: 15, color: "#065f46", fontWeight: 600 }}>
                           {order.total_amount}
                         </span>
                       </div>
                     </div>
+                    {/* Status badge at right corner */}
+                    <div style={{ position: "absolute", top: 0, right: 0 }}>
+                      <span
+                        style={{
+                          background: order.status === "Completed" ? "#dcfce7" : "#eef2ff",
+                          color: order.status === "Completed" ? "#16a34a" : "#3730a3",
+                          borderRadius: 8,
+                          padding: "4px 12px",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          boxShadow: "0 1px 4px rgba(59,130,246,0.08)",
+                        }}
+                      >
+                        {order.status || "Pending"}
+                      </span>
+                    </div>
                   </div>
-                  {/* Right: Action Buttons */}
+                  {/* Bottom row: Action Buttons centered */}
                   <div
                     style={{
                       display: "flex",
-                      flexDirection: "column",
-                      gap: 8,
+                      flexDirection: "row",
+                      gap: 16,
                       alignItems: "center",
-                      minWidth: 0,
+                      justifyContent: "center",
+                      width: "100%",
+                      marginTop: 8,
                     }}
                   >
                     <button
@@ -975,9 +960,7 @@ export default function Orders() {
                       title="View Invoice"
                       onClick={() => handleView(order)}
                     >
-                      <FaRegFilePdf
-                        style={{ fontSize: 20, color: "#0b5ed7" }}
-                      />
+                      <FaRegFilePdf style={{ fontSize: 20, color: "#0b5ed7" }} />
                     </button>
                     <a
                       href={`tel:${order.customer?.phone}`}
@@ -999,9 +982,7 @@ export default function Orders() {
                       }}
                       title="Call Customer"
                     >
-                      <FaSquarePhone
-                        style={{ fontSize: 20, color: "#0b5ed7" }}
-                      />
+                      <FaSquarePhone style={{ fontSize: 20, color: "#0b5ed7" }} />
                     </a>
                     <button
                       style={{
@@ -1022,34 +1003,30 @@ export default function Orders() {
                       title="Delete"
                       onClick={() => handleDelete(originalIndex)}
                     >
-                      <FaTrash
+                      <FaTrash style={{ color: "#ef4444", fontSize: 20, display: "block" }} />
+                    </button>
+                    {order.status !== "Completed" && (
+                      <button
                         style={{
-                          color: "#ef4444",
-                          fontSize: 20,
-                          display: "block",
+                          background: "#e0e7ff",
+                          color: "#3730a3",
+                          border: "none",
+                          borderRadius: 8,
+                          padding: "8px 12px",
+                          fontWeight: 700,
+                          fontSize: 16,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 6,
                         }}
-                      />
-                    </button>
-                    <button
-                      style={{
-                        background: "#e0e7ff",
-                        color: "#3730a3",
-                        border: "none",
-                        borderRadius: 8,
-                        padding: "8px 12px",
-                        fontWeight: 700,
-                        fontSize: 16,
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 6,
-                      }}
-                      title="Edit Order"
-                      onClick={() => handleEditOrder(order)}
-                    >
-                      <MdEdit color="#111106ff" fontSize={20} display="block" />
-                    </button>
+                        title="Edit Order"
+                        onClick={() => handleEditOrder(order)}
+                      >
+                        <MdEdit color="#111106ff" fontSize={20} display="block" />
+                      </button>
+                    )}
                   </div>
                 </div>
               );

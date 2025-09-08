@@ -2049,9 +2049,9 @@ const invoiceStyles = {
     background: "#fff",
   },
   header: { textAlign: "center", borderBottom: "1px solid #000", padding: 5 },
-  title: { fontSize: "18px", fontWeight: "bold" },
-  subTitle: { fontSize: "12px", margin: "5px 0", fontWeight: "bold" },
-  contact: { fontSize: "12px", fontWeight: "bold" },
+  title: { fontSize: "31px", fontWeight: "bold" },
+  subTitle: { fontSize: "17px", margin: "5px 0", fontWeight: "bold" },
+  contact: { fontSize: "16px", fontWeight: "bold" },
   table: { width: "100%", borderCollapse: "collapse", marginTop: 5 },
   th: {
     border: "1px solid #000",

@@ -20,8 +20,11 @@ import {
   Typography,
   Box,
   Pagination,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
+import { GoSortDesc, GoSortAsc } from "react-icons/go";
 import {
   FaUser,
   FaCalendarAlt,
@@ -126,6 +129,8 @@ const buttonStyles = {
 };
 
 export default function Orders() {
+  // Sort filter state: 'high' | 'low'
+  const [sortOrder, setSortOrder] = useState('high');
   // Filter state: 'All', 'Completed', 'Pending'
   const [orderFilter, setOrderFilter] = useState('All');
   // Pagination state
@@ -218,8 +223,15 @@ export default function Orders() {
     if (orderFilter !== 'All') {
       result = result.filter((order) => order.status === orderFilter);
     }
+    // Sort by amount
+    result = [...result].sort((a, b) => {
+      const aAmt = Number(a.total_amount || 0);
+      const bAmt = Number(b.total_amount || 0);
+      if (sortOrder === 'high') return bAmt - aAmt;
+      return aAmt - bAmt;
+    });
     return result;
-  }, [orders, search, orderFilter]);
+  }, [orders, search, orderFilter, sortOrder]);
 
   // Paginated orders
   const paginatedOrders = useMemo(() => {
@@ -865,6 +877,40 @@ export default function Orders() {
           >
             <span style={{width: '100%', textAlign: 'center', lineHeight: 'normal'}}>Pending</span>
           </Button>
+
+          {/* Sort Filter: Single Icon Button with Tooltip and Material UI Icon */}
+          <Box sx={{ ml: 2, display: 'flex', alignItems: 'center' }}>
+            <Tooltip title={sortOrder === 'high' ? 'Sort by High Amount' : 'Sort by Low Amount'} placement="top">
+              <IconButton
+                size="small"
+                color="primary"
+                sx={{
+                  borderRadius: 2,
+                  background: '#f5f7fa',
+                  border: '1.5px solid #e0e7ef',
+                  width: 36,
+                  height: 36,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  p: 0,
+                  transition: 'background 0.2s, border 0.2s',
+                  boxShadow: '0 1px 4px rgba(59,130,246,0.08)',
+                  '&:hover': {
+                    background: '#e0e7ef',
+                    border: '1.5px solid #667eea',
+                  },
+                }}
+                onClick={() => setSortOrder(sortOrder === 'high' ? 'low' : 'high')}
+              >
+                {sortOrder === 'high' ? (
+                  <GoSortDesc style={{ color: '#3730a3', fontSize: 22 }} />
+                ) : (
+                  <GoSortAsc style={{ color: '#3730a3', fontSize: 22 }} />
+                )}
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
       </Box>
       {isLoading ? (
@@ -1048,7 +1094,7 @@ export default function Orders() {
                           }}
                         >
                           <FaRupeeSign
-                            style={{ color: "#16a34a", fontSize: 16 }}
+                            style={{ color: "#991b1b", fontSize: 16 }}
                           />
                           <span
                             style={{

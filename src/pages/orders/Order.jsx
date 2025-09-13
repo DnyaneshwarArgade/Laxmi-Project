@@ -126,6 +126,8 @@ const buttonStyles = {
 };
 
 export default function Orders() {
+  // Filter state: 'All', 'Completed', 'Pending'
+  const [orderFilter, setOrderFilter] = useState('All');
   // Pagination state
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
@@ -208,13 +210,16 @@ export default function Orders() {
   // Filter orders by search
   const filteredOrders = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return orders;
-    return Array.isArray(orders)
+    let result = Array.isArray(orders)
       ? orders.filter((order) =>
           (order.customerName || "").toLowerCase().includes(q)
         )
       : [];
-  }, [orders, search]);
+    if (orderFilter !== 'All') {
+      result = result.filter((order) => order.status === orderFilter);
+    }
+    return result;
+  }, [orders, search, orderFilter]);
 
   // Paginated orders
   const paginatedOrders = useMemo(() => {
@@ -782,6 +787,85 @@ export default function Orders() {
             +
           </Button>
         </Box>
+        {/* Filter Buttons Row */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 1.5,
+            mt: 2,
+            mb: 1,
+          }}
+        >
+          <Button
+            size="small"
+            variant={orderFilter === 'All' ? "contained" : "outlined"}
+            color="primary"
+            sx={{
+              borderRadius: 99,
+              minWidth: 60,
+              px: 2,
+              py: 0.5,
+              fontWeight: 500,
+              fontSize: 13,
+              boxShadow: orderFilter === 'All' ? 1 : 0,
+              textTransform: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 32,
+            }}
+            onClick={() => setOrderFilter('All')}
+          >
+            <span style={{width: '100%', textAlign: 'center', lineHeight: 'normal'}}>All</span>
+          </Button>
+          <Button
+            size="small"
+            variant={orderFilter === 'Completed' ? "contained" : "outlined"}
+            color="success"
+            sx={{
+              borderRadius: 99,
+              minWidth: 60,
+              px: 2,
+              py: 0.5,
+              fontWeight: 500,
+              fontSize: 13,
+              boxShadow: orderFilter === 'Completed' ? 1 : 0,
+              textTransform: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 32,
+            }}
+            onClick={() => setOrderFilter('Completed')}
+          >
+            <span style={{width: '100%', textAlign: 'center', lineHeight: 'normal'}}>Completed</span>
+          </Button>
+          <Button
+            size="small"
+            variant={orderFilter === 'Pending' ? "contained" : "outlined"}
+            color="error"
+            sx={{
+              borderRadius: 99,
+              minWidth: 60,
+              px: 2,
+              py: 0.5,
+              fontWeight: 500,
+              fontSize: 13,
+              boxShadow: orderFilter === 'Pending' ? 1 : 0,
+              textTransform: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 32,
+            }}
+            onClick={() => setOrderFilter('Pending')}
+          >
+            <span style={{width: '100%', textAlign: 'center', lineHeight: 'normal'}}>Pending</span>
+          </Button>
+        </Box>
       </Box>
       {isLoading ? (
         <div style={{ textAlign: "center", marginTop: 40 }}>
@@ -871,6 +955,10 @@ export default function Orders() {
                     borderRadius: 14,
                     minHeight: 70,
                     position: "relative",
+                    background:
+                      order.status === "Pending"
+                        ? "#fee2e2" 
+                        : themedStyles.card.background,
                   }}
                 >
                   {/* Left: Basic Details (column layout) */}
@@ -891,33 +979,102 @@ export default function Orders() {
                         gap: 6,
                       }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          position: "relative",
+                        }}
+                      >
                         <FaUser style={{ color: "#667eea", fontSize: 18 }} />
-                        <span style={{ fontWeight: 700, fontSize: 17, color: "#0b1b3a" }}>
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 17,
+                            color: "#0b1b3a",
+                            wordBreak: "break-word",
+                            display: "block",
+                            width: "calc(100% - 100px)",
+                          }}
+                          title={order.customerName}
+                        >
                           {order.customerName || "—"}
                         </span>
                       </div>
                       {order.date && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <FaCalendarAlt style={{ color: "#764ba2", fontSize: 16 }} />
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
+                          <FaCalendarAlt
+                            style={{ color: "#764ba2", fontSize: 16 }}
+                          />
                           <span style={{ fontSize: 14, color: "#5b6b8c" }}>
                             {formatDateDMY(order.date)}
                           </span>
                         </div>
                       )}
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <FaRupeeSign style={{ color: "#16a34a", fontSize: 16 }} />
-                        <span style={{ fontSize: 15, color: "#065f46", fontWeight: 600 }}>
-                          {order.total_amount}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <FaRupeeSign
+                          style={{ color: "#16a34a", fontSize: 16 }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 15,
+                            color: "#065f46",
+                            fontWeight: 600,
+                          }}
+                        >
+                         Total Amount : {order.total_amount}
                         </span>
+                        
                       </div>
+                      {order.status === "Pending" && (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
+                          <FaRupeeSign
+                            style={{ color: "#16a34a", fontSize: 16 }}
+                          />
+                          <span
+                            style={{
+                              fontSize: 15,
+                              color: "#991b1b",
+                              fontWeight: 600,
+                            }}
+                          >
+                            Pending Amount : {order.unpaid_amount}
+                          </span>
+                        </div>
+                      )}
+                      
                     </div>
                     {/* Status badge at right corner */}
                     <div style={{ position: "absolute", top: 0, right: 0 }}>
                       <span
                         style={{
-                          background: order.status === "Completed" ? "#dcfce7" : "#eef2ff",
-                          color: order.status === "Completed" ? "#16a34a" : "#3730a3",
+                          background:
+                            order.status === "Completed"
+                              ? "#dcfce7"
+                              : "#eef2ff",
+                          color:
+                            order.status === "Completed"
+                              ? "#16a34a"
+                              : "#3730a3",
                           borderRadius: 8,
                           padding: "4px 12px",
                           fontSize: 13,
@@ -927,6 +1084,7 @@ export default function Orders() {
                       >
                         {order.status || "Pending"}
                       </span>
+                       
                     </div>
                   </div>
                   {/* Bottom row: Action Buttons centered */}
@@ -960,7 +1118,9 @@ export default function Orders() {
                       title="View Invoice"
                       onClick={() => handleView(order)}
                     >
-                      <FaRegFilePdf style={{ fontSize: 20, color: "#0b5ed7" }} />
+                      <FaRegFilePdf
+                        style={{ fontSize: 20, color: "#0b5ed7" }}
+                      />
                     </button>
                     <a
                       href={`tel:${order.customer?.phone}`}
@@ -982,7 +1142,9 @@ export default function Orders() {
                       }}
                       title="Call Customer"
                     >
-                      <FaSquarePhone style={{ fontSize: 20, color: "#0b5ed7" }} />
+                      <FaSquarePhone
+                        style={{ fontSize: 20, color: "#0b5ed7" }}
+                      />
                     </a>
                     <button
                       style={{
@@ -1003,7 +1165,13 @@ export default function Orders() {
                       title="Delete"
                       onClick={() => handleDelete(originalIndex)}
                     >
-                      <FaTrash style={{ color: "#ef4444", fontSize: 20, display: "block" }} />
+                      <FaTrash
+                        style={{
+                          color: "#ef4444",
+                          fontSize: 20,
+                          display: "block",
+                        }}
+                      />
                     </button>
                     {order.status !== "Completed" && (
                       <button
@@ -1024,7 +1192,11 @@ export default function Orders() {
                         title="Edit Order"
                         onClick={() => handleEditOrder(order)}
                       >
-                        <MdEdit color="#111106ff" fontSize={20} display="block" />
+                        <MdEdit
+                          color="#111106ff"
+                          fontSize={20}
+                          display="block"
+                        />
                       </button>
                     )}
                   </div>

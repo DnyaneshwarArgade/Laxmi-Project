@@ -806,9 +806,9 @@ export default function Orders() {
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
-            gap: 1.5,
-            mt: 2,
-            mb: 1,
+            gap: "5px",
+            mt: "5px",
+            mb: "5px",
           }}
         >
           <Button

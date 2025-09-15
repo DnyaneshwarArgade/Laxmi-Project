@@ -36,9 +36,9 @@ export default function Orders() {
     const filteredOrders = bills.data?.filter((order) => {
         const customerName = order.customer?.name || '';
         const searchMatch = customerName.toLowerCase().includes(searchTerm.toLowerCase());
-        
+
         const statusMatch = filterStatus === "All" || order.status.toLowerCase() === filterStatus.toLowerCase();
-        
+
         return searchMatch && statusMatch;
     });
 
@@ -63,40 +63,50 @@ export default function Orders() {
         <div className="orders-container">
             <div className="orders-header-wrapper">
                 <div className="orders-header">
-                    <h2 className="orders-title">Orders</h2>
-                    <div className="orders-search">
-                        <FaSearch className="search-icon" />
-                        <input 
-                            type="text" 
-                            placeholder="Search by customer name" 
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                        />
+                    {/* Title and Add button row */}
+                    <div className="orders-title-row">
+                        <h2 className="orders-title">Orders</h2>
+                        {/* Add button for mobile only */}
+                        <button className="add-btn add-btn-mobile">
+                            <FaPlus />
+                        </button>
                     </div>
-                    <button className="add-btn">
-                        <FaPlus />
-                    </button>
+                    {/* Search and Add button for desktop */}
+                    <div className="add-btn-search-row">
+                        <div className="orders-search">
+                            <FaSearch className="search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Search by customer name"
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                            />
+                        </div>
+                        <button className="add-btn add-btn-desktop">
+                            <FaPlus />
+                        </button>
+                    </div>
+                    {/* Filters row */}
                     <div className="orders-filters">
-                        <button 
+                        <button
                             className={`filter-btn ${filterStatus === "All" ? "active" : ""}`}
                             onClick={() => handleFilterChange("All")}
                         >
                             All
                         </button>
-                        <button 
+                        <button
                             className={`filter-btn completed ${filterStatus === "Completed" ? "active" : ""}`}
                             onClick={() => handleFilterChange("Completed")}
                         >
                             <FaCheckCircle style={{ marginRight: "6px" }} /> Completed
                         </button>
-                        <button 
+                        <button
                             className={`filter-btn pending ${filterStatus === "Pending" ? "active" : ""}`}
                             onClick={() => handleFilterChange("Pending")}
                         >
                             <FaClock style={{ marginRight: "6px" }} /> Pending
                         </button>
-                        {/* 🆕 Sort Button with new logic */}
-                        <button 
+                        <button
                             className="filter-btn filter-sort-btn"
                             onClick={() => {
                                 if (sortOrder === "none" || sortOrder === "desc") {

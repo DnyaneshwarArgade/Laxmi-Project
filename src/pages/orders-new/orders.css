@@ -1,3 +1,177 @@
+.orders-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.add-btn-desktop {
+    display: inline-flex;
+    margin-left: 10px;
+}
+.add-btn-mobile {
+    display: none;
+}
+@media (max-width: 600px) {
+    .add-btn-desktop {
+        display: none !important;
+    }
+    .add-btn-mobile {
+        display: inline-flex !important;
+        margin-left: 10px;
+    }
+}
+/* Add button in filter row for desktop, next to heading for mobile */
+.add-btn-filter-row {
+    display: flex;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .orders-title-row .add-btn-filter-row {
+        display: flex !important;
+        margin-left: 10px;
+    }
+    .orders-filters .add-btn-filter-row {
+        display: none !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .orders-title-row .add-btn-filter-row {
+        display: none !important;
+    }
+    .orders-filters .add-btn-filter-row {
+        display: flex !important;
+    }
+}
+/* Desktop-only add button after search input */
+.add-btn-desktop {
+    display: inline-flex;
+    background: linear-gradient(135deg, #4a6cf7, #7b42f6);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+.add-btn-desktop {
+    display: inline-flex;
+    background: linear-gradient(135deg, #4a6cf7, #7b42f6);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 10px; /* changed from margin-left to margin-right so it appears before all buttons */
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.add-btn-mobile {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .add-btn-desktop {
+        display: none !important;
+    }
+    .add-btn-mobile {
+        display: inline-flex;
+        background: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-left: 10px;
+    }
+}
+
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 10px; /* changed from margin-left to margin-right so it appears before all buttons */
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Hide desktop add button on mobile */
+@media (max-width: 600px) {
+    .add-btn-desktop {
+        display: none !important;
+    }
+}
+
+/* Hide mobile add button on desktop */
+@media (min-width: 601px) {
+    .add-btn-mobile {
+        display: none !important;
+    }
+}
+.add-btn-search-row {
+    display: flex;
+    align-items: center;
+}
+
+/* On desktop, show add-btn-mobile after search input */
+.add-btn-mobile {
+    display: inline-flex;
+    background: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-left: 10px;
+}
+
+@media (max-width: 600px) {
+    .orders-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .add-btn-search-row {
+        flex-direction: row;
+    }
+    .add-btn-mobile {
+        margin-left: 0;
+    }
+    /* Move add-btn-mobile next to heading on mobile */
+    .orders-title-row .add-btn-mobile {
+        display: inline-flex;
+        margin-left: 10px;
+    }
+    .add-btn-search-row .add-btn-mobile {
+        display: none;
+    }
+}
+.orders-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+/* Show mobile add button only on small screens */
+.add-btn-mobile {
+    display: inline-flex;
+    background: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-left: 10px;
+}
 /* Orders.css */
 
 /* Container */

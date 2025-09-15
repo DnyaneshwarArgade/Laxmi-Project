@@ -14,6 +14,7 @@ import {
     FaClock,
     FaCheckCircle,
     FaListUl,
+    FaSortUp, // 🆕 FaSortUp add करा
     FaSortDown
 } from "react-icons/fa";
 import { billsGetData } from "../../store/creators";
@@ -22,64 +23,106 @@ export default function Orders() {
     const dispatch = useDispatch();
     const { bills, isLoading } = useSelector((state) => state.entities?.bills);
     const [searchTerm, setSearchTerm] = useState("");
+    const [filterStatus, setFilterStatus] = useState("All");
+    const [sortOrder, setSortOrder] = useState("none"); // 🆕 नवीन state
 
     useEffect(() => {
-        // Fetch data from the server when the component mounts
-        // This 'data' object should contain the authentication token.
         const data = {
-            token: "YOUR_AUTH_TOKEN_HERE" // Replace with a dynamic token from your login state
+            token: "YOUR_AUTH_TOKEN_HERE"
         };
         dispatch(billsGetData(data));
     }, [dispatch]);
 
-    // Filter the orders based on the search term
     const filteredOrders = bills.data?.filter((order) => {
         const customerName = order.customer?.name || '';
-        return customerName.toLowerCase().includes(searchTerm.toLowerCase());
+        const searchMatch = customerName.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const statusMatch = filterStatus === "All" || order.status.toLowerCase() === filterStatus.toLowerCase();
+        
+        return searchMatch && statusMatch;
     });
+
+    // 🆕 नवीन sorting logic
+    let sortedOrders = filteredOrders;
+    if (sortOrder === "asc") {
+        sortedOrders = [...filteredOrders].sort((a, b) => a.total_amount - b.total_amount);
+    } else if (sortOrder === "desc") {
+        sortedOrders = [...filteredOrders].sort((a, b) => b.total_amount - a.total_amount);
+    }
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     };
 
+    const handleFilterChange = (status) => {
+        setFilterStatus(status);
+        setSortOrder("none"); // Filter बदलल्यावर sort reset करा
+    };
+
     return (
         <div className="orders-container">
-            {/* 🔹 Header Section */}
-            <div className="orders-header">
-                <h2 className="orders-title">Orders</h2>
-                <div className="orders-search">
-                    <FaSearch className="search-icon" />
-                    <input 
-                        type="text" 
-                        placeholder="Search by customer name" 
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                    />
-                </div>
-                <button className="add-btn">
-                    <FaPlus />
-                </button>
-                <div className="orders-filters">
-                    <button className="filter-btn active">All</button>
-                    <button className="filter-btn completed">
-                        <FaCheckCircle style={{ marginRight: "6px" }} /> Completed
+            <div className="orders-header-wrapper">
+                <div className="orders-header">
+                    <h2 className="orders-title">Orders</h2>
+                    <div className="orders-search">
+                        <FaSearch className="search-icon" />
+                        <input 
+                            type="text" 
+                            placeholder="Search by customer name" 
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                        />
+                    </div>
+                    <button className="add-btn">
+                        <FaPlus />
                     </button>
-                    <button className="filter-btn pending">
-                        <FaClock style={{ marginRight: "6px" }} /> Pending
-                    </button>
-                    <button className="filter-btn filter-sort-btn">
-                        <FaListUl className="filter-icon-left" />
-                        <FaSortDown className="filter-icon-right" />
-                    </button>
+                    <div className="orders-filters">
+                        <button 
+                            className={`filter-btn ${filterStatus === "All" ? "active" : ""}`}
+                            onClick={() => handleFilterChange("All")}
+                        >
+                            All
+                        </button>
+                        <button 
+                            className={`filter-btn completed ${filterStatus === "Completed" ? "active" : ""}`}
+                            onClick={() => handleFilterChange("Completed")}
+                        >
+                            <FaCheckCircle style={{ marginRight: "6px" }} /> Completed
+                        </button>
+                        <button 
+                            className={`filter-btn pending ${filterStatus === "Pending" ? "active" : ""}`}
+                            onClick={() => handleFilterChange("Pending")}
+                        >
+                            <FaClock style={{ marginRight: "6px" }} /> Pending
+                        </button>
+                        {/* 🆕 Sort Button with new logic */}
+                        <button 
+                            className="filter-btn filter-sort-btn"
+                            onClick={() => {
+                                if (sortOrder === "none" || sortOrder === "desc") {
+                                    setSortOrder("asc");
+                                } else {
+                                    setSortOrder("desc");
+                                }
+                            }}
+                        >
+                            <FaListUl className="filter-icon-left" />
+                            {sortOrder === "asc" ? (
+                                <FaSortUp className="filter-icon-right" />
+                            ) : (
+                                <FaSortDown className="filter-icon-right" />
+                            )}
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            {/* 🔹 Dynamic Order Cards */}
+            {/* 🔹 Dynamic Order Cards sorted by amount */}
             {isLoading ? (
                 <div style={{ textAlign: "center", marginTop: "50px" }}>Loading orders...</div>
             ) : (
-                filteredOrders && filteredOrders.length > 0 ? (
-                    filteredOrders.map((order) => (
+                sortedOrders && sortedOrders.length > 0 ? (
+                    sortedOrders.map((order) => (
                         <div className="order-card" key={order.id}>
                             <div className="order-info">
                                 <p>
@@ -97,7 +140,6 @@ export default function Orders() {
                             </div>
                             <div className="order-status">{order.status}</div>
 
-                            {/* 🔹 Bottom Actions */}
                             <div className="order-actions">
                                 <button className="icon-btn pdf"><FaFilePdf /></button>
                                 <button className="icon-btn phone"><FaPhone /></button>

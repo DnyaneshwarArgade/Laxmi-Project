@@ -452,5 +452,22 @@
     .orders-filters {
         flex-wrap: wrap;
         justify-content: center;
+        gap: 8px;
+        width: 100%;
+        overflow-x: unset;
+    }
+    .orders-filters .filter-btn {
+        flex: 1 1 22%;
+        min-width: 0;
+        max-width: none;
+        text-align: center;
+        margin-bottom: 0 !important;
+        justify-content: center;
+    }
+    .orders-filters .filter-btn.completed {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 }

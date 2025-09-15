@@ -7,6 +7,7 @@ import Customers from "./pages/customers-new/CustomersListing";
 import Items from "./pages/items-new/ItemsListing";
 import Orders from "./pages/orders/Order";
 import Login from "./pages/auth/Login";
+import OrderList from "./pages/orders-new/Order-List";
 import "./App.css";
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
             <Route path="/items" element={<ProtectedRoute><Items /></ProtectedRoute>} />
             <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+            <Route path="/orders-new" element={<ProtectedRoute><OrderList /></ProtectedRoute>} />
           </Routes>
         </div>
         {isAuth && !isLoginPage && <BottomNavigation />}

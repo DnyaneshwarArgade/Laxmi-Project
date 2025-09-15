@@ -41,23 +41,35 @@ export default function Orders() {
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
 
-    const statusMatch =
-      filterStatus === "All" ||
-      order.status.toLowerCase() === filterStatus.toLowerCase();
+    let statusMatch = false;
+    if (filterStatus === "All") {
+      statusMatch = true;
+    } else if (filterStatus === "Completed") {
+      statusMatch = order.status.toLowerCase() === "completed";
+    } else if (filterStatus === "Pending") {
+      statusMatch = order.status.toLowerCase() === "pending";
+    } else if (filterStatus === "Dummy") {
+      statusMatch = order.is_dummy === 1;
+    }
 
     return searchMatch && statusMatch;
   });
 
-  // 🆕 नवीन sorting logic
+  // 🆕 Sort by date logic
   let sortedOrders = filteredOrders;
   if (sortOrder === "asc") {
-    sortedOrders = [...filteredOrders].sort(
-      (a, b) => a.total_amount - b.total_amount
-    );
+    sortedOrders = [...filteredOrders].sort((a, b) => {
+      // Parse date strings to Date objects
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA - dateB;
+    });
   } else if (sortOrder === "desc") {
-    sortedOrders = [...filteredOrders].sort(
-      (a, b) => b.total_amount - a.total_amount
-    );
+    sortedOrders = [...filteredOrders].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateB - dateA;
+    });
   }
 
   const handleSearchChange = (event) => {
@@ -81,47 +93,61 @@ export default function Orders() {
               <FaPlus />
             </button>
           </div>
+
           {/* Search and Add button for desktop */}
-          <div className="add-btn-search-row">
-            <div className="orders-search">
-              <FaSearch className="search-icon" />
+          <section className="add-btn-search-row" aria-label="Search and Add Order">
+            <div className="orders-search" role="search">
+              <FaSearch className="search-icon" aria-hidden="true" />
               <input
                 type="text"
                 placeholder="Search by customer name"
                 value={searchTerm}
                 onChange={handleSearchChange}
+                aria-label="Search by customer name"
+                autoComplete="off"
               />
             </div>
-            <button className="add-btn add-btn-desktop">
-              <FaPlus />
+            <button className="add-btn add-btn-desktop" aria-label="Add new order">
+              <FaPlus aria-hidden="true" />
             </button>
-          </div>
+          </section>
+
           {/* Filters row */}
-          <div className="orders-filters">
+          <nav className="orders-filters compact filter-row" aria-label="Order Filters">
             <button
-              className={`filter-btn ${filterStatus === "All" ? "active" : ""}`}
+              className={`filter-btn small${filterStatus === "All" ? " active" : ""}`}
               onClick={() => handleFilterChange("All")}
+              aria-label="Show all orders"
+              tabIndex={0}
             >
               All
             </button>
             <button
-              className={`filter-btn completed ${
-                filterStatus === "Completed" ? "active" : ""
-              }`}
+              className={`filter-btn small completed${filterStatus === "Completed" ? " active" : ""}`}
               onClick={() => handleFilterChange("Completed")}
+              aria-label="Show completed orders"
+              tabIndex={0}
             >
-              <FaCheckCircle style={{ marginRight: "6px" }} /> Completed
+              <FaCheckCircle style={{ marginRight: 2, fontSize: 13 }} aria-hidden="true" />
             </button>
             <button
-              className={`filter-btn pending ${
-                filterStatus === "Pending" ? "active" : ""
-              }`}
+              className={`filter-btn small pending${filterStatus === "Pending" ? " active" : ""}`}
               onClick={() => handleFilterChange("Pending")}
+              aria-label="Show pending orders"
+              tabIndex={0}
             >
-              <FaClock style={{ marginRight: "6px" }} /> Pending
+              <FaClock style={{ marginRight: 2, fontSize: 13 }} aria-hidden="true" />
             </button>
             <button
-              className="filter-btn filter-sort-btn"
+              className={`filter-btn small dummy${filterStatus === "Dummy" ? " active" : ""}`}
+              onClick={() => handleFilterChange("Dummy")}
+              aria-label="Show dummy name orders"
+              tabIndex={0}
+            >
+              Dummy
+            </button>
+            <button
+              className="filter-btn small filter-sort-btn"
               onClick={() => {
                 if (sortOrder === "none" || sortOrder === "desc") {
                   setSortOrder("asc");
@@ -129,15 +155,17 @@ export default function Orders() {
                   setSortOrder("desc");
                 }
               }}
+              aria-label={`Sort by date ${sortOrder === "asc" ? "ascending" : "descending"}`}
+              tabIndex={0}
             >
-              <FaListUl className="filter-icon-left" />
+              <FaListUl className="filter-icon-left" aria-hidden="true" style={{ fontSize: 13 }} />
               {sortOrder === "asc" ? (
-                <FaSortUp className="filter-icon-right" />
+                <FaSortUp className="filter-icon-right" aria-hidden="true" style={{ fontSize: 13 }} />
               ) : (
-                <FaSortDown className="filter-icon-right" />
+                <FaSortDown className="filter-icon-right" aria-hidden="true" style={{ fontSize: 13 }} />
               )}
             </button>
-          </div>
+          </nav>
         </div>
       </div>
 

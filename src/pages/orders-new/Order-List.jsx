@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Modal, ModalHeader, ModalBody } from "reactstrap";
+import ViewInvoice from "./invoice/ViewInvoice";
 import "./Orders.css";
 import {
   FaPlus,
@@ -28,6 +30,19 @@ export default function Orders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [sortOrder, setSortOrder] = useState("none");
+  const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  // Handle opening invoice modal
+  const handleViewInvoice = (order) => {
+    setSelectedOrder(order);
+    setInvoiceModalOpen(true);
+  };
+
+  // Handle closing invoice modal
+  const handleCloseInvoice = () => {
+    setInvoiceModalOpen(false);
+    setSelectedOrder(null);
+  };
 
   useEffect(() => {
     dispatch(billsGetData({ token: login?.token }));
@@ -125,43 +140,52 @@ export default function Orders() {
       {isLoading ? (
         <Loading />
       ) : sortedOrders.length > 0 ? (
-        sortedOrders.map((order) => (
-          <div className="order-card" key={order.id}>
-            <div className="order-info">
-              <p>
-                <FaUser className="info-icon" /> <strong>{order.customer?.name || "N/A"}</strong>
-              </p>
-              <p>
-                <FaCalendarAlt className="info-icon" /> {order.date}
-              </p>
-              <p className="amount green">
-                <FaRupeeSign className="info-icon" /> Total amount: {order.total_amount}
-              </p>
-              <p className="amount red">
-                <FaRupeeSign className="info-icon" /> Pending amount: {order.unpaid_amount}
-              </p>
-            </div>
+        <>
+          {sortedOrders.map((order) => (
+            <div className="order-card" key={order.id}>
+              <div className="order-info">
+                <p>
+                  <FaUser className="info-icon" /> <strong>{order.customer?.name || "N/A"}</strong>
+                </p>
+                <p>
+                  <FaCalendarAlt className="info-icon" /> {order.date}
+                </p>
+                <p className="amount green">
+                  <FaRupeeSign className="info-icon" /> Total amount: {order.total_amount}
+                </p>
+                <p className="amount red">
+                  <FaRupeeSign className="info-icon" /> Pending amount: {order.unpaid_amount}
+                </p>
+              </div>
 
-            <div className="order-status">{order.status}</div>
+              <div className="order-status">{order.status}</div>
 
-            <div className="order-actions">
-              <button className="view-btn" onClick={() => alert("View " + order.id)}>
-                <FaRegFilePdf />
-              </button>
-              <a className="call-btn" href={`tel:${order.customer?.phone}`}>
-                <FaSquarePhone />
-              </a>
-              <button className="delete-btn" onClick={() => alert("Delete " + order.id)}>
-                <FaTrash />
-              </button>
-              {order.status !== "Completed" && (
-                <button className="edit-btn" onClick={() => alert("Edit " + order.id)}>
-                  <MdEdit />
+              <div className="order-actions">
+                <button className="view-btn" onClick={() => handleViewInvoice(order)}>
+                  <FaRegFilePdf />
                 </button>
-              )}
+                <a className="call-btn" href={`tel:${order.customer?.phone}`}>
+                  <FaSquarePhone />
+                </a>
+                <button className="delete-btn" onClick={() => alert("Delete " + order.id)}>
+                  <FaTrash />
+                </button>
+                {order.status !== "Completed" && (
+                  <button className="edit-btn" onClick={() => alert("Edit " + order.id)}>
+                    <MdEdit />
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))
+          ))}
+          {/* Invoice Modal */}
+          <Modal isOpen={invoiceModalOpen} toggle={handleCloseInvoice} size="lg">
+            <ModalHeader toggle={handleCloseInvoice}>Invoice</ModalHeader>
+            <ModalBody className="p-0">
+              {selectedOrder && <ViewInvoice invoice={selectedOrder} />}
+            </ModalBody>
+          </Modal>
+        </>
       ) : (
         <div style={{ textAlign: "center", marginTop: 50 }}>No orders found.</div>
       )}

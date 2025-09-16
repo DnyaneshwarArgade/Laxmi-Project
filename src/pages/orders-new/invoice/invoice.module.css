@@ -1,0 +1,209 @@
+/* External CSS for the red, ruled invoice look (reactstrap + custom styles) */
+
+:root {
+    --ink: #b31919;
+    /* print-like red */
+    --ink-dark: #8f1414;
+    --paper: #ffffff;
+}
+
+.page {
+    background: #f6f7f8;
+    min-height: 100dvh;
+    padding: 24px 0;
+}
+
+.sheet {
+    background: var(--paper);
+    color: var(--ink-dark);
+    max-width: 900px;
+    padding: 14px 18px 24px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+
+.ruleThick {
+    border: 0;
+    border-top: 3px solid var(--ink);
+    margin: 6px 0 10px;
+}
+
+/* Header */
+.headerTop {
+    color: var(--ink-dark);
+}
+
+.brandBlock {
+    padding-top: 4px;
+}
+
+.brandRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.iconPlaceholder {
+    width: 44px;
+    height: 54px;
+    border: 2px solid var(--ink);
+    background: transparent;
+}
+
+.brandText {
+    flex: 1;
+    text-align: center;
+}
+
+.subHead {
+    font-size: 12px;
+    letter-spacing: 0.2px;
+    color: var(--ink-dark);
+}
+
+.brandTitle {
+    margin: 6px 0;
+    font-size: 28px;
+    line-height: 1.5;
+    font-weight: 800;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 50px;
+}
+
+.tagline {
+    font-size: 12px;
+    margin-top: -2px;
+}
+
+.metaRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--ink-dark);
+}
+
+.metaLeft,
+.metaCenter,
+.metaRight {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.metaLine {
+    display: inline-block;
+    min-width: 64px;
+    border-bottom: 2px solid var(--ink);
+    height: 20px;
+}
+
+.metaLineWide {
+    display: inline-block;
+    min-width: 260px;
+    border-bottom: 2px solid var(--ink);
+    height: 20px;
+}
+
+.billToRow {
+    font-size: 14px;
+    color: var(--ink-dark);
+    margin: 6px 0 10px;
+}
+
+/* Table */
+.itemsTable {
+    border-color: var(--ink) !important;
+    color: var(--ink-dark);
+    font-size: 14px;
+}
+
+.itemsTable th,
+.itemsTable td {
+    border: 2px solid var(--ink) !important;
+    vertical-align: top;
+    padding: 8px 8px;
+}
+
+.itemsTable thead th {
+    text-align: center;
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.colSno {
+    width: 8%;
+}
+
+.colDesc {
+    width: 56%;
+}
+
+.colQty {
+    width: 12%;
+}
+
+.colRate {
+    width: 12%;
+}
+
+.colAmt {
+    width: 12%;
+}
+
+.rowBlank td {
+    height: 36px;
+}
+
+/* Footer */
+.amountWordsRow {
+    margin: 10px 0 8px;
+    font-size: 14px;
+    color: var(--ink-dark);
+}
+
+.footerNotes {
+    margin-top: 16px;
+    align-items: flex-end;
+    color: var(--ink-dark);
+}
+
+.noteLeft {
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.noteRight {
+    text-align: right;
+    font-size: 13px;
+}
+
+.signLine {
+    display: inline-block;
+    border-top: 2px solid var(--ink);
+    padding-top: 6px;
+}
+
+.bottomBrand {
+    text-align: right;
+    color: var(--ink);
+    font-weight: 700;
+    margin-top: -8px;
+}
+
+/* Print-friendly */
+@media print {
+    .page {
+        background: transparent;
+        padding: 0;
+    }
+
+    .sheet {
+        box-shadow: none;
+        max-width: 100%;
+        padding: 8mm 10mm;
+    }
+}

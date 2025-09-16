@@ -19,19 +19,19 @@ export default function App() {
     return isAuth ? children : <Navigate to="/login" />;
   };
   return (
-      <div className={!isLoginPage ? "app-container bg-light" : ""}>
-        {!isLoginPage && <Header />}
-        <div className={!isLoginPage ? "page-content" : ""}>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            {/* <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} /> */}
-            <Route path="/items" element={<ProtectedRoute><Items /></ProtectedRoute>} />
-            <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
-            <Route path="/orders-new" element={<ProtectedRoute><OrderList /></ProtectedRoute>} />
-          </Routes>
-        </div>
-        {isAuth && !isLoginPage && <BottomNavigation />}
+    <div className={!isLoginPage ? "app-container bg-light" : ""}>
+      {!isLoginPage && <Header />}
+      <div className={!isLoginPage ? "page-content" : ""}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/items" element={<ProtectedRoute><Items /></ProtectedRoute>} />
+          <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+          <Route path="/orders-new" element={<ProtectedRoute><OrderList /></ProtectedRoute>} />
+        </Routes>
       </div>
+      {isAuth && !isLoginPage && <BottomNavigation />}
+    </div>
   );
 }

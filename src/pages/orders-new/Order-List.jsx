@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Modal, ModalHeader, ModalBody } from "reactstrap";
 import ViewInvoice from "./invoice/ViewInvoice";
+import CreateOrder from "./create-order/CreateOrder";
 import "./Orders.css";
 import {
   FaPlus,
@@ -19,7 +20,7 @@ import {
 } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { FaSquarePhone } from "react-icons/fa6";
-import { billsGetData } from "../../store/creators";
+import { billsGetData, customersGetData, itemsGetData } from "../../store/creators";
 import Loading from "../../Component/loaders/Loading";
 
 export default function Orders() {
@@ -32,6 +33,16 @@ export default function Orders() {
   const [sortOrder, setSortOrder] = useState("none");
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [createOrderModalOpen, setCreateOrderModalOpen] = useState(false);
+  // Handle opening create order modal
+  const handleOpenCreateOrder = () => {
+    setCreateOrderModalOpen(true);
+  };
+
+  // Handle closing create order modal
+  const handleCloseCreateOrder = () => {
+    setCreateOrderModalOpen(false);
+  };
   // Handle opening invoice modal
   const handleViewInvoice = (order) => {
     setSelectedOrder(order);
@@ -46,6 +57,9 @@ export default function Orders() {
 
   useEffect(() => {
     dispatch(billsGetData({ token: login?.token }));
+    dispatch(customersGetData({ token: login?.token }));
+    dispatch(itemsGetData({ token: login?.token }));
+
   }, [dispatch, login]);
 
   // Filter orders based on search term and status
@@ -79,7 +93,7 @@ export default function Orders() {
         <div className="orders-header">
           <div className="orders-title-row">
             <h2 className="orders-title">Orders</h2>
-            <button className="add-btn add-btn-mobile">
+            <button className="add-btn add-btn-mobile" onClick={handleOpenCreateOrder}>
               <FaPlus />
             </button>
           </div>
@@ -94,7 +108,7 @@ export default function Orders() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button className="add-btn add-btn-desktop">
+            <button className="add-btn add-btn-desktop" onClick={handleOpenCreateOrder}>
               <FaPlus />
             </button>
           </section>
@@ -183,6 +197,13 @@ export default function Orders() {
             <ModalHeader toggle={handleCloseInvoice}>Invoice</ModalHeader>
             <ModalBody className="p-0">
               {selectedOrder && <ViewInvoice invoice={selectedOrder} />}
+            </ModalBody>
+          </Modal>
+          {/* Create Order Modal */}
+          <Modal isOpen={createOrderModalOpen} toggle={handleCloseCreateOrder} size="lg">
+            <ModalHeader toggle={handleCloseCreateOrder}>Create Order</ModalHeader>
+            <ModalBody className="p-0">
+              <CreateOrder />
             </ModalBody>
           </Modal>
         </>

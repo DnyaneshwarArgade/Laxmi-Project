@@ -1,0 +1,174 @@
+.invoice-page {
+  background: #fff5f5;
+  min-height: 100vh;
+  padding: 24px 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+.invoice-sheet {
+  background: #ffffff;
+  color: #000;
+  width: 595px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.invoice-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.owner-info {
+  font-size: 12px;
+  color: #c62828;
+  margin-bottom: 5px;
+}
+
+.store-title-banner {
+  background-color: #c62828;
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 10px 0;
+  border-radius: 6px;
+}
+
+.store-subtitle {
+  font-size: 11px;
+  color: #c62828;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.invoice-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.invoice-id,
+.invoice-date {
+  font-size: 14px;
+  color: #c62828;
+  position: relative;
+  padding: 8px;
+}
+
+.invoice-id span {
+  font-weight: bold;
+}
+
+.invoice-date {
+  text-align: right;
+}
+
+.underline {
+  height: 2px;
+  background-color: #c62828;
+  margin-top: 3px;
+}
+
+.customer-details-table {
+  width: 100%;
+  margin: 15px 0;
+}
+
+.customer-details-table td {
+  font-size: 13px;
+  padding: 8px;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.items-table th {
+  border: 1px solid #ddd;
+  background: #ffcdd2;
+  padding: 8px;
+  text-align: left;
+  font-weight: bold;
+}
+
+.items-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.col-sno { width: 10%; }
+.col-desc { width: 50%; }
+.col-qty { width: 10%; }
+.col-rate { width: 15%; }
+.col-amt { width: 15%; }
+
+.text-right {
+  text-align: right;
+}
+
+.text-center {
+  text-align: center;
+  font-style: italic;
+}
+
+.amount-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  border-top: 1px solid #ddd;
+  font-weight: bold;
+  background: #ffe5e5;
+}
+
+.amount-words {
+  padding: 8px;
+  border-top: 1px solid #ddd;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.bank-details {
+  padding: 8px;
+  border-top: 1px solid #ddd;
+  font-size: 12px;
+}
+
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding: 0 10px 10px 10px;
+}
+
+.signature-box {
+  text-align: center;
+  width: 40%;
+}
+
+.signature-line {
+  border-top: 1px solid #000;
+  margin: 0 auto;
+  width: 80%;
+}
+
+.signature-box div:last-child {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media print {
+  .invoice-page {
+    background: transparent;
+    padding: 0;
+  }
+  .invoice-sheet {
+    box-shadow: none;
+    border: none;
+    width: 100%;
+  }
+}

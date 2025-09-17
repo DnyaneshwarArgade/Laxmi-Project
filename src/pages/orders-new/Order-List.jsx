@@ -34,6 +34,7 @@ export default function Orders() {
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [createOrderModalOpen, setCreateOrderModalOpen] = useState(false);
+
   // Handle opening create order modal
   const handleOpenCreateOrder = () => {
     setCreateOrderModalOpen(true);
@@ -43,6 +44,7 @@ export default function Orders() {
   const handleCloseCreateOrder = () => {
     setCreateOrderModalOpen(false);
   };
+
   // Handle opening invoice modal
   const handleViewInvoice = (order) => {
     setSelectedOrder(order);
@@ -55,11 +57,11 @@ export default function Orders() {
     setSelectedOrder(null);
   };
 
+  // Fetch data on component mount
   useEffect(() => {
     dispatch(billsGetData({ token: login?.token }));
     dispatch(customersGetData({ token: login?.token }));
     dispatch(itemsGetData({ token: login?.token }));
-
   }, [dispatch, login]);
 
   // Filter orders based on search term and status
@@ -88,9 +90,11 @@ export default function Orders() {
 
   return (
     <div className="orders-container">
+
       {/* Header */}
       <div className="orders-header-wrapper">
         <div className="orders-header">
+
           <div className="orders-title-row">
             <h2 className="orders-title">Orders</h2>
             <button className="add-btn add-btn-mobile" onClick={handleOpenCreateOrder}>
@@ -147,6 +151,7 @@ export default function Orders() {
               {sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />}
             </button>
           </nav>
+
         </div>
       </div>
 
@@ -192,6 +197,7 @@ export default function Orders() {
               </div>
             </div>
           ))}
+
           {/* Invoice Modal */}
           <Modal isOpen={invoiceModalOpen} toggle={handleCloseInvoice} size="lg">
             <ModalHeader toggle={handleCloseInvoice}>Invoice</ModalHeader>
@@ -199,6 +205,7 @@ export default function Orders() {
               {selectedOrder && <ViewInvoice invoice={selectedOrder} />}
             </ModalBody>
           </Modal>
+
           {/* Create Order Modal */}
           <Modal isOpen={createOrderModalOpen} toggle={handleCloseCreateOrder} size="lg">
             <ModalHeader toggle={handleCloseCreateOrder}>Create Order</ModalHeader>
@@ -210,6 +217,7 @@ export default function Orders() {
       ) : (
         <div style={{ textAlign: "center", marginTop: 50 }}>No orders found.</div>
       )}
+
     </div>
   );
 }

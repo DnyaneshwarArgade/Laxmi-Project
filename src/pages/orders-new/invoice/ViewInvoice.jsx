@@ -1,122 +1,148 @@
-"use client";
-import { Container, Row, Col, Table } from "reactstrap";
-import styles from "./invoice.module.css";
+import React from 'react';
+import './Invoice.css';
 
-export default function ViewInvoice({ invoice }) {
-  console.log("Rendering ViewInvoice with invoice:", invoice);
-  const customerName = invoice?.customer?.name || "";
-  const invoiceId = invoice?.id || "";
-  const invoiceDate = invoice?.date || "";
+const Invoice = ({ invoice }) => {
+  const customerName = invoice?.customer?.name || "-";
+  const phone = invoice?.customer?.phone || "-";
+  const id = invoice?.id || "-";
+  const date = invoice?.date || "-";
   const items = invoice?.items || [];
-  const totalAmount = invoice?.total_amount || "";
-  const unpaidAmount = invoice?.unpaid_amount || "";
+  const total_amount = invoice?.total_amount || 0;
+  const paid_amount = invoice?.paid_amount || 0;
+  const unpaid_amount = invoice?.unpaid_amount || 0;
+
+  const formatDateDMY = (dateString) => {
+    if (!dateString) return "-";
+    const d = new Date(dateString);
+    return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+  };
+
+  const numberToWordsIndian = (num) => {
+    if (num === 0) return "Zero Rupees Only";
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+    const teens = ['Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+    const tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+
+    if(num < 10) return ones[num] + " Rupees Only";
+    if(num < 20) return teens[num-10] + " Rupees Only";
+    if(num < 100) return tens[Math.floor(num/10)] + (num%10 !== 0 ? ' '+ones[num%10] : '') + " Rupees Only";
+    if(num < 1000) return ones[Math.floor(num/100)] + " Hundred" + (num%100 !== 0 ? ' ' + numberToWordsIndian(num%100) : ' Rupees Only');
+
+    return num + " Rupees Only";
+  };
+
   return (
-    <main className={styles.page}>
-      <Container className={styles.sheet} fluid="sm">
-        <Row className={styles.headerTop}>
-          <Col xs="12" className={styles.brandBlock}>
-            <div className={styles.brandRow}>
-              {/* Decorative icon placeholder (top-left in the photo) */}
-              {/* <div className={styles.iconPlaceholder}>
-                <img src={Logo} alt="Logo" />
-              </div> */}
-              <div className={styles.brandText}>
-                <div className={styles.subHead}>
-                  {"प्रोप्रा. रविंद्र भुसारे | मो.९८५०८३७४००/९८५०३३२३५६"}
-                </div>
-                <h1 className={styles.brandTitle}>{"लक्ष्मी जनरल स्टोअर्स"}</h1>
-                <div className={styles.tagline}>
-                  {
-                    "शालेयपयोगी, गृहपयोगी, ऑफीस मटेरिअल व सौंदर्य प्रसाधनांचे विक्रेते प्रेझेंटेशन आर्टिकल, रिस्टरवॉच, वॉल क्लॉक (रेसिडेन्शियल हायस्कूल समोर,मिरी रोड, शेवगाव, जि. अहिल्यानगर ४१४५०२)"
-                  }
-                </div>
-              </div>
-            </div>
+    <div className="invoice-page">
+      <div className="invoice-sheet" id="invoice-sheet">
 
-            <div className={styles.metaRow}>
-              <div className={styles.metaLeft}>
-                {"क्र."}{" "}
-                <span className={styles.metaLine}>INV_{invoiceId}</span>
-              </div>
-              <div className={styles.metaRight}>
-                {"दि."} <span className={styles.metaLine}>{invoiceDate}</span>
-              </div>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <hr className={styles.ruleThick} />
-          </Col>
-        </Row>
-        <Row className={styles.billToRow}>
-          <Col xs="12">
-            {"श्री "}
-            <span className={styles.metaLineWide}>{customerName}</span>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs="12">
-            <Table bordered className={styles.itemsTable}>
-              <thead>
-                <tr>
-                  <th className={styles.colSno}>{"अ. नं."}</th>
-                  <th className={styles.colDesc}>{"तपशील"}</th>
-                  <th className={styles.colQty}>{"नग"}</th>
-                  <th className={styles.colRate}>{"दर"}</th>
-                  <th className={styles.colAmt}>{"रकम रुपये"}</th>
+        <div className="invoice-header">
+          <div className="owner-info">
+            प्रोप्रा. रविंद्र भुसारे | मो. ९८५०८३७४०० / ९८५०३३२३५६
+          </div>
+          <div className="store-title-banner">
+            लक्ष्मी जनरल स्टोअर्स
+          </div>
+          <div className="store-subtitle">
+            शालेय साहित्य, गृहउपयोगी, ऑफिस मटेरियल व सौंदर्य प्रसाधनांचे विक्रेते प्रेझेंटेशन आर्टिकल, रिस्टरवॉच, वॉच क्लॉक (रेसिडेन्शियल हायस्कूल समोर, मिरी रोड, शेवगाव, जि. अहिल्यानगर ४१४५०२)
+          </div>
+        </div>
+
+        <table className="invoice-details-table">
+          <tbody>
+            <tr>
+              <td className="invoice-id">
+                Bill No - <span>INV_{id}</span>
+                <div className="underline"></div>
+              </td>
+              <td className="invoice-date">
+                Date - {formatDateDMY(date)}
+                <div className="underline"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table className="customer-details-table">
+          <tbody>
+            <tr>
+              <td>
+                <strong>To,</strong><br />
+                {customerName}<br />
+                Mobile: {phone}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table className="items-table">
+          <thead>
+            <tr>
+              <th className="col-sno">S.No</th>
+              <th className="col-desc">Particulars</th>
+              <th className="col-qty">Qty</th>
+              <th className="col-rate">Rate</th>
+              <th className="col-amt">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.length > 0 ? (
+              items.map((item, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{item?.item?.name || "-"}</td>
+                  <td className="text-right">{item?.quantity || 0}</td>
+                  <td className="text-right">{item?.price || 0}</td>
+                  <td className="text-right">{(item?.quantity * item?.price).toFixed(2)}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {items.length > 0
-                  ? items.map((item, i) => (
-                      <tr key={i}>
-                        <td>{i + 1}</td>
-                        <td>{item.description || ""}</td>
-                        <td>{item.quantity || ""}</td>
-                        <td>{item.rate || ""}</td>
-                        <td>{item.amount || ""}</td>
-                      </tr>
-                    ))
-                  : Array.from({ length: 10 }).map((_, i) => (
-                      <tr key={i} className={styles.rowBlank}>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                    ))}
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
-        <Row className={styles.amountWordsRow}>
-          <Col xs="12">
-            {"अक्षरी रुपये"}{" "}
-            <span className={styles.metaLineWide}>{totalAmount}</span>
-          </Col>
-        </Row>
-        <Row className={styles.footerNotes}>
-          <Col xs="8" className={styles.noteLeft}>
-            <div>{"रोख मिळाले/येणे बाकी."}</div>
-            <div>{"धन्यवाद!..."}</div>
-            <div>{unpaidAmount ? `बाकी रक्कम: ${unpaidAmount}` : null}</div>
-          </Col>
-          <Col xs="4" className={styles.noteRight}>
-            <div className={styles.signLine}>{"माल घेऊन गेल्याची सही"}</div>
-          </Col>
-        </Row>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center">No Items</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
 
-        <Row className="mt-3">
-          <Col xs="12">
-            <hr className={styles.ruleThick} />
-            <div className={styles.bottomBrand}>
-              {"लक्ष्मी जनरल स्टोअर्स करिता"}
-            </div>
-          </Col>
-        </Row>
-      </Container>
-    </main>
+        <div className="amount-row">
+          <span>Bill Amount:</span>
+          <span>₹ {total_amount.toFixed(2)}</span>
+        </div>
+        <div className="amount-row">
+          <span>Paid Amount:</span>
+          <span>₹ {paid_amount.toFixed(2)}</span>
+        </div>
+        {unpaid_amount > 0 && (
+          <div className="amount-row">
+            <span>Unpaid Amount:</span>
+            <span>₹ {unpaid_amount.toFixed(2)}</span>
+          </div>
+        )}
+
+        <div className="amount-words">
+          <strong>Bill Amount in Words:</strong> {numberToWordsIndian(total_amount)}
+        </div>
+
+        <div className="bank-details">
+          <strong>Bank Details:</strong>
+          <div>Account Name - Laxmi General</div>
+          <div>Account Number - 42100200000374</div>
+          <div>IFSC Code - BARB0SHEVGA</div>
+        </div>
+
+        <div className="signatures">
+          <div className="signature-box">
+            <div className="signature-line"></div>
+            <div>Customer Signature</div>
+          </div>
+          <div className="signature-box">
+            <div className="signature-line"></div>
+            <div>Laxmi General Signature</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   );
-}
+};
+
+export default Invoice;

@@ -66,7 +66,8 @@ export default function Orders() {
   }, [dispatch, login]);
 
   // Filter orders based on search term and status
-  const filteredOrders = bills.data?.filter((order) => {
+  const ordersArray = Array.isArray(bills) ? bills : bills?.data || [];
+  const filteredOrders = ordersArray.filter((order) => {
     const name = order.customer?.name || "";
     const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -211,7 +212,7 @@ export default function Orders() {
           <Modal isOpen={createOrderModalOpen} toggle={handleCloseCreateOrder} size="lg">
             <ModalHeader toggle={handleCloseCreateOrder}>Create Order</ModalHeader>
             <ModalBody className="p-0">
-              <CreateOrder />
+              <CreateOrder toggle={handleCloseCreateOrder}/>
             </ModalBody>
           </Modal>
         </>

@@ -6,8 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../store/creators";
 import CustomTextField from "../../../Component/MuiComponents/CustomTextField";
 import CustomInput from "../../../Component/custom/CustomInput";
+import { MdDelete } from "react-icons/md";
+import LinerLoader from "../../../Component/loaders/LinerLoader";
 
-const CreateOrder = () => {
+const CreateOrder = ({ toggle }) => {
   const dispatch = useDispatch();
   const { login } = useSelector((state) => state?.login);
   const { isPostLoading } = useSelector((state) => state.entities?.bills);
@@ -22,7 +24,7 @@ const CreateOrder = () => {
   };
 
   const handleSubmit = (values, { setSubmitting }) => {
-    const payload = {
+    const bills = {
       customer_id: values.customer_id,
       total_amount: Math.floor(values.total_amount),
       paid_amount: Math.floor(values.paid_amount),
@@ -30,6 +32,7 @@ const CreateOrder = () => {
       status: values.status,
       is_dummy: values.is_dummy ? 1 : 0,
       has_returned: false,
+      discount: Math.floor(values.discount),
       items: values.items?.map((item) => ({
         item_id: item.item_id,
         quantity: item.quantity,
@@ -41,7 +44,7 @@ const CreateOrder = () => {
     dispatch(
       actions.postBillsData({
         data,
-        purchaseOrders: payload,
+        bills,
         toggle,
         setSubmitting,
       })
@@ -60,6 +63,9 @@ const CreateOrder = () => {
           items: [],
           item_name: "",
           is_dummy: false,
+          paid_amount:"0",
+          unpaid_amount:"0",
+          discount:"0"
         }}
         onSubmit={handleSubmit}
         validationSchema={Yup.object().shape({
@@ -71,6 +77,7 @@ const CreateOrder = () => {
         })}
       >
         {(formProps) => {
+          console.log("formProps.values", formProps.values);
           const totalAmount = formProps.values.items?.reduce(
             (sum, item) =>
               sum + (Number(item.price) * Number(item.quantity) || 0),
@@ -91,8 +98,9 @@ const CreateOrder = () => {
                       <Field type="checkbox" name="is_dummy" /> Is Dummy
                     </Label>
                   </Col>
-                  <Col md={12}>
-                    <Label>Select Company *</Label>
+                </Row>
+                <Row className="form-group pt-2">
+                  <Col md={6}>
                     <InputGroup>
                       <CustomAutoComplete
                         name="customer_id"
@@ -104,8 +112,8 @@ const CreateOrder = () => {
                       />
                     </InputGroup>
                   </Col>
+                  <Col md={6}></Col>
                 </Row>
-
                 <hr />
                 <Row className="form-group pt-2">
                   <Col md={12}>
@@ -136,9 +144,16 @@ const CreateOrder = () => {
                                 />
                                 {items?.data?.length > 0 && (
                                   <datalist id="itemdatalist">
-                                    {items?.data?.map((item, index) => (
-                                      <option key={index} value={item.name} />
-                                    ))}
+                                    {items?.data
+                                      .filter(
+                                        (item) =>
+                                          !formProps.values.items.some(
+                                            (added) => added.name === item.name
+                                          )
+                                      )
+                                      .map((item, index) => (
+                                        <option key={index} value={item.name} />
+                                      ))}
                                   </datalist>
                                 )}
                               </InputGroup>
@@ -190,6 +205,7 @@ const CreateOrder = () => {
                                   <th>UNIT</th>
                                   <th>PRICE</th>
                                   <th>TOTAL</th>
+                                  <th>Delete</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -240,6 +256,17 @@ const CreateOrder = () => {
                                           />
                                         </td>
                                         <td>₹ {total}</td>
+                                        <td>
+                                          <Button
+                                            color="danger"
+                                            size="sm"
+                                            onClick={() =>
+                                              arrayHelpers.remove(index)
+                                            }
+                                          >
+                                            <MdDelete size={20} />
+                                          </Button>
+                                        </td>
                                       </tr>
                                     );
                                   }
@@ -254,15 +281,18 @@ const CreateOrder = () => {
                                 >
                                   <td className="footer-subtotal">SUBTOTAL</td>
                                   <td className="footer-data">
-                                    {totalQuantity}
+                                    Qty {totalQuantity}
                                   </td>
                                   <td className="footer-data"></td>
+                                  <td className="footer-data"></td>
+
                                   <td
                                     className="footer-data"
-                                    style={{ textAlign: "right" }}
+                                    style={{ textAlign: "center" }}
                                   >
                                     ₹ {formProps.values.total_amount}
                                   </td>
+                                  <td className="footer-data"></td>
                                 </tr>
                               </tfoot>
                             </Table>
@@ -270,21 +300,6 @@ const CreateOrder = () => {
                         </div>
                       )}
                     />
-                  </Col>
-                </Row>
-
-                {/* Removed company summary and signature block */}
-
-                <Row className="form-group">
-                  <Col md={6}>
-                    <Label>Note</Label>
-                    <InputGroup>
-                      <CustomTextField
-                        formProps={formProps}
-                        name="notes"
-                        label="Enter Note"
-                      />
-                    </InputGroup>
                   </Col>
                 </Row>
                 <Row style={{ justifyContent: "center" }} className="mt-5">

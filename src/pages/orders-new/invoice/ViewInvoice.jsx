@@ -77,22 +77,24 @@ const Invoice = ({ invoice }) => {
         <table className="items-table">
           <thead>
             <tr>
-              <th className="col-sno">S.No</th>
+              <th className="col-sno text-center">S.No</th>
               <th className="col-desc">Particulars</th>
-              <th className="col-qty">Qty</th>
-              <th className="col-rate">Rate</th>
-              <th className="col-amt">Total</th>
+              <th className="col-unit text-center">Unit</th>
+              <th className="col-qty text-center">Qty</th>
+              <th className="col-rate text-center">Rate</th>
+              <th className="col-amt text-center">Total</th>
             </tr>
           </thead>
           <tbody>
             {items.length > 0 ? (
               items.map((item, index) => (
                 <tr key={index}>
-                  <td>{index + 1}</td>
+                  <td className="text-center">{index + 1}</td>
                   <td>{item?.item?.name || "-"}</td>
-                  <td className="text-right">{item?.quantity || 0}</td>
-                  <td className="text-right">{item?.price || 0}</td>
-                  <td className="text-right">{(item?.quantity * item?.price).toFixed(2)}</td>
+                  <td className="text-center">{item?.unit}</td>
+                  <td className="text-center">{item?.quantity || 0}</td>
+                  <td className="text-center">{item?.price || 0}</td>
+                  <td className="text-center">{(item?.quantity * item?.price).toFixed(2)}</td>
                 </tr>
               ))
             ) : (

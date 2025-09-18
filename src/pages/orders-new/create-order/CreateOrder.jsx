@@ -2,10 +2,8 @@ import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { Col, InputGroup, Label, Row, Button, Table } from "reactstrap";
 import CustomAutoComplete from "../../../Component/MuiComponents/CustomAutoComplete";
-import { Autocomplete } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../store/creators";
-import { toWords } from "number-to-words";
 import CustomTextField from "../../../Component/MuiComponents/CustomTextField";
 import CustomInput from "../../../Component/custom/CustomInput";
 
@@ -26,8 +24,9 @@ const CreateOrder = () => {
   const handleSubmit = (values, { setSubmitting }) => {
     const payload = {
       customer_id: values.customer_id,
-      notes: values.notes,
       total_amount: Math.floor(values.total_amount),
+      paid_amount: Math.floor(values.paid_amount),
+      unpaid_amount: Math.floor(values.unpaid_amount),
       status: values.status,
       is_dummy: values.is_dummy ? 1 : 0,
       has_returned: false,
@@ -149,45 +148,26 @@ const CreateOrder = () => {
                                 color="success"
                                 size="small"
                                 onClick={() => {
-                                  const existingItemIndex =
-                                    formProps.values.items.findIndex(
-                                      (o) =>
-                                        o.name === formProps.values.item_name
-                                    );
-
-                                  if (existingItemIndex !== -1) {
-                                    const updatedItems = [
-                                      ...formProps.values.items,
-                                    ];
-                                    updatedItems[
-                                      existingItemIndex
-                                    ].quantity += 1;
-                                    updatedItems[existingItemIndex].amount =
-                                      updatedItems[existingItemIndex].price *
-                                      updatedItems[existingItemIndex].quantity;
-
-                                    formProps.setFieldValue(
-                                      "items",
-                                      updatedItems
-                                    );
-                                  } else {
-                                    let obj = items?.data.find(
-                                      (o) =>
-                                        o.name === formProps.values.item_name
-                                    );
-                                    if (obj) {
-                                      arrayHelpers.push({
-                                        item_id: obj.id,
-                                        name: obj.name,
-                                        price: obj.unit_price,
-                                        quantity: 1,
-                                        amount: obj.unit_price,
-                                      });
-                                      formProps.setFieldValue(
-                                        "item_name",
-                                        obj.name
-                                      );
-                                    }
+                                  const itemName = formProps.values.item_name;
+                                  if (!itemName) return;
+                                  const exists = formProps.values.items.some(
+                                    (item) => item.name === itemName
+                                  );
+                                  if (exists) {
+                                    formProps.setFieldValue("item_name", "");
+                                    return;
+                                  }
+                                  const obj = items?.data.find(
+                                    (o) => o.name === itemName
+                                  );
+                                  if (obj) {
+                                    arrayHelpers.push({
+                                      item_id: obj.id,
+                                      name: obj.name,
+                                      price: obj.price,
+                                      quantity: 1,
+                                      unit: "",
+                                    });
                                   }
                                   formProps.setFieldValue("item_name", "");
                                 }}
@@ -198,18 +178,18 @@ const CreateOrder = () => {
                             </Col>
                           </Row>
 
-                          <div className="text-danger p-2">
+                          <div className="text-danger">
                             <ErrorMessage name="items" />
                           </div>
                           <div className="table-section">
                             <Table className="mt-3">
                               <thead>
                                 <tr>
-                                  <th>ITEM Name</th>
+                                  <th>Item Name</th>
                                   <th>QTY</th>
                                   <th>UNIT</th>
                                   <th>PRICE</th>
-                                  <th>Delete</th>
+                                  <th>TOTAL</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -217,13 +197,20 @@ const CreateOrder = () => {
                                   (product, index) => {
                                     const price = Number(product.price);
                                     const quantity = Number(product.quantity);
-                                    const final = price * quantity;
-                                    product.amount = final;
-                                    product.unit_price = price;
-                                    product.total_amount = final;
-
+                                    const total = price * quantity;
                                     return (
                                       <tr key={index}>
+                                        <td>
+                                          <Field
+                                            component={CustomInput}
+                                            type="text"
+                                            name={`items.${index}.name`}
+                                            id="name"
+                                            value={product.name}
+                                            readOnly
+                                            style={{ background: "#f5f5f5" }}
+                                          />
+                                        </td>
                                         <td>
                                           <Field
                                             component={CustomInput}
@@ -246,23 +233,13 @@ const CreateOrder = () => {
                                         <td>
                                           <Field
                                             component={CustomInput}
-                                            type="text"
+                                            type="number"
                                             name={`items.${index}.price`}
                                             id="price"
                                             placeholder="Enter Price"
                                           />
                                         </td>
-                                        <td>
-                                          <Button
-                                            color="danger"
-                                            size="sm"
-                                            onClick={() =>
-                                              arrayHelpers.remove(index)
-                                            }
-                                          >
-                                            <i className="fa fa-trash" />
-                                          </Button>
-                                        </td>
+                                        <td>₹ {total}</td>
                                       </tr>
                                     );
                                   }

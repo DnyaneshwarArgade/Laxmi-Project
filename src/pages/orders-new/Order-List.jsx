@@ -22,6 +22,7 @@ import { MdEdit } from "react-icons/md";
 import { FaSquarePhone } from "react-icons/fa6";
 import { billsGetData, customersGetData, itemsGetData } from "../../store/creators";
 import Loading from "../../Component/loaders/Loading";
+import { formatDateDMY } from "../../Helpers/dateFormat";
 
 export default function Orders() {
   const dispatch = useDispatch();
@@ -167,7 +168,7 @@ export default function Orders() {
                   <FaUser className="info-icon" /> <strong>{order.customer?.name || "N/A"}</strong>
                 </p>
                 <p>
-                  <FaCalendarAlt className="info-icon" /> {order.date}
+                  <FaCalendarAlt className="info-icon" /> {formatDateDMY(order.date)}
                 </p>
                 <p className="amount green">
                   <FaRupeeSign className="info-icon" /> Total amount: {order.total_amount}
@@ -199,7 +200,7 @@ export default function Orders() {
           ))}
 
           {/* Invoice Modal */}
-          <Modal isOpen={invoiceModalOpen} toggle={handleCloseInvoice} size="lg">
+          <Modal isOpen={invoiceModalOpen} toggle={handleCloseInvoice} size="md">
             <ModalHeader toggle={handleCloseInvoice}>Invoice</ModalHeader>
             <ModalBody className="p-0">
               {selectedOrder && <ViewInvoice invoice={selectedOrder} />}

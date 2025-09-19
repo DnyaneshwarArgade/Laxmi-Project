@@ -7,6 +7,7 @@ import * as actions from "../../../store/creators";
 import CustomInput from "../../../Component/custom/CustomInput";
 import { MdDelete } from "react-icons/md";
 import LinerLoader from "../../../Component/loaders/LinerLoader";
+import { MdAdd } from "react-icons/md";
 
 const CreateOrder = ({ toggle }) => {
   const dispatch = useDispatch();
@@ -82,16 +83,14 @@ const CreateOrder = ({ toggle }) => {
 
               return (
                 <Form>
-                  {/* Dummy Checkbox */}
                   <Row className="mb-3">
-                    <Col>
+                    <Col className="text-right">
                       <Label check>
-                        <Field type="checkbox" name="is_dummy" className="mr-2" /> Is Dummy
+                        <Field type="checkbox" name="is_dummy" className="mr-2"/> Is Dummy
                       </Label>
                     </Col>
                   </Row>
 
-                  {/* Customer & Date */}
                   <Row className="mb-3">
                     <Col md={6} xs={12} className="mb-2">
                       <CustomAutoComplete
@@ -120,13 +119,12 @@ const CreateOrder = ({ toggle }) => {
 
                   <hr />
 
-                  {/* Items Section */}
                   <FieldArray
                     name="items"
                     render={(arrayHelpers) => (
                       <div>
-                        <Row className="align-items-center mb-2">
-                          <Col md={8} xs={12} className="mb-2">
+                        <div className="d-flex align-items-center mb-2">
+                          <div className="flex-grow-1 me-2">
                             <Field
                               component={CustomInput}
                               type="text"
@@ -147,50 +145,69 @@ const CreateOrder = ({ toggle }) => {
                                   ))}
                               </datalist>
                             )}
-                          </Col>
-                          <Col md={4} xs={12}>
-                            <Button
-                              color="success"
-                              block
-                              onClick={() => {
-                                const itemName = formProps.values.item_name;
-                                if (!itemName) return;
-                                const exists = formProps.values.items.some((item) => item.name === itemName);
-                                if (exists) {
-                                  formProps.setFieldValue("item_name", "");
-                                  return;
-                                }
-                                const obj = items?.data.find((o) => o.name === itemName);
-                                if (obj) {
-                                  arrayHelpers.push({
-                                    item_id: obj.id,
-                                    name: obj.name,
-                                    price: obj.price,
-                                    quantity: 1,
-                                    unit: "",
-                                  });
-                                }
+                          </div>
+                          <Button
+                            color="success"
+                            className="rounded-circle p-0 d-flex align-items-center justify-content-center"
+                            style={{ 
+                              width: "40px", 
+                              height: "40px",
+                              flexShrink: 0
+                            }}
+                            onClick={() => {
+                              const itemName = formProps.values.item_name;
+                              if (!itemName) return;
+                              const exists = formProps.values.items.some((item) => item.name === itemName);
+                              if (exists) {
                                 formProps.setFieldValue("item_name", "");
-                              }}
-                            >
-                              Add Item
-                            </Button>
-                          </Col>
-                        </Row>
+                                return;
+                              }
+                              const obj = items?.data.find((o) => o.name === itemName);
+                              if (obj) {
+                                arrayHelpers.push({
+                                  item_id: obj.id,
+                                  name: obj.name,
+                                  price: obj.price,
+                                  quantity: 1,
+                                  unit: "",
+                                });
+                              }
+                              formProps.setFieldValue("item_name", "");
+                            }}
+                          >
+                            <MdAdd size={24} />
+                          </Button>
+                        </div>
 
                         <ErrorMessage name="items" className="text-danger" />
 
-                        {/* Table */}
-                        <div className="table-responsive">
-                          <Table bordered hover className="mt-3 align-middle" size="sm">
+                        <div className="table-responsive"
+                          style={{
+                            overflowX: "auto",
+                            width: "100%",
+                            display: "block",
+                          }}>
+                          <Table bordered hover className="mt-3 align-middle" size="sm" style={{ 
+                            tableLayout: "fixed",
+                            minWidth: "600px",
+                            width: "100%"
+                          }}>
+                            <colgroup>
+                              <col style={{ width: "80px" }} /> 
+                              <col style={{ width: "150px" }} /> 
+                              <col style={{ width: "80px" }} />  
+                              <col style={{ width: "80px" }} />  
+                              <col style={{ width: "100px" }} /> 
+                              <col style={{ width: "100px" }} /> 
+                            </colgroup>
                             <thead className="table-light" style={{ fontSize: "0.8rem" }}>
                               <tr>
-                                <th>Item Name</th>
-                                <th>QTY</th>
-                                <th>Unit</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                                <th>Action</th>
+                                <th style={{ width: "80px" }}>Action</th>
+                                <th style={{ width: "150px" }}>Item Name</th>
+                                <th style={{ width: "80px" }}>QTY</th>
+                                <th style={{ width: "80px" }}>Unit</th>
+                                <th style={{ width: "100px" }}>Price</th>
+                                <th style={{ width: "100px" }}>Total</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -198,7 +215,18 @@ const CreateOrder = ({ toggle }) => {
                                 const total = Number(product.price) * Number(product.quantity);
                                 return (
                                   <tr key={index} style={{ fontSize: "0.75rem" }}>
-                                    <td>
+                                     <td style={{ width: "80px" }}>
+                                      <Button 
+                                        color="danger" 
+                                        size="sm" 
+                                        className="rounded-circle p-0 d-flex align-items-center justify-content-center"
+                                        style={{ width: "30px", height: "30px" }}
+                                        onClick={() => arrayHelpers.remove(index)}
+                                      >
+                                        <MdDelete size={19} />
+                                      </Button>
+                                    </td>
+                                    <td style={{ width: "150px", overflow: "hidden", textOverflow: "ellipsis" }}>
                                       <Field
                                         component={CustomInput}
                                         type="text"
@@ -206,40 +234,51 @@ const CreateOrder = ({ toggle }) => {
                                         value={product.name}
                                         readOnly
                                         className="form-control-plaintext p-1"
+                                        style={{ width: "100%", overflow: "hidden", textOverflow: "ellipsis" }}
                                       />
                                     </td>
-                                    <td>
-                                      <Field component={CustomInput} type="number" min="1" name={`items.${index}.quantity`} className="p-1" />
+                                    <td style={{ width: "80px" }}>
+                                      <Field 
+                                        component={CustomInput} 
+                                        type="number" 
+                                        min="1" 
+                                        name={`items.${index}.quantity`} 
+                                        className="p-1" 
+                                        style={{ width: "100%" }}
+                                      />
                                     </td>
-                                    <td>
-                                      <Field component={CustomInput} type="text" name={`items.${index}.unit`} className="p-1" />
+                                    <td style={{ width: "80px" }}>
+                                      <Field 
+                                        component={CustomInput} 
+                                        type="text" 
+                                        name={`items.${index}.unit`} 
+                                        placeholder="Unit"
+                                        className="p-1" 
+                                        style={{ width: "100%" }}
+                                      />
                                     </td>
-                                    <td>
-                                      <Field component={CustomInput} type="number" name={`items.${index}.price`} className="p-1" />
+                                    <td style={{ width: "100px" }}>
+                                      <Field 
+                                        component={CustomInput} 
+                                        type="number" 
+                                        name={`items.${index}.price`} 
+                                        className="p-1" 
+                                        style={{ width: "100%" }}
+                                      />
                                     </td>
-                                    <td>₹ {total}</td>
-                                    <td>
-                                      <Button color="danger" size="sm" onClick={() => arrayHelpers.remove(index)}>
-                                        <MdDelete size={16} />
-                                      </Button>
-                                    </td>
+                                    <td style={{ width: "100px" }}>₹ {total}</td>                                
                                   </tr>
                                 );
                               })}
                             </tbody>
 
-                            {/* Footer */}
                             <tfoot>
                               <tr className="fw-bold" style={{ fontSize: "0.8rem" }}>
-                                <td>Subtotal</td>
-                                <td>Qty {totalQuantity}</td>
-                                <td></td>
-                                <td></td>
+                                <td colSpan="2">Subtotal (Qty: {totalQuantity})</td>
+                                <td colSpan="3"></td>
                                 <td>₹ {formProps.values.total_amount}</td>
-                                <td></td>
                               </tr>
 
-                              {/* Paid Amount Row */}
                               <tr>
                                 <td colSpan="6">
                                   <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ fontSize: "0.8rem" }}>
@@ -262,7 +301,6 @@ const CreateOrder = ({ toggle }) => {
                                 </td>
                               </tr>
 
-                              {/* Unpaid Amount Row */}
                               <tr>
                                 <td colSpan="6">
                                   <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ fontSize: "0.8rem" }}>
@@ -278,28 +316,23 @@ const CreateOrder = ({ toggle }) => {
                     )}
                   />
 
-                  {/* Buttons */}
-                  <Row className="mt-4">
-                    <Col md={6} xs={12} className="mb-2">
-                      <Button type="reset" color="danger" block>
-                        Reset
-                      </Button>
-                    </Col>
-                    <Col md={6} xs={12}>
-                      <Button
-                        type="submit"
-                        disabled={formProps.isSubmitting}
-                        block
-                        style={{
-                          background: "linear-gradient(90deg, #4a6cf7, #7b42f6)",
-                          border: "none",
-                          color: "white",
-                        }}
-                      >
-                        Submit
-                      </Button>
-                    </Col>
-                  </Row>
+                  <div className="d-flex gap-2 mt-4">
+                    <Button type="reset" color="danger" className="flex-fill">
+                      Reset
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={formProps.isSubmitting}
+                      className="flex-fill"
+                      style={{
+                        background: "linear-gradient(90deg, #4a6cf7, #7b42f6)",
+                        border: "none",
+                        color: "white",
+                      }}
+                    >
+                      Submit
+                    </Button>
+                  </div>
                 </Form>
               );
             }}

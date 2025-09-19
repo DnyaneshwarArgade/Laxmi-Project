@@ -16,7 +16,9 @@ import {
   FaCheckCircle,
   FaListUl,
   FaSortUp,
-  FaSortDown
+  FaSortDown,
+  FaAngleLeft,
+  FaAngleRight
 } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { FaSquarePhone } from "react-icons/fa6";
@@ -35,37 +37,34 @@ export default function Orders() {
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [createOrderModalOpen, setCreateOrderModalOpen] = useState(false);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Handle opening create order modal
   const handleOpenCreateOrder = () => {
     setCreateOrderModalOpen(true);
   };
 
-  // Handle closing create order modal
   const handleCloseCreateOrder = () => {
     setCreateOrderModalOpen(false);
   };
 
-  // Handle opening invoice modal
   const handleViewInvoice = (order) => {
     setSelectedOrder(order);
     setInvoiceModalOpen(true);
   };
 
-  // Handle closing invoice modal
   const handleCloseInvoice = () => {
     setInvoiceModalOpen(false);
     setSelectedOrder(null);
   };
 
-  // Fetch data on component mount
   useEffect(() => {
     dispatch(billsGetData({ token: login?.token }));
     dispatch(customersGetData({ token: login?.token }));
     dispatch(itemsGetData({ token: login?.token }));
   }, [dispatch, login]);
 
-  // Filter orders based on search term and status
   const ordersArray = Array.isArray(bills) ? bills : bills?.data || [];
   const filteredOrders = ordersArray.filter((order) => {
     const name = order.customer?.name || "";
@@ -83,12 +82,77 @@ export default function Orders() {
     return matchesSearch && matchesStatus;
   });
 
-  // Sort orders by date
   const sortedOrders = [...(filteredOrders || [])].sort((a, b) => {
     if (sortOrder === "asc") return new Date(a.date) - new Date(b.date);
     if (sortOrder === "desc") return new Date(b.date) - new Date(a.date);
     return 0;
   });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentOrders = sortedOrders.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sortedOrders.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPageNumbers = 5;
+    
+    if (totalPages <= maxPageNumbers) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      pageNumbers.push(1);
+      
+      let start = Math.max(2, currentPage - 1);
+      let end = Math.min(totalPages - 1, currentPage + 1);
+      
+      if (currentPage <= 2) {
+        end = 4;
+      }
+      
+      if (currentPage >= totalPages - 1) {
+        start = totalPages - 3;
+      }
+      
+      if (start > 2) {
+        pageNumbers.push('...');
+      }
+      
+      for (let i = start; i <= end; i++) {
+        pageNumbers.push(i);
+      }
+      
+      if (end < totalPages - 1) {
+        pageNumbers.push('...');
+      }
+      
+      if (totalPages > 1) {
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
 
   return (
     <div className="orders-container">
@@ -119,29 +183,28 @@ export default function Orders() {
             </button>
           </section>
 
-          {/* Filters & Sorting */}
           <nav className="orders-filters compact filter-row">
             <button
               className={`filter-btn small${filterStatus === "All" ? " active" : ""}`}
-              onClick={() => setFilterStatus("All")}
+              onClick={() => {setFilterStatus("All"); setCurrentPage(1);}}
             >
               All
             </button>
             <button
               className={`filter-btn small completed${filterStatus === "Completed" ? " active" : ""}`}
-              onClick={() => setFilterStatus("Completed")}
+              onClick={() => {setFilterStatus("Completed"); setCurrentPage(1);}}
             >
               <FaCheckCircle />
             </button>
             <button
               className={`filter-btn small pending${filterStatus === "Pending" ? " active" : ""}`}
-              onClick={() => setFilterStatus("Pending")}
+              onClick={() => {setFilterStatus("Pending"); setCurrentPage(1);}}
             >
               <FaClock />
             </button>
             <button
               className={`filter-btn small dummy${filterStatus === "Dummy" ? " active" : ""}`}
-              onClick={() => setFilterStatus("Dummy")}
+              onClick={() => {setFilterStatus("Dummy"); setCurrentPage(1);}}
             >
               Dummy
             </button>
@@ -157,12 +220,32 @@ export default function Orders() {
         </div>
       </div>
 
-      {/* Orders List */}
+      {sortedOrders.length > 0 && (
+        <div className="pagination-controls-top">
+          <div className="items-per-page-selector">
+            <label htmlFor="itemsPerPage">Show: </label>
+            <select
+              id="itemsPerPage"
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+          <div className="pagination-info">
+            Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, sortedOrders.length)} of {sortedOrders.length} orders
+          </div>
+        </div>
+      )}
+
       {isLoading ? (
         <Loading />
-      ) : sortedOrders.length > 0 ? (
+      ) : currentOrders.length > 0 ? (
         <>
-          {sortedOrders.map((order) => (
+          {currentOrders.map((order) => (
             <div
               className={`order-card ${order.status.toLowerCase() === "completed" ? "completed-card" : ""}`}
               key={order.id}
@@ -207,7 +290,41 @@ export default function Orders() {
             </div>
           ))}
 
-          {/* Invoice Modal */}
+          {totalPages > 1 && (
+            <div className="pagination-controls">
+              <div className="pagination-buttons">
+                <button 
+                  onClick={prevPage} 
+                  disabled={currentPage === 1}
+                  className="pagination-btn"
+                  title="Previous Page"
+                >
+                  <FaAngleLeft />
+                </button>
+                
+                {getPageNumbers().map((pageNumber, index) => (
+                  <button
+                    key={index}
+                    onClick={() => typeof pageNumber === 'number' ? paginate(pageNumber) : null}
+                    className={`pagination-btn ${currentPage === pageNumber ? 'active' : ''} ${typeof pageNumber !== 'number' ? 'disabled' : ''}`}
+                    disabled={typeof pageNumber !== 'number'}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+                
+                <button 
+                  onClick={nextPage} 
+                  disabled={currentPage === totalPages}
+                  className="pagination-btn"
+                  title="Next Page"
+                >
+                  <FaAngleRight />
+                </button>
+              </div>
+            </div>
+          )}
+
           <Modal isOpen={invoiceModalOpen} toggle={handleCloseInvoice} size="md">
             <ModalHeader toggle={handleCloseInvoice}>Invoice</ModalHeader>
             <ModalBody className="p-0">
@@ -215,7 +332,6 @@ export default function Orders() {
             </ModalBody>
           </Modal>
 
-          {/* Create Order Modal */}
           <Modal isOpen={createOrderModalOpen} toggle={handleCloseCreateOrder} size="lg">
             <ModalHeader toggle={handleCloseCreateOrder}>Create Order</ModalHeader>
             <ModalBody className="p-0">

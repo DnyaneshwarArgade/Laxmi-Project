@@ -262,6 +262,7 @@ export default function Orders() {
                 alignItems: "center",
                 gap: "6px",
                 padding: "6px 14px",
+                height: "28px",
                 borderRadius: "20px",
                 border: sortOrder !== "none" ? "2px solid #4a6cf7" : "1px solid #ccc",
                 background: sortOrder !== "none" ? "#eef3fe" : "#fff",

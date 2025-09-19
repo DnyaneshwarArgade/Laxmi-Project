@@ -405,7 +405,7 @@
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background-color: #f0f4ff;
+  /* background-color: #f0f4ff; */
   border-color: #4a6cf7;
 }
 

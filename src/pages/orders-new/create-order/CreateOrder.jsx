@@ -17,10 +17,14 @@ const CreateOrder = ({ toggle }) => {
   const { items } = useSelector((state) => state.entities?.items);
 
   const data = { token: login?.token };
-  const customersProps = { options: customers?.data, getOptionLabel: (option) => option?.name };
+  const customersProps = {
+    options: customers?.data,
+    getOptionLabel: (option) => option?.name,
+  };
 
   const handleSubmit = (values, { setSubmitting }) => {
-    const finalStatus = Number(values.unpaid_amount) === 0 ? "Completed" : values.status;
+    const finalStatus =
+      Number(values.unpaid_amount) === 0 ? "Completed" : values.status;
     const bills = {
       customer_id: values.customer_id,
       date: values.date,
@@ -66,12 +70,15 @@ const CreateOrder = ({ toggle }) => {
               date: Yup.string(),
               status: Yup.string().required("This Field is Mandatory"),
               total_amount: Yup.string().required("This Field is Mandatory"),
-              items: Yup.array().min(1, "At least one item is required").required("Items are required"),
+              items: Yup.array()
+                .min(1, "At least one item is required")
+                .required("Items are required"),
             })}
           >
             {(formProps) => {
               const totalAmount = formProps.values.items?.reduce(
-                (sum, item) => sum + (Number(item.price) * Number(item.quantity) || 0),
+                (sum, item) =>
+                  sum + (Number(item.price) * Number(item.quantity) || 0),
                 0
               );
               formProps.values.total_amount = totalAmount;
@@ -86,7 +93,12 @@ const CreateOrder = ({ toggle }) => {
                   <Row className="mb-3">
                     <Col className="text-right">
                       <Label check>
-                        <Field type="checkbox" name="is_dummy" className="mr-2"/> Is Dummy
+                        <Field
+                          type="checkbox"
+                          name="is_dummy"
+                          className="mr-2"
+                        />{" "}
+                        Is Dummy
                       </Label>
                     </Col>
                   </Row>
@@ -139,7 +151,12 @@ const CreateOrder = ({ toggle }) => {
                             {items?.data?.length > 0 && (
                               <datalist id="itemdatalist">
                                 {items?.data
-                                  .filter((item) => !formProps.values.items.some((added) => added.name === item.name))
+                                  .filter(
+                                    (item) =>
+                                      !formProps.values.items.some(
+                                        (added) => added.name === item.name
+                                      )
+                                  )
                                   .map((item, index) => (
                                     <option key={index} value={item.name} />
                                   ))}
@@ -149,20 +166,24 @@ const CreateOrder = ({ toggle }) => {
                           <Button
                             color="success"
                             className="rounded-circle p-0 d-flex align-items-center justify-content-center"
-                            style={{ 
-                              width: "40px", 
+                            style={{
+                              width: "40px",
                               height: "40px",
-                              flexShrink: 0
+                              flexShrink: 0,
                             }}
                             onClick={() => {
                               const itemName = formProps.values.item_name;
                               if (!itemName) return;
-                              const exists = formProps.values.items.some((item) => item.name === itemName);
+                              const exists = formProps.values.items.some(
+                                (item) => item.name === itemName
+                              );
                               if (exists) {
                                 formProps.setFieldValue("item_name", "");
                                 return;
                               }
-                              const obj = items?.data.find((o) => o.name === itemName);
+                              const obj = items?.data.find(
+                                (o) => o.name === itemName
+                              );
                               if (obj) {
                                 arrayHelpers.push({
                                   item_id: obj.id,
@@ -181,107 +202,181 @@ const CreateOrder = ({ toggle }) => {
 
                         <ErrorMessage name="items" className="text-danger" />
 
-                        <div className="table-responsive"
+                        <div
+                          className="table-responsive"
                           style={{
                             overflowX: "auto",
                             width: "100%",
                             display: "block",
-                          }}>
-                          <Table bordered hover className="mt-3 align-middle" size="sm" style={{ 
-                            tableLayout: "fixed",
-                            minWidth: "600px",
-                            width: "100%"
-                          }}>
+                          }}
+                        >
+                          <Table
+                            bordered
+                            hover
+                            className="mt-3 align-middle"
+                            size="sm"
+                            style={{
+                              tableLayout: "fixed",
+                              minWidth: "600px",
+                              width: "100%",
+                            }}
+                          >
                             <colgroup>
-                              <col style={{ width: "80px" }} /> 
-                              <col style={{ width: "150px" }} /> 
-                              <col style={{ width: "80px" }} />  
-                              <col style={{ width: "80px" }} />  
-                              <col style={{ width: "100px" }} /> 
-                              <col style={{ width: "100px" }} /> 
+                              <col style={{ width: "50px" }} />
+                              <col style={{ width: "150px" }} />
+                              <col style={{ width: "50px" }} />
+                              <col style={{ width: "80px" }} />
+                              <col style={{ width: "100px" }} />
+                              <col style={{ width: "100px" }} />
                             </colgroup>
-                            <thead className="table-light" style={{ fontSize: "0.8rem" }}>
+                            <thead
+                              className="table-light"
+                              style={{ fontSize: "0.8rem" }}
+                            >
                               <tr>
-                                <th style={{ width: "80px" }}>Action</th>
+                                <th style={{ width: "50px" }}></th>
                                 <th style={{ width: "150px" }}>Item Name</th>
-                                <th style={{ width: "80px" }}>QTY</th>
-                                <th style={{ width: "80px" }}>Unit</th>
-                                <th style={{ width: "100px" }}>Price</th>
+                                <th
+                                  style={{ width: "50px", textAlign: "center" }}
+                                >
+                                  QTY
+                                </th>
+                                <th style={{ width: "100px" }}>Unit</th>
+                                <th style={{ width: "80px" }}>Price</th>
                                 <th style={{ width: "100px" }}>Total</th>
                               </tr>
                             </thead>
                             <tbody>
                               {formProps.values.items.map((product, index) => {
-                                const total = Number(product.price) * Number(product.quantity);
+                                const total =
+                                  Number(product.price) *
+                                  Number(product.quantity);
                                 return (
-                                  <tr key={index} style={{ fontSize: "0.75rem" }}>
-                                     <td style={{ width: "80px" }}>
-                                      <Button 
-                                        color="danger" 
-                                        size="sm" 
+                                  <tr
+                                    key={index}
+                                    style={{ fontSize: "0.75rem" }}
+                                  >
+                                    <td
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      <Button
+                                        color="danger"
+                                        size="sm"
                                         className="rounded-circle p-0 d-flex align-items-center justify-content-center"
-                                        style={{ width: "30px", height: "30px" }}
-                                        onClick={() => arrayHelpers.remove(index)}
+                                        style={{
+                                          width: "30px",
+                                          height: "30px",
+                                        }}
+                                        onClick={() =>
+                                          arrayHelpers.remove(index)
+                                        }
                                       >
                                         <MdDelete size={19} />
                                       </Button>
                                     </td>
-                                    <td style={{ width: "150px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    <td
+                                      style={{
+                                        width: "150px",
+                                        verticalAlign: "middle", // optional, for better alignment
+                                      }}
+                                    >
+                                      <div
+                                        style={{
+                                          width: "100%",
+                                          whiteSpace: "normal",
+                                          wordBreak: "break-word",
+                                          background: "transparent",
+                                          border: "none",
+                                          padding: "4px 8px",
+                                          minHeight: "32px",
+                                        }}
+                                      >
+                                        {product.name}
+                                      </div>
+                                    </td>
+                                    <td
+                                      style={{
+                                        width: "50px",
+                                        textAlign: "center",
+                                      }}
+                                    >
                                       <Field
                                         component={CustomInput}
-                                        type="text"
-                                        name={`items.${index}.name`}
-                                        value={product.name}
-                                        readOnly
-                                        className="form-control-plaintext p-1"
-                                        style={{ width: "100%", overflow: "hidden", textOverflow: "ellipsis" }}
-                                      />
-                                    </td>
-                                    <td style={{ width: "80px" }}>
-                                      <Field 
-                                        component={CustomInput} 
-                                        type="number" 
-                                        min="1" 
-                                        name={`items.${index}.quantity`} 
-                                        className="p-1" 
-                                        style={{ width: "100%" }}
-                                      />
-                                    </td>
-                                    <td style={{ width: "80px" }}>
-                                      <Field 
-                                        component={CustomInput} 
-                                        type="text" 
-                                        name={`items.${index}.unit`} 
-                                        placeholder="Unit"
-                                        className="p-1" 
-                                        style={{ width: "100%" }}
+                                        type="number"
+                                        min="1"
+                                        name={`items.${index}.quantity`}
+                                        className="p-1"
+                                        style={{
+                                          width: "100%",
+                                          textAlign: "center",
+                                        }}
                                       />
                                     </td>
                                     <td style={{ width: "100px" }}>
-                                      <Field 
-                                        component={CustomInput} 
-                                        type="number" 
-                                        name={`items.${index}.price`} 
-                                        className="p-1" 
+                                      <Field
+                                        component={CustomInput}
+                                        type="text"
+                                        name={`items.${index}.unit`}
+                                        placeholder="Unit"
+                                        className="p-1"
                                         style={{ width: "100%" }}
                                       />
                                     </td>
-                                    <td style={{ width: "100px" }}>₹ {total}</td>                                
+                                    <td style={{ width: "80px" }}>
+                                      <Field
+                                        component={CustomInput}
+                                        type="number"
+                                        name={`items.${index}.price`}
+                                        className="p-1"
+                                        style={{
+                                          width: "100%",
+                                          textAlign: "center",
+                                        }}
+                                      />
+                                    </td>
+                                    <td
+                                      style={{
+                                        width: "100px",
+                                        textAlign: "center",
+                                        fontSize: "18px",
+                                      }}
+                                    >
+                                      <b>&#8377;&nbsp;{total}</b>
+                                    </td>
                                   </tr>
                                 );
                               })}
                             </tbody>
 
                             <tfoot>
-                              <tr className="fw-bold" style={{ fontSize: "0.8rem" }}>
-                                <td colSpan="2">Subtotal (Qty: {totalQuantity})</td>
+                              <tr
+                                className="fw-bold"
+                                style={{ fontSize: "0.8rem" }}
+                              >
+                                <td colSpan="2">
+                                  Subtotal (Qty: {totalQuantity})
+                                </td>
                                 <td colSpan="3"></td>
-                                <td>₹ {formProps.values.total_amount}</td>
+                                <td
+                                  style={{
+                                    width: "100px",
+                                    textAlign: "center",
+                                    fontSize: "18px",
+                                  }}
+                                >
+                                  &#8377;&nbsp;{formProps.values.total_amount}
+                                </td>
                               </tr>
 
                               <tr>
                                 <td colSpan="6">
-                                  <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ fontSize: "0.8rem" }}>
+                                  <div
+                                    className="d-flex justify-content-between align-items-center flex-wrap"
+                                    style={{ fontSize: "0.8rem" }}
+                                  >
                                     <span className="fw-bold">Paid Amount</span>
                                     <Field
                                       component={CustomInput}
@@ -289,12 +384,24 @@ const CreateOrder = ({ toggle }) => {
                                       name="paid_amount"
                                       placeholder="Enter Paid Amount"
                                       className="form-control"
-                                      style={{ maxWidth: "120px", flex: "1", marginTop: "5px" }}
+                                      style={{
+                                        maxWidth: "120px",
+                                        flex: "1",
+                                        marginTop: "5px",
+                                      }}
                                       onChange={(e) => {
-                                        const paid = Number(e.target.value) || 0;
-                                        formProps.setFieldValue("paid_amount", paid);
-                                        const unpaid = formProps.values.total_amount - paid;
-                                        formProps.setFieldValue("unpaid_amount", unpaid >= 0 ? unpaid : 0);
+                                        const paid =
+                                          Number(e.target.value) || 0;
+                                        formProps.setFieldValue(
+                                          "paid_amount",
+                                          paid
+                                        );
+                                        const unpaid =
+                                          formProps.values.total_amount - paid;
+                                        formProps.setFieldValue(
+                                          "unpaid_amount",
+                                          unpaid >= 0 ? unpaid : 0
+                                        );
                                       }}
                                     />
                                   </div>
@@ -303,9 +410,16 @@ const CreateOrder = ({ toggle }) => {
 
                               <tr>
                                 <td colSpan="6">
-                                  <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ fontSize: "0.8rem" }}>
-                                    <span className="fw-bold">Unpaid Amount</span>
-                                    <span className="fw-bold text-danger">₹ {formProps.values.unpaid_amount}</span>
+                                  <div
+                                    className="d-flex justify-content-between align-items-center flex-wrap"
+                                    style={{ fontSize: "0.8rem" }}
+                                  >
+                                    <span className="fw-bold">
+                                      Unpaid Amount
+                                    </span>
+                                    <span className="fw-bold text-danger">
+                                      ₹ {formProps.values.unpaid_amount}
+                                    </span>
                                   </div>
                                 </td>
                               </tr>
@@ -317,9 +431,6 @@ const CreateOrder = ({ toggle }) => {
                   />
 
                   <div className="d-flex gap-2 mt-4">
-                    <Button type="reset" color="danger" className="flex-fill">
-                      Reset
-                    </Button>
                     <Button
                       type="submit"
                       disabled={formProps.isSubmitting}
@@ -331,6 +442,9 @@ const CreateOrder = ({ toggle }) => {
                       }}
                     >
                       Submit
+                    </Button>
+                    <Button type="reset" color="danger" className="flex-fill">
+                      Reset
                     </Button>
                   </div>
                 </Form>

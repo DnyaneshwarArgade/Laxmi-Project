@@ -296,6 +296,10 @@
     font-size: 20px;
 }
 
+.completed-card {
+  background-color: #d4edda; 
+}
+
 @media (max-width: 600px) {
     .add-btn-desktop {
         display: none !important;

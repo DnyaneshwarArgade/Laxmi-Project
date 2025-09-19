@@ -75,10 +75,10 @@ export default function Orders() {
       filterStatus === "All"
         ? true
         : filterStatus === "Completed"
-        ? order.status.toLowerCase() === "completed"
-        : filterStatus === "Pending"
-        ? order.status.toLowerCase() === "pending"
-        : order.is_dummy === 1;
+          ? order.status.toLowerCase() === "completed"
+          : filterStatus === "Pending"
+            ? order.status.toLowerCase() === "pending"
+            : order.is_dummy === 1;
 
     return matchesSearch && matchesStatus;
   });
@@ -163,14 +163,21 @@ export default function Orders() {
       ) : sortedOrders.length > 0 ? (
         <>
           {sortedOrders.map((order) => (
-            <div className="order-card" key={order.id}>
+            <div
+              className={`order-card ${order.status.toLowerCase() === "completed" ? "completed-card" : ""}`}
+              key={order.id}
+            >
+
               <div className="order-info">
                 <p>
                   <FaUser className="info-icon" /> <strong>{order.customer?.name || "N/A"}</strong>
                 </p>
-                <p>
-                  <FaCalendarAlt className="info-icon" /> {formatDateDMY(order.date)}
-                </p>
+                {order.date && (
+                  <p>
+                    <FaCalendarAlt className="info-icon" /> {formatDateDMY(order.date)}
+                  </p>
+                )}
+
                 <p className="amount green">
                   <FaRupeeSign className="info-icon" /> Total amount: {order.total_amount}
                 </p>
@@ -212,7 +219,7 @@ export default function Orders() {
           <Modal isOpen={createOrderModalOpen} toggle={handleCloseCreateOrder} size="lg">
             <ModalHeader toggle={handleCloseCreateOrder}>Create Order</ModalHeader>
             <ModalBody className="p-0">
-              <CreateOrder toggle={handleCloseCreateOrder}/>
+              <CreateOrder toggle={handleCloseCreateOrder} />
             </ModalBody>
           </Modal>
         </>

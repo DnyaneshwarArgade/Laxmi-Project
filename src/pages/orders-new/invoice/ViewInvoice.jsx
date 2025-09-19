@@ -102,7 +102,7 @@ const Invoice = ({ invoice }) => {
           <table className="invoice-details-table">
             <tbody>
               <tr>
-                <td className="invoice-id">
+                <td className="invoice-id w-50">
                   Bill No - <span>INV_{id}</span>
                   <div className="underline"></div>
                 </td>
@@ -131,24 +131,24 @@ const Invoice = ({ invoice }) => {
           <table className="items-table">
             <thead>
               <tr>
-                <th className="col-sno text-center">S.No</th>
+                <th className="col-sno">Sr.No</th>
                 <th className="col-desc">Particulars</th>
-                <th className="col-unit text-center">Unit</th>
-                <th className="col-qty text-center">Qty</th>
-                <th className="col-rate text-center">Rate</th>
-                <th className="col-amt text-center">Total</th>
+                <th className="col-unit">Unit</th>
+                <th className="col-qty">Qty</th>
+                <th className="col-rate">Rate</th>
+                <th className="col-amt">Total</th>
               </tr>
             </thead>
             <tbody>
               {items.length > 0 ? (
                 items.map((item, index) => (
                   <tr key={index}>
-                    <td className="text-center">{index + 1}</td>
+                    <td>{index + 1}</td>
                     <td>{item?.item?.name || "-"}</td>
-                    <td className="text-center">{item?.unit}</td>
-                    <td className="text-center">{item?.quantity || 0}</td>
-                    <td className="text-center">{item?.price || 0}</td>
-                    <td className="text-center">
+                    <td>{item?.unit}</td>
+                    <td>{item?.quantity || 0}</td>
+                    <td>{item?.price || 0}</td>
+                    <td>
                       {(item?.quantity * item?.price).toFixed(2)}
                     </td>
                   </tr>
@@ -162,21 +162,26 @@ const Invoice = ({ invoice }) => {
               )}
             </tbody>
           </table>
-
+         
           <div className="amount-row">
             <span>Bill Amount:</span>
             <span>₹ {total_amount.toFixed(2)}</span>
           </div>
-          <div className="amount-row">
-            <span>Paid Amount:</span>
-            <span>₹ {paid_amount.toFixed(2)}</span>
-          </div>
-          {unpaid_amount > 0 && (
+       
+          {paid_amount !== total_amount && (
+            <div className="amount-row">
+              <span>Paid Amount:</span>
+              <span>₹ {paid_amount.toFixed(2)}</span>
+            </div>
+          )}
+
+          {paid_amount > 0 && paid_amount < total_amount && (
             <div className="amount-row">
               <span>Unpaid Amount:</span>
               <span>₹ {unpaid_amount.toFixed(2)}</span>
             </div>
           )}
+
 
           <div className="amount-words">
             <strong>Bill Amount in Words:</strong>{" "}

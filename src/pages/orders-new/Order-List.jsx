@@ -22,9 +22,10 @@ import {
 } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { FaSquarePhone } from "react-icons/fa6";
-import { billsGetData, customersGetData, itemsGetData } from "../../store/creators";
+import { billsGetData, deleteBillsData, customersGetData, itemsGetData } from "../../store/creators";
 import Loading from "../../Component/loaders/Loading";
 import { formatDateDMY } from "../../Helpers/dateFormat";
+import Swal from "sweetalert2";
 
 export default function Orders() {
   const dispatch = useDispatch();
@@ -64,6 +65,22 @@ export default function Orders() {
     dispatch(customersGetData({ token: login?.token }));
     dispatch(itemsGetData({ token: login?.token }));
   }, [dispatch, login]);
+
+  const deleteOrder = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteBillsData({ id, data: { token: login?.token } }));
+      }
+    });
+  };
 
   const ordersArray = Array.isArray(bills) ? bills : bills?.data || [];
   const filteredOrders = ordersArray.filter((order) => {
@@ -278,7 +295,7 @@ export default function Orders() {
                 <a className="call-btn" href={`tel:${order.customer?.phone}`}>
                   <FaSquarePhone />
                 </a>
-                <button className="delete-btn" onClick={() => alert("Delete " + order.id)}>
+                <button className="delete-btn" onClick={() => deleteOrder(order.id)}>
                   <FaTrash />
                 </button>
                 {order.status !== "Completed" && (

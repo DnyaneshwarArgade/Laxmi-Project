@@ -147,7 +147,6 @@ const CreateOrder = ({ toggle }) => {
                     </Col>
                   </Row>
 
-
                   <FieldArray
                     name="items"
                     render={(arrayHelpers) => (
@@ -174,6 +173,7 @@ const CreateOrder = ({ toggle }) => {
                           >
                             <colgroup>
                               <col style={{ width: "50px" }} />
+                              {/* <col style={{ width: "50px" }} /> */}
                               <col style={{ width: "150px" }} />
                               <col style={{ width: "50px" }} />
                               <col style={{ width: "80px" }} />
@@ -186,6 +186,11 @@ const CreateOrder = ({ toggle }) => {
                             >
                               <tr>
                                 <th style={{ width: "50px" }}></th>
+                                {/* <th
+                                  style={{ width: "50px", textAlign: "center" }}
+                                >
+                                  Sr.No
+                                </th> */}
                                 <th style={{ width: "150px" }}>Item Name</th>
                                 <th
                                   style={{ width: "50px", textAlign: "center" }}
@@ -207,6 +212,7 @@ const CreateOrder = ({ toggle }) => {
                                     key={index}
                                     style={{ fontSize: "0.75rem" }}
                                   >
+                                    
                                     <td
                                       style={{
                                         display: "flex",
@@ -228,10 +234,18 @@ const CreateOrder = ({ toggle }) => {
                                         <MdDelete size={19} />
                                       </Button>
                                     </td>
+                                    {/* <td
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      {index + 1}
+                                    </td> */}
                                     <td
                                       style={{
                                         width: "150px",
-                                        verticalAlign: "middle", // optional, for better alignment
+                                        verticalAlign: "middle", 
                                       }}
                                     >
                                       <CustomAutoComplete

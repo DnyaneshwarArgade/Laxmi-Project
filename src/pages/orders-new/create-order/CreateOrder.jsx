@@ -7,6 +7,7 @@ import * as actions from "../../../store/creators";
 import CustomInput from "../../../Component/custom/CustomInput";
 import { MdDelete } from "react-icons/md";
 import LinerLoader from "../../../Component/loaders/LinerLoader";
+import { Autocomplete, TextField } from "@mui/material";
 
 const CreateOrder = ({ toggle }) => {
   const dispatch = useDispatch();
@@ -174,7 +175,7 @@ const CreateOrder = ({ toggle }) => {
                             <colgroup>
                               <col style={{ width: "50px" }} />
                               <col style={{ width: "50px" }} />
-                              <col style={{ width: "150px" }} />
+                              <col style={{ width: "200px" }} />
                               <col style={{ width: "50px" }} />
                               <col style={{ width: "80px" }} />
                               <col style={{ width: "100px" }} />
@@ -191,7 +192,7 @@ const CreateOrder = ({ toggle }) => {
                                 >
                                   Sr No
                                 </th>
-                                <th style={{ width: "150px" }}>Item Name</th>
+                                <th style={{ width: "200px" }}>Item Name</th>
                                 <th
                                   style={{ width: "50px", textAlign: "center" }}
                                 >
@@ -212,12 +213,7 @@ const CreateOrder = ({ toggle }) => {
                                     key={index}
                                     style={{ fontSize: "0.75rem" }}
                                   >
-                                    <td
-                                      // style={{
-                                      //   display: "flex",
-                                      //   justifyContent: "center",
-                                      // }}
-                                    >
+                                    <td className="text-center">
                                       <Button
                                         color="danger"
                                         size="sm"
@@ -243,41 +239,43 @@ const CreateOrder = ({ toggle }) => {
                                     </td>
                                     <td
                                       style={{
-                                        width: "150px",
+                                        width: "200px",
                                         verticalAlign: "middle",
                                       }}
                                     >
-                                      <CustomAutoComplete
-                                        name={`items.${index}.item_id`}
-                                        formProps={formProps}
-                                        defaultProps={{
-                                          options: items?.data,
-                                          getOptionLabel: (option) =>
-                                            option?.name || "",
-                                        }}
-                                        label="Item Name"
-                                        value={product.item_id}
-                                        onChange={(e, value) => {
-                                          if (value) {
+                                      <Autocomplete
+                                        options={items?.data || []}
+                                        getOptionLabel={(option) =>
+                                          option?.name || ""
+                                        }
+                                        value={
+                                          items?.data?.find(
+                                            (item) =>
+                                              item.id === product.item_id
+                                          ) || null
+                                        }
+                                        onChange={(event, value) => {
+                                          if (
+                                            value &&
+                                            typeof value === "object"
+                                          ) {
                                             formProps.setFieldValue(
                                               `items.${index}.item_id`,
-                                              value.id
+                                              value.id ?? ""
                                             );
-
                                             formProps.setFieldValue(
                                               `items.${index}.price`,
-                                              value.price
+                                              value.price ?? ""
                                             );
                                             formProps.setFieldValue(
                                               `items.${index}.unit`,
-                                              value.unit || ""
+                                              value.unit ?? ""
                                             );
                                           } else {
                                             formProps.setFieldValue(
                                               `items.${index}.item_id`,
                                               ""
                                             );
-
                                             formProps.setFieldValue(
                                               `items.${index}.price`,
                                               ""
@@ -288,7 +286,15 @@ const CreateOrder = ({ toggle }) => {
                                             );
                                           }
                                         }}
-                                        style={{ width: "100%" }}
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            label="Item Name"
+                                            fullWidth
+                                            size="small"
+                                          />
+                                        )}
+                                        sx={{ width: "100%" }}
                                       />
                                       <div
                                         className="text-danger"
@@ -427,100 +433,97 @@ const CreateOrder = ({ toggle }) => {
                               </tr>
                             </tfoot> */}
                           </Table>
-                          <table>
-                              <tr
-                                className="fw-bold"
-                                style={{ fontSize: "0.8rem" }}
-                              >
-                                <td colSpan="4">
-                                  Subtotal (Qty: {totalQuantity})
-                                </td>
-                                <td colSpan="2"></td>
-                                <td
-                                  style={{
-                                    width: "100px",
-                                    textAlign: "center",
-                                    fontSize: "18px",
-                                  }}
-                                >
-                                  &#8377;&nbsp;{formProps.values.total_amount}
-                                </td>
-                              </tr>
-
-                              <tr>
-                                <td>
-                                  <div
-                                    className="d-flex justify-content-between align-items-center flex-wrap"
-                                    style={{ fontSize: "0.8rem" }}
-                                  >
-                                    <span className="fw-bold">Paid Amount</span>
-                                    <Field
-                                      component={CustomInput}
-                                      type="number"
-                                      name="paid_amount"
-                                      placeholder="Enter Paid Amount"
-                                      className="form-control"
-                                      style={{
-                                        maxWidth: "120px",
-                                        flex: "1",
-                                        marginTop: "5px",
-                                      }}
-                                      onChange={(e) => {
-                                        const paid =
-                                          Number(e.target.value) || 0;
-                                        formProps.setFieldValue(
-                                          "paid_amount",
-                                          paid
-                                        );
-                                        const unpaid =
-                                          formProps.values.total_amount - paid;
-                                        formProps.setFieldValue(
-                                          "unpaid_amount",
-                                          unpaid >= 0 ? unpaid : 0
-                                        );
-                                      }}
-                                    />
-                                  </div>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <div
-                                    className="d-flex justify-content-between align-items-center flex-wrap"
-                                    style={{ fontSize: "0.8rem" }}
-                                  >
-                                    <span className="fw-bold">
-                                      Unpaid Amount
-                                    </span>
-                                    <span className="fw-bold text-danger">
-                                      ₹ {formProps.values.unpaid_amount}
-                                    </span>
-                                  </div>
-                                </td>
-                              </tr>
-                            </table>
-                          <div className="mt-2 mb-2 d-flex justify-content-end">
-                            <Button
-                              color="primary"
-                              size="sm"
-                              onClick={() =>
-                                arrayHelpers.push({
-                                  item_id: "",
-                                  quantity: "1",
-                                  price: "0",
-                                  unit: "",
-                                })
-                              }
+                        </div>
+                        <div className="mt-2 mb-2 d-flex justify-content-end">
+                          <Button
+                            color="primary"
+                            size="sm"
+                            onClick={() =>
+                              arrayHelpers.push({
+                                item_id: "",
+                                quantity: "1",
+                                price: "0",
+                                unit: "",
+                              })
+                            }
+                          >
+                            Add Item
+                          </Button>
+                        </div>
+                        {/* Mobile-friendly summary section */}
+                        <div
+                          className="order-summary-mobile mt-3 mb-3 p-2 rounded shadow-sm"
+                          style={{ background: "#f8f9fa" }}
+                        >
+                          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                            <div
+                              className="fw-bold"
+                              style={{ fontSize: "1rem" }}
                             >
-                              Add Item
-                            </Button>
+                              Subtotal (Qty: {totalQuantity})
+                            </div>
+                            <div
+                              className="fw-bold"
+                              style={{ fontSize: "1rem" }}
+                            >
+                              Subtotal (Price: {formProps.values.total_amount})
+                            </div>
+                            {/* <div className="fw-bold text-primary" style={{ fontSize: '1.2rem', textAlign: 'right' }}>
+                                &#8377;&nbsp;{formProps.values.total_amount}
+                              </div> */}
+                          </div>
+                          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mt-2">
+                            <div
+                              className="fw-bold"
+                              style={{ fontSize: "1rem" }}
+                            >
+                              Paid Amount
+                            </div>
+                            <Field
+                              component={CustomInput}
+                              type="number"
+                              name="paid_amount"
+                              placeholder="Enter Paid Amount"
+                              className="form-control"
+                              style={{
+                                maxWidth: "160px",
+                                width: "100%",
+                                marginTop: "5px",
+                              }}
+                              onChange={(e) => {
+                                const paid = Number(e.target.value) || 0;
+                                formProps.setFieldValue("paid_amount", paid);
+                                const unpaid =
+                                  formProps.values.total_amount - paid;
+                                formProps.setFieldValue(
+                                  "unpaid_amount",
+                                  unpaid >= 0 ? unpaid : 0
+                                );
+                              }}
+                            />
+                          </div>
+                          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mt-2">
+                            <div
+                              className="fw-bold"
+                              style={{ fontSize: "1rem" }}
+                            >
+                              Unpaid Amount
+                            </div>
+                            <div
+                              className="fw-bold text-danger"
+                              style={{ fontSize: "1.1rem" }}
+                            >
+                              ₹ {formProps.values.unpaid_amount}
+                            </div>
                           </div>
                         </div>
                       </div>
                     )}
                   />
-
                   <div className="d-flex gap-2 mt-4">
+                    <Button type="reset" color="danger" className="flex-fill">
+                      Reset
+                    </Button>
                     <Button
                       type="submit"
                       disabled={formProps.isSubmitting}
@@ -532,9 +535,6 @@ const CreateOrder = ({ toggle }) => {
                       }}
                     >
                       Submit
-                    </Button>
-                    <Button type="reset" color="danger" className="flex-fill">
-                      Reset
                     </Button>
                   </div>
                 </Form>

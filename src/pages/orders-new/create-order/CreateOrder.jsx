@@ -141,6 +141,9 @@ const CreateOrder = ({ toggle }) => {
                         className="form-control"
                         value={formProps.values.date}
                         onChange={formProps.handleChange}
+                        placeholder="dd-mm-yyyy"
+                        pattern="\d{4}-\d{2}-\d{2}"
+                        inputMode="numeric"
                       />
                       <div className="text-danger">
                         <ErrorMessage name="date" />

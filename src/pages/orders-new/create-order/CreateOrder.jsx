@@ -46,7 +46,7 @@ const CreateOrder = ({ toggle }) => {
   };
 
   return (
-    <div className="p-2">
+    <div className="p-0">
       {isPostLoading && <LinerLoader />}
       <Card className="shadow-sm border-0">
         <CardBody>
@@ -74,18 +74,23 @@ const CreateOrder = ({ toggle }) => {
             validationSchema={Yup.object().shape({
               customer_id: Yup.string().required("This Field is Mandatory"),
               total_amount: Yup.string().required("This Field is Mandatory"),
-            //   items: Yup.array()
-            //     .of(
-            //       Yup.object().shape({
-            //         item_id: Yup.string().required("Item is required"),
-            //         quantity: Yup.number().min(1, "Quantity must be at least 1"),
-            //         price: Yup.number(),
-            //         unit: Yup.string(),
-            //       })
-            //     )
-            //     .min(1, "At least one item is required")
-            //     .required("Items are required"),
-             })}
+              // items: Yup.array()
+              //   .of(
+              //     Yup.object().shape({
+              //       item_id: Yup.string()
+              //         .required("Item is required")
+              //         .min(1, "Item is required"),
+              //       quantity: Yup.number().min(
+              //         1,
+              //         "Quantity must be at least 1"
+              //       ),
+              //       price: Yup.number(),
+              //       unit: Yup.string(),
+              //     })
+              //   )
+              //   .min(1, "At least one item is required")
+              //   .required("Items are required"),
+            })}
           >
             {(formProps) => {
               console.log("formProps.values", formProps.values);
@@ -142,7 +147,6 @@ const CreateOrder = ({ toggle }) => {
                     </Col>
                   </Row>
 
-                  <hr />
 
                   <FieldArray
                     name="items"
@@ -152,7 +156,7 @@ const CreateOrder = ({ toggle }) => {
                         <div
                           className="table-responsive"
                           style={{
-                            overflowX: "auto",
+                            // overflowX: "auto",
                             width: "100%",
                             display: "block",
                           }}
@@ -246,10 +250,7 @@ const CreateOrder = ({ toggle }) => {
                                               `items.${index}.item_id`,
                                               value.id
                                             );
-                                            formProps.setFieldValue(
-                                              `items.${index}.name`,
-                                              value.name
-                                            );
+
                                             formProps.setFieldValue(
                                               `items.${index}.price`,
                                               value.price
@@ -263,10 +264,7 @@ const CreateOrder = ({ toggle }) => {
                                               `items.${index}.item_id`,
                                               ""
                                             );
-                                            formProps.setFieldValue(
-                                              `items.${index}.name`,
-                                              ""
-                                            );
+
                                             formProps.setFieldValue(
                                               `items.${index}.price`,
                                               ""
@@ -279,6 +277,14 @@ const CreateOrder = ({ toggle }) => {
                                         }}
                                         style={{ width: "100%" }}
                                       />
+                                      <div
+                                        className="text-danger"
+                                        style={{ fontSize: "0.75rem" }}
+                                      >
+                                        <ErrorMessage
+                                          name={`items.${index}.item_id`}
+                                        />
+                                      </div>
                                     </td>
                                     <td
                                       style={{

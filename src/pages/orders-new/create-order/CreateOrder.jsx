@@ -355,7 +355,7 @@ const CreateOrder = ({ toggle }) => {
                                         fontSize: "18px",
                                       }}
                                     >
-                                      <b>&#8377;&nbsp;{total}</b>
+                                      &#8377;&nbsp;{total}
                                     </td>
                                   </tr>
                                 );

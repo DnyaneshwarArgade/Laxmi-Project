@@ -7,7 +7,6 @@ import * as actions from "../../../store/creators";
 import CustomInput from "../../../Component/custom/CustomInput";
 import { MdDelete } from "react-icons/md";
 import LinerLoader from "../../../Component/loaders/LinerLoader";
-import { MdAdd } from "react-icons/md";
 
 const CreateOrder = ({ toggle }) => {
   const dispatch = useDispatch();
@@ -58,8 +57,14 @@ const CreateOrder = ({ toggle }) => {
               notes: "",
               total_amount: "0",
               status: "Pending",
-              items: [],
-              item_name: "",
+              items: [
+                {
+                  item_id: "",
+                  quantity: "1",
+                  price: "0",
+                  unit: "",
+                },
+              ],
               is_dummy: false,
               paid_amount: "0",
               unpaid_amount: "0",
@@ -67,15 +72,23 @@ const CreateOrder = ({ toggle }) => {
             }}
             onSubmit={handleSubmit}
             validationSchema={Yup.object().shape({
-              date: Yup.string(),
-              status: Yup.string().required("This Field is Mandatory"),
+              customer_id: Yup.string().required("This Field is Mandatory"),
               total_amount: Yup.string().required("This Field is Mandatory"),
-              items: Yup.array()
-                .min(1, "At least one item is required")
-                .required("Items are required"),
-            })}
+            //   items: Yup.array()
+            //     .of(
+            //       Yup.object().shape({
+            //         item_id: Yup.string().required("Item is required"),
+            //         quantity: Yup.number().min(1, "Quantity must be at least 1"),
+            //         price: Yup.number(),
+            //         unit: Yup.string(),
+            //       })
+            //     )
+            //     .min(1, "At least one item is required")
+            //     .required("Items are required"),
+             })}
           >
             {(formProps) => {
+              console.log("formProps.values", formProps.values);
               const totalAmount = formProps.values.items?.reduce(
                 (sum, item) =>
                   sum + (Number(item.price) * Number(item.quantity) || 0),
@@ -135,73 +148,7 @@ const CreateOrder = ({ toggle }) => {
                     name="items"
                     render={(arrayHelpers) => (
                       <div>
-                        <div className="d-flex align-items-center mb-2">
-                          <div className="flex-grow-1 me-2">
-                            <Field
-                              component={CustomInput}
-                              type="text"
-                              list="itemdatalist"
-                              name="item_name"
-                              placeholder="Enter Item Name"
-                              className="form-control"
-                              value={formProps.values.item_name}
-                              onChange={formProps.handleChange}
-                              autoComplete="off"
-                            />
-                            {items?.data?.length > 0 && (
-                              <datalist id="itemdatalist">
-                                {items?.data
-                                  .filter(
-                                    (item) =>
-                                      !formProps.values.items.some(
-                                        (added) => added.name === item.name
-                                      )
-                                  )
-                                  .map((item, index) => (
-                                    <option key={index} value={item.name} />
-                                  ))}
-                              </datalist>
-                            )}
-                          </div>
-                          <Button
-                            color="success"
-                            className="rounded-circle p-0 d-flex align-items-center justify-content-center"
-                            style={{
-                              width: "40px",
-                              height: "40px",
-                              flexShrink: 0,
-                            }}
-                            onClick={() => {
-                              const itemName = formProps.values.item_name;
-                              if (!itemName) return;
-                              const exists = formProps.values.items.some(
-                                (item) => item.name === itemName
-                              );
-                              if (exists) {
-                                formProps.setFieldValue("item_name", "");
-                                return;
-                              }
-                              const obj = items?.data.find(
-                                (o) => o.name === itemName
-                              );
-                              if (obj) {
-                                arrayHelpers.push({
-                                  item_id: obj.id,
-                                  name: obj.name,
-                                  price: obj.price,
-                                  quantity: 1,
-                                  unit: "",
-                                });
-                              }
-                              formProps.setFieldValue("item_name", "");
-                            }}
-                          >
-                            <MdAdd size={24} />
-                          </Button>
-                        </div>
-
                         <ErrorMessage name="items" className="text-danger" />
-
                         <div
                           className="table-responsive"
                           style={{
@@ -283,19 +230,55 @@ const CreateOrder = ({ toggle }) => {
                                         verticalAlign: "middle", // optional, for better alignment
                                       }}
                                     >
-                                      <div
-                                        style={{
-                                          width: "100%",
-                                          whiteSpace: "normal",
-                                          wordBreak: "break-word",
-                                          background: "transparent",
-                                          border: "none",
-                                          padding: "4px 8px",
-                                          minHeight: "32px",
+                                      <CustomAutoComplete
+                                        name={`items.${index}.item_id`}
+                                        formProps={formProps}
+                                        defaultProps={{
+                                          options: items?.data,
+                                          getOptionLabel: (option) =>
+                                            option?.name || "",
                                         }}
-                                      >
-                                        {product.name}
-                                      </div>
+                                        label="Item Name"
+                                        value={product.item_id}
+                                        onChange={(e, value) => {
+                                          if (value) {
+                                            formProps.setFieldValue(
+                                              `items.${index}.item_id`,
+                                              value.id
+                                            );
+                                            formProps.setFieldValue(
+                                              `items.${index}.name`,
+                                              value.name
+                                            );
+                                            formProps.setFieldValue(
+                                              `items.${index}.price`,
+                                              value.price
+                                            );
+                                            formProps.setFieldValue(
+                                              `items.${index}.unit`,
+                                              value.unit || ""
+                                            );
+                                          } else {
+                                            formProps.setFieldValue(
+                                              `items.${index}.item_id`,
+                                              ""
+                                            );
+                                            formProps.setFieldValue(
+                                              `items.${index}.name`,
+                                              ""
+                                            );
+                                            formProps.setFieldValue(
+                                              `items.${index}.price`,
+                                              ""
+                                            );
+                                            formProps.setFieldValue(
+                                              `items.${index}.unit`,
+                                              ""
+                                            );
+                                          }
+                                        }}
+                                        style={{ width: "100%" }}
+                                      />
                                     </td>
                                     <td
                                       style={{

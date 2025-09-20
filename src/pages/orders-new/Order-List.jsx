@@ -105,10 +105,10 @@ export default function Orders() {
   });
 
   const sortedOrders = [...(filteredOrders || [])].sort((a, b) => {
-  if (sortOrder === "asc") return new Date(a.date) - new Date(b.date);
-  if (sortOrder === "desc") return new Date(b.date) - new Date(a.date);
-  // If sortOrder is 'none', keep original order
-  return 0;
+    if (sortOrder === "asc") return new Date(a.date) - new Date(b.date);
+    if (sortOrder === "desc") return new Date(b.date) - new Date(a.date);
+    // If sortOrder is 'none', keep original order
+    return 0;
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -256,7 +256,9 @@ export default function Orders() {
               Dummy
             </button>
             <button
-              className={`filter-btn date-sort-btn${sortOrder !== "none" ? " active" : ""}`}
+              className={`filter-btn date-sort-btn${
+                sortOrder !== "none" ? " active" : ""
+              }`}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -264,12 +266,13 @@ export default function Orders() {
                 padding: "6px 14px",
                 height: "28px",
                 borderRadius: "20px",
-                border: sortOrder !== "none" ? "2px solid #4a6cf7" : "1px solid #ccc",
+                border:
+                  sortOrder !== "none" ? "2px solid #4a6cf7" : "1px solid #ccc",
                 background: sortOrder !== "none" ? "#eef3fe" : "#fff",
                 color: sortOrder !== "none" ? "#4a6cf7" : "#333",
                 fontWeight: "bold",
                 cursor: "pointer",
-                transition: "all 0.2s"
+                transition: "all 0.2s",
               }}
               onClick={() => {
                 if (sortOrder === "none") setSortOrder("asc");
@@ -281,8 +284,12 @@ export default function Orders() {
               <FaCalendarAlt />
               <span>Date</span>
               {sortOrder === "asc" && <FaSortUp style={{ color: "#4a6cf7" }} />}
-              {sortOrder === "desc" && <FaSortDown style={{ color: "#4a6cf7" }} />}
-              {sortOrder === "none" && <span style={{ fontSize: "1rem", color: "#aaa" }}>↕</span>}
+              {sortOrder === "desc" && (
+                <FaSortDown style={{ color: "#4a6cf7" }} />
+              )}
+              {sortOrder === "none" && (
+                <span style={{ fontSize: "1rem", color: "#aaa" }}>↕</span>
+              )}
             </button>
           </nav>
         </div>
@@ -431,7 +438,7 @@ export default function Orders() {
           <Modal
             isOpen={createOrderModalOpen}
             toggle={handleCloseCreateOrder}
-            size="lg"
+            fullscreen
           >
             <ModalHeader toggle={handleCloseCreateOrder}>
               Create Order

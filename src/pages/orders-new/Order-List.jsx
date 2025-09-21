@@ -71,6 +71,11 @@ export default function Orders() {
     dispatch(itemsGetData({ token: login?.token }));
   }, [dispatch, login]);
 
+  // Reset to page 1 when search term, filter status, or sort order changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus, sortOrder]);
+
   const deleteOrder = (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -96,10 +101,10 @@ export default function Orders() {
       filterStatus === "All"
         ? true
         : filterStatus === "Completed"
-        ? order.status.toLowerCase() === "completed"
-        : filterStatus === "Pending"
-        ? order.status.toLowerCase() === "pending"
-        : order.is_dummy === 1;
+          ? order.status.toLowerCase() === "completed"
+          : filterStatus === "Pending"
+            ? order.status.toLowerCase() === "pending"
+            : order.is_dummy === 1;
 
     return matchesSearch && matchesStatus;
   });
@@ -212,53 +217,44 @@ export default function Orders() {
 
           <nav className="orders-filters compact filter-row">
             <button
-              className={`filter-btn small${
-                filterStatus === "All" ? " active" : ""
-              }`}
+              className={`filter-btn small${filterStatus === "All" ? " active" : ""
+                }`}
               onClick={() => {
                 setFilterStatus("All");
-                setCurrentPage(1);
               }}
             >
               All
             </button>
             <button
-              className={`filter-btn small completed${
-                filterStatus === "Completed" ? " active" : ""
-              }`}
+              className={`filter-btn small completed${filterStatus === "Completed" ? " active" : ""
+                }`}
               onClick={() => {
                 setFilterStatus("Completed");
-                setCurrentPage(1);
               }}
             >
               <FaCheckCircle />
             </button>
             <button
-              className={`filter-btn small pending${
-                filterStatus === "Pending" ? " active" : ""
-              }`}
+              className={`filter-btn small pending${filterStatus === "Pending" ? " active" : ""
+                }`}
               onClick={() => {
                 setFilterStatus("Pending");
-                setCurrentPage(1);
               }}
             >
               <FaClock />
             </button>
             <button
-              className={`filter-btn small dummy${
-                filterStatus === "Dummy" ? " active" : ""
-              }`}
+              className={`filter-btn small dummy${filterStatus === "Dummy" ? " active" : ""
+                }`}
               onClick={() => {
                 setFilterStatus("Dummy");
-                setCurrentPage(1);
               }}
             >
               Dummy
             </button>
             <button
-              className={`filter-btn date-sort-btn${
-                sortOrder !== "none" ? " active" : ""
-              }`}
+              className={`filter-btn date-sort-btn${sortOrder !== "none" ? " active" : ""
+                }`}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -295,40 +291,16 @@ export default function Orders() {
         </div>
       </div>
 
-      {/* {sortedOrders.length > 0 && (
-        <div className="pagination-controls-top">
-          <div className="items-per-page-selector">
-            <label htmlFor="itemsPerPage">Show: </label>
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={handleItemsPerPageChange}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
-          </div>
-          <div className="pagination-info">
-            Showing {indexOfFirstItem + 1}-
-            {Math.min(indexOfLastItem, sortedOrders.length)} of{" "}
-            {sortedOrders.length} orders
-          </div>
-        </div>
-      )} */}
-
       {isLoading ? (
         <Loading />
       ) : currentOrders.length > 0 ? (
         <>
           {currentOrders.map((order) => (
             <div
-              className={`order-card ${
-                order.status.toLowerCase() === "completed"
+              className={`order-card ${order.status.toLowerCase() === "completed"
                   ? "completed-card"
                   : ""
-              }`}
+                }`}
               key={order.id}
             >
               <div className="order-info">
@@ -347,10 +319,14 @@ export default function Orders() {
                   <FaRupeeSign className="info-icon" /> Total amount:{" "}
                   {order.total_amount}
                 </p>
-                <p className="amount red">
-                  <FaRupeeSign className="info-icon" /> Pending amount:{" "}
-                  {order.unpaid_amount}
-                </p>
+
+                {/* Only show pending amount if it's greater than 0 */}
+                {order.unpaid_amount > 0 && (
+                  <p className="amount red">
+                    <FaRupeeSign className="info-icon" /> Pending amount:{" "}
+                    {order.unpaid_amount}
+                  </p>
+                )}
               </div>
 
               <div className="order-status">{order.status}</div>
@@ -403,9 +379,8 @@ export default function Orders() {
                         ? paginate(pageNumber)
                         : null
                     }
-                    className={`pagination-btn ${
-                      currentPage === pageNumber ? "active" : ""
-                    } ${typeof pageNumber !== "number" ? "disabled" : ""}`}
+                    className={`pagination-btn ${currentPage === pageNumber ? "active" : ""
+                      } ${typeof pageNumber !== "number" ? "disabled" : ""}`}
                     disabled={typeof pageNumber !== "number"}
                   >
                     {pageNumber}

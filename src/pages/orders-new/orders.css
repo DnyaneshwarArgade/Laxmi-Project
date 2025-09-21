@@ -168,23 +168,26 @@
 }
 
 .order-card {
+    position: relative;
     background: #ffeaea;
     border-radius: 15px;
     padding: 18px;
     display: flex;
     flex-direction: column;
-    position: relative;
-    /* min-height: 201px; */
-    /* Remove or adjust if not needed */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s, box-shadow 0.2s;
     margin: 25px 19px;
-    /* Reduced bottom margin */
 }
 
 .order-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.order-info {
+    position: relative;
+    margin-bottom: 15px;
+    padding-right: 100px; /* Space for status badge */
 }
 
 .order-info p {
@@ -198,8 +201,10 @@
 .info-icon {
     color: #4a6cf7;
     font-size: 18px;
+    flex-shrink: 0;
 }
 
+/* Order Status Positioning - Fixed for mobile */
 .order-status {
     position: absolute;
     top: 12px;
@@ -210,6 +215,27 @@
     font-weight: 600;
     color: #4a6cf7;
     font-size: 14px;
+    z-index: 2;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-transform: capitalize;
+}
+
+.completed-card {
+    background-color: white;
+}
+
+.completed-card .order-status {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.order-card:not(.completed-card) .order-status {
+    background: #ffecb3;
+    color: #f57c00;
 }
 
 .amount.green {
@@ -230,11 +256,16 @@
     color: darkred;
 }
 
+/* Hide pending amount if it's 0 */
+.order-info p.amount.red[data-pending="0"] {
+    display: none;
+}
+
 .order-actions {
     display: flex;
     justify-content: center;
     gap: 22px;
-
+    margin-top: 15px;
 }
 
 .order-actions .view-btn,
@@ -296,10 +327,97 @@
     font-size: 20px;
 }
 
-.completed-card {
-  background-color: white 
+/* Pagination Controls */
+.pagination-controls-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 20px;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.items-per-page-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.items-per-page-selector label {
+    font-weight: 500;
+    color: #555;
+}
+
+.items-per-page-selector select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    padding: 0 20px;
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination-btn {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background-color: white;
+    color: #333;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    font-weight: 500;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    border-color: #4a6cf7;
+}
+
+.pagination-btn.active {
+    background-color: #4a6cf7;
+    color: white;
+    border-color: #4a6cf7;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-btn.disabled {
+    cursor: default;
+    background-color: transparent;
+    border: none;
+    min-width: 20px;
+}
+
+/* Media Queries */
 @media (max-width: 600px) {
     .add-btn-desktop {
         display: none !important;
@@ -334,141 +452,87 @@
         width: 100%;
         overflow-x: unset;
     }
-} 
-
-/* Pagination Controls */
-.pagination-controls-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 15px 20px;
-  padding: 10px 15px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.items-per-page-selector {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.items-per-page-selector label {
-  font-weight: 500;
-  color: #555;
-}
-
-.items-per-page-selector select {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  background: white;
-  cursor: pointer;
-}
-
-.pagination-info {
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
-}
-
-.pagination-controls {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-  padding: 0 20px;
-}
-
-.pagination-buttons {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.pagination-btn {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  background-color: white;
-  color: #333;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 40px;
-  font-weight: 500;
-}
-
-.pagination-btn:hover:not(:disabled) {
-  /* background-color: #f0f4ff; */
-  border-color: #4a6cf7;
-}
-
-.pagination-btn.active {
-  background-color: #4a6cf7;
-  color: white;
-  border-color: #4a6cf7;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pagination-btn.disabled {
-  cursor: default;
-  background-color: transparent;
-  border: none;
-  min-width: 20px;
-}
-
-/* Responsive pagination */
-@media (max-width: 768px) {
-  .pagination-controls-top {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-    margin: 10px;
-    padding: 10px;
-  }
-  
-  .pagination-buttons {
-    gap: 4px;
-  }
-  
-  .pagination-btn {
-    padding: 6px 8px;
-    min-width: 36px;
-    height: 36px;
-    font-size: 14px;
-  }
-  
-  .items-per-page-selector {
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .pagination-info {
-    width: 100%;
-    text-align: center;
-    margin-top: 5px;
-  }
+    
+    /* Keep status at top right in mobile */
+    .order-status {
+        position: absolute;
+        top: 12px;
+        right: 15px;
+        margin: 0;
+        max-width: 100px;
+    }
+    
+    .order-info {
+        padding-right: 90px; /* Less space for mobile */
+    }
+    
+    .order-card {
+        margin: 15px 10px;
+    }
+    
+    .pagination-controls-top {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+        margin: 10px;
+        padding: 10px;
+    }
+    
+    .pagination-buttons {
+        gap: 4px;
+    }
+    
+    .pagination-btn {
+        padding: 6px 8px;
+        min-width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .items-per-page-selector {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .pagination-info {
+        width: 100%;
+        text-align: center;
+        margin-top: 5px;
+    }
 }
 
 @media (max-width: 480px) {
-  .pagination-buttons {
-    gap: 2px;
-  }
-  
-  .pagination-btn {
-    padding: 5px 6px;
-    min-width: 32px;
-    height: 32px;
-    font-size: 12px;
-  }
-} 
+    .pagination-buttons {
+        gap: 2px;
+    }
+    
+    .pagination-btn {
+        padding: 5px 6px;
+        min-width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .order-actions {
+        gap: 12px;
+    }
+    
+    .order-actions .view-btn,
+    .order-actions .call-btn,
+    .order-actions .delete-btn,
+    .order-actions .edit-btn {
+        padding: 6px 8px;
+        font-size: 14px;
+    }
+    
+    /* Adjust status for very small screens */
+    .order-status {
+        max-width: 80px;
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+    
+    .order-info {
+        padding-right: 75px; /* Even less space for very small screens */
+    }
+}

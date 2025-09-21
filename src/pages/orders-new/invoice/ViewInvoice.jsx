@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import { toWords } from "number-to-words";
 import { formatDateDMY } from "../../../Helpers/dateFormat";
 
-
 const Invoice = ({ invoice }) => {
   const invoiceRef = useRef(null);
   const customerName = invoice?.customer?.name || "-";
@@ -89,13 +88,14 @@ const Invoice = ({ invoice }) => {
         <div className="invoice-sheet" id="invoice-sheet" ref={invoiceRef}>
           <div className="invoice-header">
             <div className="owner-info">
-              प्रोप्रा. रविंद्र भुसारे | मो. ९८५०८३७४०० / ९८५०३३२३५६
+              ॥ श्री ॥
             </div>
             <div className="store-title-banner">लक्ष्मी जनरल स्टोअर्स</div>
             <div className="store-subtitle">
-              शालेय साहित्य, गृहउपयोगी, ऑफिस मटेरियल व सौंदर्य प्रसाधनांचे
-              विक्रेते प्रेझेंटेशन आर्टिकल, रिस्टरवॉच, वॉच क्लॉक (रेसिडेन्शियल
-              हायस्कूल समोर, मिरी रोड, शेवगाव, जि. अहिल्यानगर ४१४५०२)
+              शालेय साहित्य, ऑफिस स्टेशनरी, गिफ्ट, टॉइज, गॉगल्स, घड्याळे,
+              क्लिनिंग मटेरियल<br />
+              रेसिडेन्शियल हायस्कूल समोर, मिरी रोड, शेवगाव, जि. अहिल्यानगर ४१४५०२ <br />
+              ९८५०८३७४००, ९८५०३३२३५६
             </div>
           </div>
 
@@ -155,19 +155,19 @@ const Invoice = ({ invoice }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="text-center">
+                  <td colSpan="6" className="text-center">
                     No Items
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
-         
+
           <div className="amount-row">
             <span>Bill Amount:</span>
             <span>₹ {total_amount.toFixed(2)}</span>
           </div>
-       
+
           {paid_amount !== total_amount && (
             <div className="amount-row">
               <span>Paid Amount:</span>
@@ -182,10 +182,9 @@ const Invoice = ({ invoice }) => {
             </div>
           )}
 
-
           <div className="amount-words">
             <strong>Bill Amount in Words:</strong>{" "}
-            {toWords(total_amount)}
+            {toWords(total_amount)} Rupees Only
           </div>
 
           <div className="bank-details">

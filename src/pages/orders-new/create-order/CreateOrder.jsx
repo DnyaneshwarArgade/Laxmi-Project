@@ -18,14 +18,23 @@ const CreateOrder = ({ toggle }) => {
   const { items } = useSelector((state) => state.entities?.items);
 
   const data = { token: login?.token };
+  // Helper function to truncate a string to 20 words or single alphabets separated by spaces
+  const truncateWords = (str, numWords = 20) => {
+    if (!str) return '';
+    // Split by spaces, filter out empty strings
+    const words = str.split(' ').filter(Boolean);
+    // Count each word or single alphabet as one
+    return words.length > numWords ? words.slice(0, numWords).join(' ') + '...' : str;
+  };
+
   const customersProps = {
     options: customers?.data,
-    getOptionLabel: (option) => option?.name,
+    getOptionLabel: (option) => truncateWords(option?.name),
   };
 
   const handleSubmit = (values, { setSubmitting }) => {
     const finalStatus =
-      Number(values.unpaid_amount) === 0 ? "Completed" : values.status;
+      Number(values.unpaid_amount) === 0 ? "Completed" : "Pending";
     const bills = {
       customer_id: values.customer_id,
       date: values.date,

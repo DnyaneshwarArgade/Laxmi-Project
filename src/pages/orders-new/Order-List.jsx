@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Modal, ModalHeader, ModalBody } from "reactstrap";
 import ViewInvoice from "./invoice/ViewInvoice";
 import CreateOrder from "./create-order/CreateOrder";
+import UpdateOrder from "./create-order/UpdateOrder";
 import "./Orders.css";
 import {
   FaPlus,
@@ -43,6 +44,17 @@ export default function Orders() {
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [createOrderModalOpen, setCreateOrderModalOpen] = useState(false);
+  const [updateOrderModalOpen, setUpdateOrderModalOpen] = useState(false);
+  const [orderToUpdate, setOrderToUpdate] = useState(null);
+  const handleOpenUpdateOrder = (order) => {
+    setOrderToUpdate(order);
+    setUpdateOrderModalOpen(true);
+  };
+
+  const handleCloseUpdateOrder = () => {
+    setUpdateOrderModalOpen(false);
+    setOrderToUpdate(null);
+  };
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -101,12 +113,12 @@ export default function Orders() {
       filterStatus === "All"
         ? order.is_dummy !== 1 // All मध्ये dummy exclude
         : filterStatus === "Completed"
-          ? order.status.toLowerCase() === "completed" && order.is_dummy !== 1
-          : filterStatus === "Pending"
-            ? order.status.toLowerCase() === "pending" && order.is_dummy !== 1
-            : filterStatus === "Dummy"
-              ? order.is_dummy === 1
-              : true;
+        ? order.status.toLowerCase() === "completed" && order.is_dummy !== 1
+        : filterStatus === "Pending"
+        ? order.status.toLowerCase() === "pending" && order.is_dummy !== 1
+        : filterStatus === "Dummy"
+        ? order.is_dummy === 1
+        : true;
 
     return matchesSearch && matchesStatus;
   });
@@ -219,8 +231,9 @@ export default function Orders() {
 
           <nav className="orders-filters compact filter-row">
             <button
-              className={`filter-btn small${filterStatus === "All" ? " active" : ""
-                }`}
+              className={`filter-btn small${
+                filterStatus === "All" ? " active" : ""
+              }`}
               onClick={() => {
                 setFilterStatus("All");
               }}
@@ -228,8 +241,9 @@ export default function Orders() {
               All
             </button>
             <button
-              className={`filter-btn small completed${filterStatus === "Completed" ? " active" : ""
-                }`}
+              className={`filter-btn small completed${
+                filterStatus === "Completed" ? " active" : ""
+              }`}
               onClick={() => {
                 setFilterStatus("Completed");
               }}
@@ -237,8 +251,9 @@ export default function Orders() {
               <FaCheckCircle />
             </button>
             <button
-              className={`filter-btn small pending${filterStatus === "Pending" ? " active" : ""
-                }`}
+              className={`filter-btn small pending${
+                filterStatus === "Pending" ? " active" : ""
+              }`}
               onClick={() => {
                 setFilterStatus("Pending");
               }}
@@ -246,8 +261,9 @@ export default function Orders() {
               <FaClock />
             </button>
             <button
-              className={`filter-btn small dummy${filterStatus === "Dummy" ? " active" : ""
-                }`}
+              className={`filter-btn small dummy${
+                filterStatus === "Dummy" ? " active" : ""
+              }`}
               onClick={() => {
                 setFilterStatus("Dummy");
               }}
@@ -255,8 +271,9 @@ export default function Orders() {
               Dummy
             </button>
             <button
-              className={`filter-btn date-sort-btn${sortOrder !== "none" ? " active" : ""
-                }`}
+              className={`filter-btn date-sort-btn${
+                sortOrder !== "none" ? " active" : ""
+              }`}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -299,10 +316,11 @@ export default function Orders() {
         <>
           {currentOrders.map((order) => (
             <div
-              className={`order-card ${order.status.toLowerCase() === "completed"
-                ? "completed-card"
-                : ""
-                }`}
+              className={`order-card ${
+                order.status.toLowerCase() === "completed"
+                  ? "completed-card"
+                  : ""
+              }`}
               key={order.id}
             >
               <div className="order-info">
@@ -318,16 +336,19 @@ export default function Orders() {
                 )}
 
                 <p className="amount green">
-                  <FaRupeeSign className="info-icon" /> Total amount: {order.total_amount}
+                  <FaRupeeSign className="info-icon" /> Total amount:{" "}
+                  {order.total_amount}
                 </p>
                 {/* Show paid and unpaid only if status is pending */}
                 {order.status && order.status.toLowerCase() === "pending" && (
                   <>
                     <p className="amount blue">
-                      <FaRupeeSign className="info-icon" /> Paid amount: {order.paid_amount}
+                      <FaRupeeSign className="info-icon" /> Paid amount:{" "}
+                      {order.paid_amount}
                     </p>
                     <p className="amount red">
-                      <FaRupeeSign className="info-icon" /> Unpaid amount: {order.unpaid_amount}
+                      <FaRupeeSign className="info-icon" /> Unpaid amount:{" "}
+                      {order.unpaid_amount}
                     </p>
                   </>
                 )}
@@ -351,14 +372,12 @@ export default function Orders() {
                 >
                   <FaTrash />
                 </button>
-                {order.status !== "Completed" && (
-                  <button
-                    className="edit-btn"
-                    onClick={() => alert("Edit " + order.id)}
-                  >
-                    <MdEdit />
-                  </button>
-                )}
+                <button
+                  className="edit-btn"
+                  onClick={() => handleOpenUpdateOrder(order)}
+                >
+                  <MdEdit />
+                </button>
               </div>
             </div>
           ))}
@@ -383,8 +402,9 @@ export default function Orders() {
                         ? paginate(pageNumber)
                         : null
                     }
-                    className={`pagination-btn ${currentPage === pageNumber ? "active" : ""
-                      } ${typeof pageNumber !== "number" ? "disabled" : ""}`}
+                    className={`pagination-btn ${
+                      currentPage === pageNumber ? "active" : ""
+                    } ${typeof pageNumber !== "number" ? "disabled" : ""}`}
                     disabled={typeof pageNumber !== "number"}
                   >
                     {pageNumber}
@@ -424,6 +444,23 @@ export default function Orders() {
             </ModalHeader>
             <ModalBody className="p-0">
               <CreateOrder toggle={handleCloseCreateOrder} />
+            </ModalBody>
+          </Modal>
+          <Modal
+            isOpen={updateOrderModalOpen}
+            toggle={handleCloseUpdateOrder}
+            fullscreen
+          >
+            <ModalHeader toggle={handleCloseUpdateOrder}>
+              Update Order
+            </ModalHeader>
+            <ModalBody className="p-0">
+              {orderToUpdate && (
+                <UpdateOrder
+                  toggle={handleCloseUpdateOrder}
+                  prevOrder={orderToUpdate}
+                />
+              )}
             </ModalBody>
           </Modal>
         </>

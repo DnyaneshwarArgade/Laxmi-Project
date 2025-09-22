@@ -87,12 +87,6 @@
     margin-left: 10px;
 }
 
-.add-btn:hover,
-.add-btn-desktop:hover,
-.add-btn-mobile:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 6px rgba(74, 108, 247, 0.5);
-}
 
 .add-btn-desktop {
     display: inline-flex;

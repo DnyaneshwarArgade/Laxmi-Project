@@ -99,6 +99,10 @@ const CreateOrder = ({ toggle }) => {
               );
               formProps.values.total_amount = totalAmount;
 
+              // Set unpaid_amount to total_amount minus paid_amount, or total_amount if paid is 0
+              const paid = Number(formProps.values.paid_amount) || 0;
+              formProps.values.unpaid_amount = paid === 0 ? totalAmount : Math.max(totalAmount - paid, 0);
+
               const totalQuantity = formProps.values?.items?.reduce(
                 (sum, item) => sum + (parseInt(item.quantity) || 0),
                 0
@@ -357,12 +361,10 @@ const CreateOrder = ({ toggle }) => {
                                 onChange={(e) => {
                                   const paid = Number(e.target.value) || 0;
                                   formProps.setFieldValue("paid_amount", paid);
-                                  const unpaid =
-                                    formProps.values.total_amount - paid;
-                                  formProps.setFieldValue(
-                                    "unpaid_amount",
-                                    unpaid >= 0 ? unpaid : 0
-                                  );
+                                  const unpaid = paid === 0
+                                    ? formProps.values.total_amount
+                                    : Math.max(formProps.values.total_amount - paid, 0);
+                                  formProps.setFieldValue("unpaid_amount", unpaid);
                                 }}
                               />
                             </div>

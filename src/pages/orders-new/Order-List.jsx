@@ -99,12 +99,14 @@ export default function Orders() {
 
     const matchesStatus =
       filterStatus === "All"
-        ? true
+        ? order.is_dummy !== 1 // All मध्ये dummy exclude
         : filterStatus === "Completed"
-          ? order.status.toLowerCase() === "completed"
+          ? order.status.toLowerCase() === "completed" && order.is_dummy !== 1
           : filterStatus === "Pending"
-            ? order.status.toLowerCase() === "pending"
-            : order.is_dummy === 1;
+            ? order.status.toLowerCase() === "pending" && order.is_dummy !== 1
+            : filterStatus === "Dummy"
+              ? order.is_dummy === 1
+              : true;
 
     return matchesSearch && matchesStatus;
   });
@@ -298,8 +300,8 @@ export default function Orders() {
           {currentOrders.map((order) => (
             <div
               className={`order-card ${order.status.toLowerCase() === "completed"
-                  ? "completed-card"
-                  : ""
+                ? "completed-card"
+                : ""
                 }`}
               key={order.id}
             >

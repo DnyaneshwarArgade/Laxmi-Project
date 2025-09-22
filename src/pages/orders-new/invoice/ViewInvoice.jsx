@@ -30,7 +30,7 @@ const Invoice = ({ invoice }) => {
       color: "#18181b",
     }).then((result) => {
       if (result.isConfirmed) {
-        let customerName = invoice?.customer?.name || "Customer";
+        let customerName = invoice?.customer?.id || "Customer";
         customerName = customerName.replace(/[^a-zA-Z0-9]/g, "_");
         const opt = {
           margin: 0.5,

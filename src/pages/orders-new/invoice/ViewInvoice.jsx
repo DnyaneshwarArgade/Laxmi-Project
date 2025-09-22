@@ -168,14 +168,14 @@ const Invoice = ({ invoice }) => {
             <span>₹ {total_amount.toFixed(2)}</span>
           </div>
 
-          {paid_amount !== total_amount && (
+          {invoice.status !== "Completed" && (
             <div className="amount-row">
               <span>Paid Amount:</span>
               <span>₹ {paid_amount.toFixed(2)}</span>
             </div>
           )}
 
-          {paid_amount > 0 && paid_amount < total_amount && (
+          {invoice.status !== "Completed" && (
             <div className="amount-row">
               <span>Unpaid Amount:</span>
               <span>₹ {unpaid_amount.toFixed(2)}</span>

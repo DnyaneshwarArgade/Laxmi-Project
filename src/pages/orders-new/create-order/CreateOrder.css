@@ -217,9 +217,9 @@
 }
 
 /* Add to your CreateOrder.css */
-.create-order-container .MuiAutocomplete-input {
+/* .create-order-container .MuiAutocomplete-input {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  max-width: 200px; /* Adjust as needed */
-}
+  max-width: 200px; 
+} */

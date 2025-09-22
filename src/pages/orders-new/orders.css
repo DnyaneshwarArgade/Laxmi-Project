@@ -256,6 +256,14 @@
 .amount.red .info-icon {
     color: darkred;
 }
+.amount.blue {
+    color: blue;
+    font-weight: bold;
+}
+
+.amount.blue .info-icon {
+    color: blue;
+}
 
 /* Hide pending amount if it's 0 */
 .order-info p.amount.red[data-pending="0"] {

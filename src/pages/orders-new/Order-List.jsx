@@ -318,16 +318,18 @@ export default function Orders() {
                 )}
 
                 <p className="amount green">
-                  <FaRupeeSign className="info-icon" /> Total amount:{" "}
-                  {order.total_amount}
+                  <FaRupeeSign className="info-icon" /> Total amount: {order.total_amount}
                 </p>
-
-                {/* Only show pending amount if it's greater than 0 */}
-                {order.unpaid_amount > 0 && (
-                  <p className="amount red">
-                    <FaRupeeSign className="info-icon" /> Pending amount:{" "}
-                    {order.unpaid_amount}
-                  </p>
+                {/* Show paid and unpaid only if status is pending */}
+                {order.status && order.status.toLowerCase() === "pending" && (
+                  <>
+                    <p className="amount blue">
+                      <FaRupeeSign className="info-icon" /> Paid amount: {order.paid_amount}
+                    </p>
+                    <p className="amount red">
+                      <FaRupeeSign className="info-icon" /> Unpaid amount: {order.unpaid_amount}
+                    </p>
+                  </>
                 )}
               </div>
 

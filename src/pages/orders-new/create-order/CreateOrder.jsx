@@ -18,13 +18,12 @@ const CreateOrder = ({ toggle }) => {
   const { items } = useSelector((state) => state.entities?.items);
 
   const data = { token: login?.token };
-  // Helper function to truncate a string to 20 words or single alphabets separated by spaces
-  const truncateWords = (str, numWords = 20) => {
-    if (!str) return '';
-    // Split by spaces, filter out empty strings
-    const words = str.split(' ').filter(Boolean);
-    // Count each word or single alphabet as one
-    return words.length > numWords ? words.slice(0, numWords).join(' ') + '...' : str;
+  const truncateWords = (str, numWords = 10) => {
+    if (!str) return "";
+    const words = str.split(" ").filter(Boolean);
+    return words.length > numWords
+      ? words.slice(0, numWords).join(" ") + "..."
+      : str;
   };
 
   const customersProps = {
@@ -156,9 +155,9 @@ const CreateOrder = ({ toggle }) => {
                         {/* Fix the error by using a custom error renderer for the items array */}
                         {formProps.errors.items && formProps.touched.items && (
                           <div className="create-order-error">
-                            {typeof formProps.errors.items === 'string' 
-                              ? formProps.errors.items 
-                              : 'Please check all item fields'}
+                            {typeof formProps.errors.items === "string"
+                              ? formProps.errors.items
+                              : "Please check all item fields"}
                           </div>
                         )}
                         <div className="create-order-table-container">
@@ -253,17 +252,24 @@ const CreateOrder = ({ toggle }) => {
                                             error={Boolean(
                                               formProps.errors.items?.[index]
                                                 ?.item_id &&
-                                              formProps.touched.items?.[index]
-                                                ?.item_id
+                                                formProps.touched.items?.[index]
+                                                  ?.item_id
                                             )}
                                           />
                                         )}
                                         sx={{ width: "100%" }}
                                       />
                                       <div className="create-order-field-error">
-                                        {formProps.errors.items?.[index]?.item_id &&
-                                         formProps.touched.items?.[index]?.item_id ? (
-                                          <div>{formProps.errors.items[index].item_id}</div>
+                                        {formProps.errors.items?.[index]
+                                          ?.item_id &&
+                                        formProps.touched.items?.[index]
+                                          ?.item_id ? (
+                                          <div>
+                                            {
+                                              formProps.errors.items[index]
+                                                .item_id
+                                            }
+                                          </div>
                                         ) : null}
                                       </div>
                                     </td>

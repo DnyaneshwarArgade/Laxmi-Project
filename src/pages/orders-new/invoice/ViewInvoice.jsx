@@ -31,7 +31,6 @@ const Invoice = ({ invoice }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         let customerName = invoice?.customer?.id || "Customer";
-        customerName = customerName.replace(/[^a-zA-Z0-9]/g, "_");
         const opt = {
           margin: 0.5,
           filename: `Invoice_${customerName}.pdf`,

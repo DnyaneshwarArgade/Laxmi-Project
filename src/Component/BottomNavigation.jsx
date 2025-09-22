@@ -7,8 +7,7 @@ const navItems = [
   { to: "/", label: "Home", icon: <FaHome /> },
   { to: "/items", label: "Items", icon: <FaBoxOpen /> },
   { to: "/customers", label: "Customer", icon: <FaUser /> },
-  // { to: "/orders", label: "Order", icon: <FaShoppingCart /> },
-  { to: "/orders-new", label: "Order", icon: <FaShoppingCart /> },
+  { to: "/orders", label: "Order", icon: <FaShoppingCart /> },
 ];
 
 const BottomNavigation = () => (

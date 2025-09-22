@@ -1,0 +1,225 @@
+/* CreateOrder.css */
+
+/* Container Styles */
+.create-order-container {
+  padding: 0;
+}
+
+.create-order-card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: none;
+}
+
+/* Form Layout */
+.create-order-form {
+  width: 100%;
+}
+
+.create-order-row {
+  margin-bottom: 1rem;
+}
+
+.create-order-checkbox-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.create-order-checkbox {
+  margin-right: 0.5rem;
+}
+
+/* Table Styles */
+.create-order-table-container {
+  width: 100%;
+  display: block;
+  overflow-x: auto;
+}
+
+.create-order-table {
+  table-layout: fixed;
+  min-width: 600px;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.create-order-table thead {
+  font-size: 0.8rem;
+  background-color: #f8f9fa;
+}
+
+.create-order-table th {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.create-order-table th:first-child {
+  width: 60px;
+}
+
+.create-order-table th:nth-child(2) {
+  width: 50px;
+  text-align: center;
+}
+
+.create-order-table th:nth-child(3) {
+  width: 200px;
+}
+
+.create-order-table th:nth-child(4) {
+  width: 50px;
+  text-align: center;
+}
+
+.create-order-table th:nth-child(5) {
+  width: 100px;
+}
+
+.create-order-table th:nth-child(6) {
+  width: 80px;
+}
+
+.create-order-table th:nth-child(7) {
+  width: 100px;
+}
+
+.create-order-table td {
+  vertical-align: middle;
+  font-size: 0.75rem;
+}
+
+.create-order-sr-no {
+  font-size: 1rem;
+    text-align: center;
+}
+
+.create-order-delete-btn {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.create-order-delete-btn:hover {
+  background-color: #bb2d3b;
+  border-color: #b02a37;
+}
+
+.create-order-item-cell {
+  width: 200px;
+}
+
+.create-order-quantity-cell {
+  width: 50px;
+  text-align: center;
+}
+
+.create-order-unit-cell {
+  width: 100px;
+}
+
+.create-order-price-cell {
+  width: 80px;
+}
+
+.create-order-total-cell {
+  width: 100px;
+  text-align: center;
+  font-size: 18px;
+}
+
+/* Add Item Button */
+.create-order-add-item-btn {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Summary Section */
+.create-order-summary-mobile {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #f8f9fa;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.create-order-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.create-order-summary-label {
+  font-weight: bold;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.create-order-summary-value {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #dc3545;
+  text-align: right;
+  flex: 1;
+}
+
+.create-order-summary-input {
+  flex: 1;
+  text-align: right;
+}
+
+.paid-amount-input {
+  max-width: 120px !important;
+  display: inline-block;
+}
+
+/* Form Buttons */
+.create-order-form-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.create-order-form-buttons button {
+  flex: 1;
+}
+
+.create-order-submit-btn {
+  background: linear-gradient(90deg, #4a6cf7, #7b42f6);
+  border: none;
+  color: white;
+}
+
+.create-order-submit-btn:hover {
+  background: linear-gradient(90deg, #3a5cd8, #6a32d6);
+  color: white;
+}
+
+/* Error Messages */
+.create-order-error {
+  color: #dc3545;
+  font-size: 0.75rem;
+}
+
+.create-order-field-error {
+  color: #dc3545;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Add to your CreateOrder.css */
+.create-order-container .MuiAutocomplete-input {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 200px; /* Adjust as needed */
+}

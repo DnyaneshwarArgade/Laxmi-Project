@@ -11,6 +11,8 @@ import {
 import PeopleIcon from "@mui/icons-material/People";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import { countGetData } from "../../store/components/Dashboard/count";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -49,6 +51,21 @@ export default function DashboardCards() {
       color: "#FCE4EC",
       iconColor: "#C2185B",
     },
+    {
+      title: "Completed Orders",
+      value: count?.data?.orders?.complete ?? 0,
+      icon: <CheckCircleIcon fontSize="large" />,
+      color: "#E8F5E8", 
+      iconColor: "#4CAF50", 
+    },
+
+{
+  title: "Pending Orders",
+  value: count?.data?.orders?.pending ?? 0,
+  icon: <HourglassEmptyIcon fontSize="large" />,
+  color: "#FFF3E0", 
+  iconColor: "#FF9800",
+}
   ];
 
   if (isLoading) {
@@ -78,7 +95,7 @@ export default function DashboardCards() {
         maxWidth: "1200px",
         width: "100%",
         p: { xs: 2, sm: 3, md: 4 },
-        bgcolor: "linear-gradient(135deg, #f9fbff 0%, #eef3f9 100%)", // ✅ Light background
+        bgcolor: "linear-gradient(135deg, #f9fbff 0%, #eef3f9 100%)",
         mx: "auto",
         minHeight: "70vh",
       }}
@@ -93,7 +110,7 @@ export default function DashboardCards() {
           style={{ width: "100%", maxWidth: 350 }}
         >
           <Card
-            elevation={0}   // ✅ Shadow काढण्यासाठी
+            elevation={0}
             sx={{
               borderRadius: "20px",
               background: "#fff",
@@ -102,13 +119,11 @@ export default function DashboardCards() {
               transition: "0.3s",
               position: "relative",
               overflow: "hidden",
-              boxShadow: "none",  // ✅ अजून खात्रीसाठी
+              boxShadow: "none",
               "&:hover": {
-                // हवे असल्यास hover ला काही style देऊ शकतो
               },
             }}
           >
-
             <CardContent sx={{ p: 3 }}>
               <Box
                 sx={{
@@ -165,7 +180,6 @@ export default function DashboardCards() {
                 left: 0,
                 width: "100%",
                 height: "6px",
-                //background: `linear-gradient(90deg, ${item.iconColor} 0%, transparent 100%)`,
                 opacity: 0.2,
               }}
             />

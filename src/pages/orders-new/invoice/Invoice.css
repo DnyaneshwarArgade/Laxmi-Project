@@ -12,19 +12,20 @@
   color: #000;
   width: 595px;
   padding: 20px;
+  box-shadow: none;
   border: 1px solid #ccc;
   font-size: 14px;
 }
 
 .invoice-header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px; /* Reduced from 20px */
 }
 
 .owner-info {
-  font-size: 12px;
+  font-size: 14px;
   color: #c62828;
-  margin-bottom: 5px;
+  margin-bottom: 3px; /* Reduced from 5px */
 }
 
 .store-title-banner {
@@ -32,68 +33,73 @@
   color: #fff;
   font-size: 22px;
   font-weight: bold;
-  padding: 10px 0;
+  padding: 8px 0; /* Reduced from 10px */
   border-radius: 50px;
 }
 
 .store-subtitle {
-  font-size: 9px;
+  font-size: 14px;
   color: #c62828;
-  margin-top: 8px;
-  line-height: 1.5;
+  margin-top: 5px; /* Reduced from 8px */
+  line-height: 1.3; /* Reduced from 1.5 */
 }
 
 .invoice-details-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 5px; /* Reduced from 8px */
+  margin-bottom: 5px; /* Reduced from 8px */
 }
-
+.to {
+  font-size: 19px;
+}
 .invoice-id,
 .invoice-date {
   font-size: 14px;
   color: #c62828;
   position: relative;
-  padding: 8px;
+  padding: 1px 8px; /* Reduced vertical padding */
+  vertical-align: top;
+  line-height: 1.1; /* Reduced from 1.2 */
 }
 
 .invoice-id span {
   font-weight: bold;
 }
 
+.underline-container {
+  padding: 0 !important;
+}
+
 .underline {
-  height: 2px;
+  height: 1px;
   background-color: #c62828;
-  margin-top: 3px;
-}
-
-.customer-details-table {
+  margin-top: 2px; /* Reduced from 4px */
   width: 100%;
-  margin: 15px 0;
 }
 
-.customer-details-table td {
-  font-size: 13px;
-  padding: 8px;
+.invoice-id br,
+.invoice-date br {
+  line-height: 0.6; /* Reduced from 0.8 */
 }
 
 .items-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
+  margin-bottom: 15px; /* Reduced from 20px */
 }
 
 .items-table th {
   border: 1px solid #ddd;
   background: #ffcdd2;
-  padding: 8px;
+  padding: 6px; /* Reduced from 8px */
   text-align: left;
   font-weight: bold;
 }
 
 .items-table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 6px; /* Reduced from 8px */
 }
 
 .col-sno { width: 10%; }
@@ -111,21 +117,21 @@
 .amount-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px;
+  padding: 6px; /* Reduced from 8px */
   border-top: 1px solid #ddd;
   font-weight: bold;
   background: #ffe5e5;
 }
 
 .amount-words {
-  padding: 8px;
+  padding: 6px; /* Reduced from 8px */
   border-top: 1px solid #ddd;
   font-size: 12px;
   text-transform: capitalize;
 }
 
 .bank-details {
-  padding: 8px;
+  padding: 6px; /* Reduced from 8px */
   border-top: 1px solid #ddd;
   font-size: 12px;
 }
@@ -133,7 +139,7 @@
 .signatures {
   display: flex;
   justify-content: space-between;
-  margin-top: 40px;
+  margin-top: 30px; /* Reduced from 40px */
   padding: 0 10px 10px 10px;
 }
 

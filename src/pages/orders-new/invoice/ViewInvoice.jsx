@@ -15,7 +15,7 @@ const Invoice = ({ invoice }) => {
   const paid_amount = invoice?.paid_amount || 0;
   const unpaid_amount = invoice?.unpaid_amount || 0;
 
-  const downloadInvoicePDF = () => {
+ const downloadInvoicePDF = () => {
     if (!invoiceRef.current) return;
     Swal.fire({
       title: "Download Invoice PDF?",
@@ -32,22 +32,52 @@ const Invoice = ({ invoice }) => {
       if (result.isConfirmed) {
         let customerName = invoice?.customer?.id || "Customer";
         const opt = {
-          margin: 0.5,
+          margin: [0.5, 0.5, 0.5, 0.5], // [top, right, bottom, left] - equal margins for center
           filename: `Invoice_${customerName}.pdf`,
           image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+          html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            logging: false
+          },
+          jsPDF: { 
+            unit: "in", 
+            format: "a4", 
+            orientation: "portrait" 
+          },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
+        
+        // Center the content in PDF
+        const element = invoiceRef.current;
+        element.style.margin = '0 auto';
+        element.style.display = 'block';
+        
         window
           .html2pdf()
           .set(opt)
-          .from(invoiceRef.current)
+          .from(element)
           .save()
           .then(() => {
+            // Reset styles after download
+            element.style.margin = '';
+            element.style.display = '';
+            
             Swal.fire({
               icon: "success",
               title: "Downloaded!",
               text: "Invoice PDF has been downloaded.",
+              confirmButtonColor: "#667eea",
+              background: "#fff",
+              color: "#18181b",
+            });
+          })
+          .catch((error) => {
+            console.error('PDF download error:', error);
+            Swal.fire({
+              icon: "error",
+              title: "Error!",
+              text: "Failed to download PDF. Please try again.",
               confirmButtonColor: "#667eea",
               background: "#fff",
               color: "#18181b",
@@ -101,39 +131,35 @@ const Invoice = ({ invoice }) => {
           <table className="invoice-details-table">
             <tbody>
               <tr>
-                <td className="invoice-id w-50">
-                  Bill No - <span>INV_{id}</span>
-                  <div className="underline"></div>
-                </td>
-                <td className="invoice-date">
-                  Date - {formatDateDMY(date)}
-                  <div className="underline"></div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <table className="customer-details-table">
-            <tbody>
-              <tr>
-                <td>
-                  <strong>To,</strong>
+                <td className="invoice-id">
+                  Bill No - <span>inv_{id}</span>
+                  <br/>
+                  <strong className="to">To,</strong>
                   <br />
                   {customerName}
                   <br />
                   Mobile: {phone}
                 </td>
+                <td className="invoice-date">
+                  Date - {formatDateDMY(date)}
+                </td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="underline-container">
+                  <div className="underline"></div>
+                </td>
               </tr>
             </tbody>
           </table>
+          
 
           <table className="items-table">
             <thead>
               <tr>
                 <th className="col-sno">Sr.No</th>
                 <th className="col-desc">Particulars</th>
-                <th className="col-unit">Unit</th>
                 <th className="col-qty">Qty</th>
+                <th className="col-unit">Unit</th>
                 <th className="col-rate">Rate</th>
                 <th className="col-amt">Total</th>
               </tr>
@@ -144,8 +170,8 @@ const Invoice = ({ invoice }) => {
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td>{item?.item?.name || "-"}</td>
-                    <td>{item?.unit}</td>
                     <td>{item?.quantity || 0}</td>
+                    <td>{item?.unit}</td>
                     <td>{item?.price || 0}</td>
                     <td>
                       {(item?.quantity * item?.price).toFixed(2)}

@@ -344,18 +344,6 @@ function CustomersListing() {
                         </InputGroup>
                       </Col>
                     </Row>
-                    {/* <Row className="form-group">
-                                            <Col md={12} className="mt-3">
-                                                <InputGroup>
-                                                    <CustomTextField
-                                                        formProps={formProps}
-                                                        name="address"
-                                                        label="Enter Address "
-                                                    />
-                                                </InputGroup>
-                                            </Col>
-                                        </Row> */}
-
                     <Row style={{ justifyContent: "center" }} className="mt-3">
                       <Col md={4}>
                         <Button

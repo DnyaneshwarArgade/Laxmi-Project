@@ -58,7 +58,7 @@ function ActionsCustomersListing(props) {
     let customers = {
       name: values.name,
       phone: values.phone,
-      address: values.address,
+      // address: values.address,
     };
 
     dispatch(
@@ -134,7 +134,7 @@ function ActionsCustomersListing(props) {
             initialValues={{
               name: props.data?.name ?? "",
               phone: props.data?.phone ?? "",
-              address: props.data?.address ?? "",
+              // address: props.data?.address ?? "",
             }}
             onSubmit={handleSubmit}
             validationSchema={Yup.object().shape({
@@ -172,18 +172,7 @@ function ActionsCustomersListing(props) {
                           formProps={formProps}
                           name="phone"
                           label="Enter Phone *"
-                          type="number"
-                        />
-                      </InputGroup>
-                    </Col>
-                  </Row>
-                  <Row className="form-group">
-                    <Col md={12} className="mt-3">
-                      <InputGroup>
-                        <CustomTextField
-                          formProps={formProps}
-                          name="address"
-                          label="Enter Address "
+                          type="text"
                         />
                       </InputGroup>
                     </Col>

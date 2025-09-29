@@ -423,7 +423,24 @@ export default function Orders() {
             </div>
           )}
 
-          <Modal
+         
+        </>
+      ) : (
+        <div style={{ textAlign: "center", marginTop: 50 }}>
+          No orders found.
+        </div>
+      )}
+      <Modal
+        isOpen={createOrderModalOpen}
+        toggle={handleCloseCreateOrder}
+        fullscreen
+      >
+        <ModalHeader toggle={handleCloseCreateOrder}>Create Order</ModalHeader>
+        <ModalBody className="p-0">
+          <CreateOrder toggle={handleCloseCreateOrder} />
+        </ModalBody>
+      </Modal>
+       <Modal
             isOpen={invoiceModalOpen}
             toggle={handleCloseInvoice}
             size="md"
@@ -431,19 +448,6 @@ export default function Orders() {
             <ModalHeader toggle={handleCloseInvoice}>Invoice</ModalHeader>
             <ModalBody className="p-0">
               {selectedOrder && <ViewInvoice invoice={selectedOrder} />}
-            </ModalBody>
-          </Modal>
-
-          <Modal
-            isOpen={createOrderModalOpen}
-            toggle={handleCloseCreateOrder}
-            fullscreen
-          >
-            <ModalHeader toggle={handleCloseCreateOrder}>
-              Create Order
-            </ModalHeader>
-            <ModalBody className="p-0">
-              <CreateOrder toggle={handleCloseCreateOrder} />
             </ModalBody>
           </Modal>
           <Modal
@@ -463,12 +467,6 @@ export default function Orders() {
               )}
             </ModalBody>
           </Modal>
-        </>
-      ) : (
-        <div style={{ textAlign: "center", marginTop: 50 }}>
-          No orders found.
-        </div>
-      )}
     </div>
   );
 }

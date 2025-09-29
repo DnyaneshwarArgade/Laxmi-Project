@@ -422,8 +422,6 @@ export default function Orders() {
               </div>
             </div>
           )}
-
-         
         </>
       ) : (
         <div style={{ textAlign: "center", marginTop: 50 }}>
@@ -440,33 +438,27 @@ export default function Orders() {
           <CreateOrder toggle={handleCloseCreateOrder} />
         </ModalBody>
       </Modal>
-       <Modal
-            isOpen={invoiceModalOpen}
-            toggle={handleCloseInvoice}
-            size="md"
-          >
-            <ModalHeader toggle={handleCloseInvoice}>Invoice</ModalHeader>
-            <ModalBody className="p-0">
-              {selectedOrder && <ViewInvoice invoice={selectedOrder} />}
-            </ModalBody>
-          </Modal>
-          <Modal
-            isOpen={updateOrderModalOpen}
-            toggle={handleCloseUpdateOrder}
-            fullscreen
-          >
-            <ModalHeader toggle={handleCloseUpdateOrder}>
-              Update Order
-            </ModalHeader>
-            <ModalBody className="p-0">
-              {orderToUpdate && (
-                <UpdateOrder
-                  toggle={handleCloseUpdateOrder}
-                  prevOrder={orderToUpdate}
-                />
-              )}
-            </ModalBody>
-          </Modal>
+      <Modal isOpen={invoiceModalOpen} toggle={handleCloseInvoice} size="md">
+        <ModalHeader toggle={handleCloseInvoice}>Invoice</ModalHeader>
+        <ModalBody className="p-0">
+          {selectedOrder && <ViewInvoice invoice={selectedOrder} />}
+        </ModalBody>
+      </Modal>
+      <Modal
+        isOpen={updateOrderModalOpen}
+        toggle={handleCloseUpdateOrder}
+        fullscreen
+      >
+        <ModalHeader toggle={handleCloseUpdateOrder}>Update Order</ModalHeader>
+        <ModalBody className="p-0">
+          {orderToUpdate && (
+            <UpdateOrder
+              toggle={handleCloseUpdateOrder}
+              prevOrder={orderToUpdate}
+            />
+          )}
+        </ModalBody>
+      </Modal>
     </div>
   );
 }
